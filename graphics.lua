@@ -66,11 +66,23 @@ graphics.bitmask_wall = function(x, y, z)
   return value
 end
 
-graphics.draw_queue_item = function(v)
-  if v.quad then
-    love.graphics.draw(v.img, v.quad, math.floor(v.x), math.floor(v.y+v.z))
-  else
-    love.graphics.draw(v.img, math.floor(v.x), math.floor(v.y+v.z))
+graphics.draw_queue = function(y)
+  local current_queue = {}
+  for i, v in ipairs(queue) do
+    if not v.drawn and 1+math.floor((v.y+v.w)/tile_size) <= y then
+      current_queue[#current_queue + 1] = v
+      v.drawn = true
+    end
+  end
+  if # current_queue > 0 then
+    table.sort(current_queue, function(a, b) return a.y < b.y end)
+    for i, v in ipairs(current_queue) do
+      if v.quad then
+        love.graphics.draw(v.img, v.quad, math.ceil(v.x), math.ceil(v.y+v.z))
+      else
+        love.graphics.draw(v.img, math.ceil(v.x), math.ceil(v.y+v.z))
+      end
+    end
   end
 end
 

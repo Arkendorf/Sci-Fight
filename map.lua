@@ -27,13 +27,8 @@ end
 
 
 map.draw = function()
-  for i, v in ipairs(queue) do -- draw images behind map
-    if math.floor((v.y+v.w)/tile_size) < 0 then
-      graphics.draw_queue_item(v)
-      v.drawn = true
-    end
-  end
 
+  graphics.draw_queue(0)
   for y, _ in ipairs(grid[1]) do
     for z, _ in ipairs(grid) do
       for x, tile in ipairs(grid[z][y]) do
@@ -49,19 +44,10 @@ map.draw = function()
         end
       end
     end
-    for i, v in ipairs(queue) do -- draw other images in proper order wtih map tiles
-      if not v.drawn and 1+math.floor((v.y+v.w)/tile_size) <= y then
-        graphics.draw_queue_item(v)
-        v.drawn = true
-      end
-    end
+    graphics.draw_queue(y)
   end
-
-  for i, v in ipairs(queue) do -- draw remaining images
-    if not v.drawn then
-      graphics.draw_queue_item(v)
-    end
-  end
+  graphics.draw_queue(math.huge)
+  
 end
 
 map.wall_block = function(x, y, z)
