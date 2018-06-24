@@ -19,7 +19,7 @@ player.update = function(dt)
     char.xV = char.xV + dt * 60
   end
   if love.keyboard.isDown("space") and not char.jump then
-    char.zV = char.zV - dt * 60 * 6
+    char.zV = char.zV - dt * 60 * 5
     char.jump = true
   end
   --gravity

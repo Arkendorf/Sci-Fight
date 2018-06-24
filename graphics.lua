@@ -66,4 +66,12 @@ graphics.bitmask_wall = function(x, y, z)
   return value
 end
 
+graphics.draw_queue_item = function(v)
+  if v.quad then
+    love.graphics.draw(v.img, v.quad, math.floor(v.x), math.floor(v.y+v.z))
+  else
+    love.graphics.draw(v.img, math.floor(v.x), math.floor(v.y+v.z))
+  end
+end
+
 return graphics
