@@ -43,6 +43,7 @@ player.update = function(dt)
 end
 
 player.draw = function()
+
   -- player
   queue[#queue + 1] = {img = char_img, x = char.x, y = char.y, z = char.z, w = char.w}
 

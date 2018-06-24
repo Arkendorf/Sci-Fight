@@ -23,6 +23,24 @@ map.load = function()
 
   tiles = {1}
   tile_size = 32
+
+
+  -- shader stuff
+  floor_canvas = love.graphics.newCanvas(#grid[1][1]*#grid[1], #grid+#grid[1])
+  love.graphics.setCanvas(floor_canvas)
+  for z = 1, #grid do
+    for y = 1, #grid[1] do
+      for x = 1, #grid[1][1] do
+        if grid[z][y][x] > 0 then
+          love.graphics.rectangle("fill", (x-1)+(z-1)*#grid[1], (y-1)+(z-1), 1, 1)
+        end
+      end
+    end
+  end
+  love.graphics.setCanvas()
+  shader.shadow:send("grid", floor_canvas)
+  -- shader.shadow:send("grid_w", #grid[1])
+  shader.shadow:send("grid_size", {tile_size*#grid[1][1]*#grid[1], tile_size*(#grid+#grid[1])})
 end
 
 
@@ -47,7 +65,19 @@ map.draw = function()
     graphics.draw_queue(y)
   end
   graphics.draw_queue(math.huge)
-  
+
+  -- shadow
+  love.graphics.setShader(shader.shadow)
+  for z = 1+math.floor((char.z+char.h*0.5)/tile_size), #grid-1 do
+    shader.shadow:send("coords", {char.x, char.y, z*tile_size})
+    love.graphics.draw(shadow_img, char.x, char.y+z*tile_size)
+  end
+  love.graphics.setShader()
+
+  love.graphics.draw(floor_canvas, 300, 200, 0, 4, 4)
+  love.graphics.setColor(255, 0, 0)
+  love.graphics.rectangle("fill", 300+(char.x+char.z*#grid[1][1])/(#grid[1][1]*#grid[1]*tile_size) *#grid[1][1]*#grid[1]*4, 200+(char.y)/(tile_size*(#grid+#grid[1])) *(#grid+#grid[1])*4, 4, 4)
+  love.graphics.setColor(255, 255, 255)
 end
 
 map.wall_block = function(x, y, z)

@@ -1,5 +1,6 @@
 local graphics = {}
 
+love.graphics.setDefaultFilter("nearest", "nearest")
 graphics.load = function()
   tile_img, tile_quad = graphics.load_tiles("tiles")
 

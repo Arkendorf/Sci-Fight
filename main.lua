@@ -2,6 +2,7 @@ map = require "map"
 graphics = require "graphics"
 player = require "player"
 collision = require "collision"
+shader = require "shader"
 
 love.load = function()
   map.load()
@@ -16,7 +17,7 @@ end
 love.draw = function()
   queue = {}
   player.draw()
-  
+
   map.draw()
 end
 
