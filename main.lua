@@ -12,12 +12,13 @@ end
 
 love.update = function(dt)
   player.update(dt)
+
+  queue = {}
+  player.queue()
+  map.update_mask()
 end
 
 love.draw = function()
-  queue = {}
-  player.draw()
-
   map.draw()
 end
 

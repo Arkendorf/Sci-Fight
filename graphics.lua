@@ -75,16 +75,46 @@ graphics.draw_queue = function(y)
       v.drawn = true
     end
   end
-  if # current_queue > 0 then
+  if #current_queue > 0 then
     table.sort(current_queue, function(a, b) return a.y < b.y end)
     for i, v in ipairs(current_queue) do
-      if v.quad then
-        love.graphics.draw(v.img, v.quad, math.ceil(v.x), math.ceil(v.y+v.z))
-      else
-        love.graphics.draw(v.img, math.ceil(v.x), math.ceil(v.y+v.z))
-      end
+      graphics.draw(v)
     end
   end
+end
+
+graphics.draw = function(v)
+  if v.color then
+    love.graphics.setColor(v.color)
+  end
+  if v.shader then
+    love.graphics.setShader(shader[v.shader.type])
+    for j, w in ipairs(v.shader.info) do
+      shader[v.shader.type]:send(w[1], w[2])
+    end
+  end
+  if v.quad then
+    love.graphics.draw(v.img, v.quad, math.ceil(v.x), math.ceil(v.y+v.z))
+  elseif v.shape then
+    love.graphics[v.shape]("fill", math.ceil(v.x), math.ceil(v.y+v.z), v.a, v.b)
+  else
+    love.graphics.draw(v.img, math.ceil(v.x), math.ceil(v.y+v.z))
+  end
+  love.graphics.setShader()
+  love.graphics.setColor(1, 1, 1)
+end
+
+graphics.shadow = function(v)
+  love.graphics.setShader(shader.shadow)
+  for z_offset = 1+math.floor((v.z+v.h*0.5)/tile_size), #grid-1 do
+    local diffuse = (z_offset*tile_size-(v.z+v.h))/tile_size*0.3
+    local r = v.l/2
+    shader.shadow:send("z", z_offset+1)
+    love.graphics.setColor(0.4, 0.4, 0.4, 1-diffuse)
+    love.graphics.circle("fill", v.x+v.l/2, v.y+v.w/2+z_offset*tile_size, r*(1+diffuse), 24)
+  end
+  love.graphics.setColor(1, 1, 1)
+  love.graphics.setShader()
 end
 
 return graphics

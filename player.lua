@@ -42,13 +42,8 @@ player.update = function(dt)
   char.z = char.z + char.zV
 end
 
-player.draw = function()
-
-  -- player
-  queue[#queue + 1] = {img = char_img, x = char.x, y = char.y, z = char.z, w = char.w}
-
-  -- info
-  love.graphics.print("x = "..math.floor(char.x)..", y = "..math.floor(char.y)..", z = "..math.floor(char.z), 196, 0)
+player.queue = function()
+  queue[#queue + 1] = {img = char_img, x = char.x, y = char.y, z = char.z+char.l-char.h, w = char.w, h = char.h, l = char.l}
 end
 
 player.keypressed = function(key)
