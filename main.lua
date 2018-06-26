@@ -11,15 +11,21 @@ love.load = function()
 end
 
 love.update = function(dt)
+  -- normal updates
   player.update(dt)
 
+  -- create drawing queue
   queue = {}
   player.queue()
-  map.update_mask()
+
+  -- update masks (e.g. layer and shadow)
+  map.update_masks()
 end
 
 love.draw = function()
   map.draw()
+  graphics.draw_queue()
+  graphics.draw_shadow_layer()
 end
 
 love.keypressed = function(key)
