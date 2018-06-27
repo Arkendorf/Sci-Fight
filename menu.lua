@@ -19,13 +19,48 @@ end
 menu.draw = function()
 end
 
-menu.opening = function(a) -- find available space in list 'a'
-  for i, v in ipairs(a) do
-    if v == nil then
-      return i
+menu.new_player = function(i, name)
+  players[i] = {name = name, ready = false, x = -font:getWidth(name), left = false}
+end
+
+menu.update_list = function(dt)
+  local start = true
+  for k, v in pairs(players) do
+    v.x = graphics.zoom(not v.left, v.x, -font:getWidth(v.name), (screen.w-192)/2+2, dt * 12)
+    if v.left and v.x <= -font:getWidth(v.name) then
+      players[k] = nil
+    end
+    if not v.ready then
+      start = false
     end
   end
-  return #a + 1
+  return start
+end
+
+menu.draw_list = function()
+  local x = (screen.w-192)/2
+  local y = (screen.h-48-16*12)/2
+  local i = 0
+  for k, v in pairs(players) do
+    love.graphics.print(v.name, v.x, y+i*16+4)
+    if v.ready then
+      love.graphics.print("Ready", x+190-font:getWidth("Ready"), y+i*16+4)
+    end
+    i = i + 1
+  end
+  for i = 0, 11 do
+    love.graphics.rectangle("line", x, y+i*16, 192, 16)
+  end
+end
+
+menu.start_game = function()
+  for k, v in pairs(players) do
+    if v.left then
+      players[k] = nil
+    end
+  end
+  state = "game"
+  gui.clear()
 end
 
 return menu

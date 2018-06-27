@@ -23,13 +23,15 @@ local client_hooks = {
   end,
   -- when server leaves
   disconnect = function(data)
-    client:disconnect()
-    state = "mainmenu"
-    mainmenu.start()
+    wipe.start(clientmenu.leave)
   end,
   -- when game starts
   startgame = function(data)
-    state = "game"
+    wipe.start(menu.start_game)
+  end,
+  -- if a player presses ready
+  ready = function(data, client)
+    players[data.index].ready = data.value
   end,
 }
 
@@ -44,19 +46,33 @@ clientmenu.start = function(ip, port)
   end
 
   menu.start()
+
+  gui.clear()
+  gui.add(1, {{x = (screen.w)/2-65, y= screen.h-48, w = 64, h = 32, txt = "Leave", func = wipe.start, args = {clientmenu.leave}}, {x = (screen.w)/2+1, y= screen.h-48, w = 64, h = 32, txt = "Ready", func = clientmenu.ready, args = {id}}}, {})
 end
 
 clientmenu.update = function(dt)
+  menu.update_list(dt)
 end
 
 clientmenu.draw = function()
-  for i, v in pairs(players) do
-    love.graphics.print(v.name, 2, i * 32)
-  end
+  menu.draw_list()
+end
+
+clientmenu.leave = function()
+  clientmenu.quit()
+  state = "mainmenu"
+  mainmenu.start()
+end
+
+clientmenu.ready = function()
+  players[id].ready = not players[id].ready
+  client:send("ready", players[id].ready)
 end
 
 clientmenu.quit = function()
   client:disconnectNow()
+  client = nil
 end
 
 return clientmenu
