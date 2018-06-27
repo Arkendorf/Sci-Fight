@@ -17,7 +17,7 @@ graphics.load = function()
 
   love.graphics.setLineWidth(1)
 
-  char_img = love.graphics.newImage("char.png")
+  player_img = love.graphics.newImage("char.png")
 end
 
 graphics.load_tiles = function(str)

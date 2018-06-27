@@ -1,6 +1,6 @@
 map = require "map"
 graphics = require "graphics"
-player = require "player"
+char = require "char"
 collision = require "collision"
 shader = require "shader"
 
@@ -8,16 +8,16 @@ local game = {}
 
 game.load = function()
   map.load()
-  player.load()
+  char.load()
   queue = {}
 end
 
 game.update = function(dt)
   -- normal updates
-  player.update(dt)
+  char.update(dt)
   -- create drawing queue
   queue = {}
-  player.queue()
+  char.queue()
   -- update masks (e.g. layer and shadow)
   map.update_masks()
 end
