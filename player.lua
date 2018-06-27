@@ -46,7 +46,4 @@ player.queue = function()
   queue[#queue + 1] = {img = char_img, x = char.x, y = char.y, z = char.z+char.l-char.h, w = char.w, h = char.h, l = char.l, shadow = true}
 end
 
-player.keypressed = function(key)
-end
-
 return player

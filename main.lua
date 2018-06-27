@@ -1,33 +1,48 @@
-map = require "map"
-graphics = require "graphics"
-player = require "player"
-collision = require "collision"
-shader = require "shader"
+mainmenu = require "mainmenu"
+game = require "game"
+gui = require "gui"
+enet = require "enet"
+sock = require "sock"
 
 love.load = function()
-  map.load()
-  graphics.load()
-  player.load()
+  gui.load()
+
+  mainmenu.load()
+  game.load()
+
+  state = "mainmenu"
 end
 
 love.update = function(dt)
-  -- normal updates
-  player.update(dt)
-
-  -- create drawing queue
-  queue = {}
-  player.queue()
-
-  -- update masks (e.g. layer and shadow)
-  map.update_masks()
+  if state == "mainmenu" then
+    mainmenu.update(dt)
+  elseif state == "game" then
+    game.update(dt)
+  end
+  gui.update(dt)
 end
 
 love.draw = function()
-  map.draw()
-  graphics.draw_queue()
-  graphics.draw_shadow_layer()
+  love.graphics.setCanvas(screen.canvas)
+  love.graphics.clear()
+  if state == "mainmenu" then
+    mainmenu.draw()
+  elseif state == "game" then
+    game.draw()
+  end
+  gui.draw()
+  love.graphics.setCanvas()
+  love.graphics.draw(screen.canvas, screen.x, screen.y, 0, screen.scale, screen.scale)
+end
+
+love.mousepressed = function(x, y, button)
+  gui.mousepressed(x, y, button)
 end
 
 love.keypressed = function(key)
-  player.keypressed(key)
+  gui.keypressed(key)
+end
+
+love.textinput = function(text)
+  gui.textinput(text)
 end

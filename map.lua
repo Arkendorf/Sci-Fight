@@ -46,13 +46,13 @@ end
 map.update_masks = function()
   -- draw layer mask
   love.graphics.setCanvas(layer_mask)
-  map.iterate(graphics.draw_layer_mask)
+  map.iterate(game.draw_layer_mask)
   shader.layer:send("mask", layer_mask)
 
 
   -- draw shadow mask
   love.graphics.setCanvas(shadow_mask)
-  map.iterate(graphics.draw_shadow_mask)
+  map.iterate(game.draw_shadow_mask)
   shader.shadow:send("mask", shadow_mask)
 
   -- reset
@@ -62,7 +62,7 @@ end
 
 map.draw = function()
   -- map
-  map.iterate(graphics.draw_tiles)
+  map.iterate(game.draw_tiles)
 end
 
 map.wall_block = function(x, y, z)
