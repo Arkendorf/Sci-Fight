@@ -3,7 +3,7 @@ local char = {}
 char.load = function()
 end
 
-char.update = function(dt)
+char.input = function(dt)
   --input
   if love.keyboard.isDown("w") then
     players[id].yV = players[id].yV - dt * 60
@@ -21,9 +21,11 @@ char.update = function(dt)
     players[id].zV = players[id].zV - dt * 60 * 5
     players[id].jump = true
   end
+end
 
+char.update = function(dt)
   for i, v in pairs(players) do
-    --gravity
+    -- gravity
     if v.zV < 10 then
       v.zV = v.zV + dt * 60 * 0.2
     elseif v.zV > 10 then

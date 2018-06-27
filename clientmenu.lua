@@ -27,7 +27,7 @@ local client_hooks = {
   end,
   -- when game starts
   startgame = function(data)
-    wipe.start(menu.start_game)
+    wipe.start(clientmenu.start_game, {"client"})
   end,
   -- if a player presses ready
   ready = function(data, client)
@@ -68,6 +68,18 @@ end
 clientmenu.ready = function()
   players[id].ready = not players[id].ready
   client:send("ready", players[id].ready)
+end
+
+clientmenu.start_game = function()
+  for k, v in pairs(players) do
+    if v.left then
+      players[k] = nil
+    else
+      players[k] = {x = 64, y = 64, z = 0, l = 24, w = 24, h = 24, xV = 0, yV = 0, zV = 0, jump = false}
+    end
+  end
+  state = "clientgame"
+  clientgame.start()
 end
 
 clientmenu.quit = function()

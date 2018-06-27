@@ -3,6 +3,8 @@ graphics = require "graphics"
 char = require "char"
 collision = require "collision"
 shader = require "shader"
+clientgame = require "clientgame"
+servergame = require "servergame"
 
 local game = {}
 
@@ -10,6 +12,9 @@ game.load = function()
   map.load()
   char.load()
   queue = {}
+
+  clientgame.load()
+  servergame.load()
 end
 
 game.update = function(dt)

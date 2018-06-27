@@ -25,8 +25,10 @@ love.update = function(dt)
     clientmenu.update(dt)
   elseif state == "servermenu" then
     servermenu.update(dt)
-  elseif state == "game" then
-    game.update(dt)
+  elseif state == "clientgame" then
+    clientgame.update(dt)
+  elseif state == "servergame" then
+    servergame.update(dt)
   end
   gui.update(dt)
   if server then
@@ -47,8 +49,10 @@ love.draw = function()
     clientmenu.draw()
   elseif state == "servermenu" then
     servermenu.draw()
-  elseif state == "game" then
-    game.draw()
+  elseif state == "clientgame" then
+    clientgame.draw()
+  elseif state == "servergame" then
+    servergame.draw()
   end
   gui.draw()
   wipe.draw()
@@ -73,5 +77,9 @@ love.quit = function()
     clientmenu.quit()
   elseif state == "servermenu" then
     servermenu.quit()
+  elseif state == "clientgame" then
+    clientgame.quit()
+  elseif state == "servergame" then
+    servergame.quit()
   end
 end

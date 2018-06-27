@@ -53,15 +53,4 @@ menu.draw_list = function()
   end
 end
 
-menu.start_game = function()
-  for k, v in pairs(players) do
-    if v.left then
-      players[k] = nil
-    end
-    players[k] = {x = 64, y = 64, z = 0, l = 24, w = 24, h = 24, xV = 0, yV = 0, zV = 0, jump = false}
-  end
-  state = "game"
-  gui.clear()
-end
-
 return menu

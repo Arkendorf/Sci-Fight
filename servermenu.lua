@@ -6,16 +6,20 @@ end
 local server_hooks = {
   -- if a player connects
   playerinfo = function(data, client)
-    local index = client:getIndex()
-    menu.new_player(index, data.name)
-    server:sendToPeer(server:getPeerByIndex(index), "allinfo", {id = index, players = players})
-    server:sendToAllBut(client, "newplayer", {info = players[index], index = index})
+    if state == "servermenu" then
+      local index = client:getIndex()
+      menu.new_player(index, data.name)
+      server:sendToPeer(server:getPeerByIndex(index), "allinfo", {id = index, players = players})
+      server:sendToAllBut(client, "newplayer", {info = players[index], index = index})
+    end
   end,
   -- if a player disconnects
   disconnect = function(data, client)
     local index = client:getIndex()
-    players[index].left = true
-    server:sendToAll("left", index)
+    if players[index] then
+      players[index].left = true
+      server:sendToAll("left", index)
+    end
   end,
   -- if a player presses ready
   ready = function(data, client)
@@ -43,7 +47,7 @@ end
 servermenu.update = function(dt)
   local start = menu.update_list(dt)
   if start then
-    servermenu.start_game()
+    servermenu.all_ready()
   end
 end
 
@@ -51,9 +55,21 @@ servermenu.draw = function()
   menu.draw_list()
 end
 
-servermenu.start_game = function()
+servermenu.all_ready = function()
   server:sendToAll("startgame")
-  wipe.start(menu.start_game)
+  wipe.start(servermenu.start_game, {"server"})
+end
+
+servermenu.start_game = function()
+  for k, v in pairs(players) do
+    if v.left then
+      players[k] = nil
+    else
+      players[k] = {x = 64, y = 64, z = 0, l = 24, w = 24, h = 24, xV = 0, yV = 0, zV = 0, jump = false}
+    end
+  end
+  state = "servergame"
+  servergame.start()
 end
 
 servermenu.leave = function()
