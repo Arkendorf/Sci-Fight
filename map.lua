@@ -31,6 +31,9 @@ map.load = function()
   tiles = {1}
   tile_size = 32
 
+  -- load tile images
+  tile_img, tile_quad = graphics.load_tiles("tiles")
+
 
   -- shader stuff
   local x, y = #grid[1][1]*tile_size, (#grid+#grid[1])*tile_size

@@ -8,8 +8,8 @@ local game = {}
 
 game.load = function()
   map.load()
-  graphics.load()
   player.load()
+  queue = {}
 end
 
 game.update = function(dt)

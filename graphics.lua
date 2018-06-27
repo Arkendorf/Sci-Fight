@@ -1,7 +1,14 @@
 local graphics = {}
 
 love.graphics.setDefaultFilter("nearest", "nearest")
+
 graphics.load = function()
+  screen = {scale = 2, x = 0, y = 0}
+  screen.w = love.graphics.getWidth() / screen.scale
+  screen.h = love.graphics.getHeight() / screen.scale
+  screen.canvas = love.graphics.newCanvas(screen.w, screen.h)
+
+
   font = love.graphics.newImageFont("font.png",
   " abcdefghijklmnopqrstuvwxyz" ..
   "ABCDEFGHIJKLMNOPQRSTUVWXYZ0" ..
@@ -9,8 +16,6 @@ graphics.load = function()
   love.graphics.setFont(font)
 
   love.graphics.setLineWidth(1)
-
-  tile_img, tile_quad = graphics.load_tiles("tiles")
 
   char_img = love.graphics.newImage("char.png")
 end
