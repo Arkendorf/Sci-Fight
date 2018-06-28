@@ -8,11 +8,10 @@ graphics.load = function()
   screen.h = love.graphics.getHeight() / screen.scale
   screen.canvas = love.graphics.newCanvas(screen.w, screen.h)
 
-
   font = love.graphics.newImageFont("font.png",
   " abcdefghijklmnopqrstuvwxyz" ..
   "ABCDEFGHIJKLMNOPQRSTUVWXYZ0" ..
-  "123456789.,!?-+/():;%&`'*#=[]\"", 1)
+  "123456789.,!?-+/():;%&`'*#=[]\"_", 1)
   love.graphics.setFont(font)
 
   love.graphics.setLineWidth(1)

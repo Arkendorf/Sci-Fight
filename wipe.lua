@@ -26,7 +26,9 @@ wipe.update = function(dt)
 end
 
 wipe.draw = function()
+  love.graphics.setColor(menu_color)
   love.graphics.rectangle("fill", x2, 0, x1-x2, screen.h)
+  love.graphics.setColor(1, 1, 1)
 end
 
 wipe.start = function(func, args)

@@ -1,3 +1,4 @@
+love.keyboard.setKeyRepeat(true)
 local gui = {}
 
 gui.load = function()
@@ -5,23 +6,40 @@ gui.load = function()
 end
 
 gui.update = function(dt)
+  if gui.current_box then
+    gui.current_box.flash = gui.current_box.flash + dt
+  end
 end
 
 gui.draw = function()
   for i, v in pairs(gui.menus) do
     for j, w in ipairs(v.textboxes) do
       local x, y = gui.get_pos(w)
+      love.graphics.setColor(menu_color)
+      love.graphics.setLineWidth(2)
       love.graphics.rectangle("line", math.floor(x), math.floor(y), math.floor(w.w), math.floor(w.h))
-      if string.len(w.t[w.i]) < 1 and w.sample then
-        love.graphics.print(w.sample, math.floor(x+2), math.floor(y+(w.h-font:getHeight())/2))
+      love.graphics.setColor(1, 1, 1)
+
+      local string = ""
+      if gui.current_box and gui.current_box[1] == i and gui.current_box[2] == j then
+        string = w.t[w.i]
+        if math.floor(math.sin(gui.current_box.flash*4)+0.5) == 0 then
+          string = string.."_"
+        end
+      elseif string.len(w.t[w.i]) < 1 and w.sample then
+        string = w.sample
       else
-        love.graphics.print(w.t[w.i], math.floor(x+2), math.floor(y+(w.h-font:getHeight())/2))
+        string = w.t[w.i]
       end
+      love.graphics.print(string, math.floor(x+2), math.floor(y+(w.h-font:getHeight())/2))
     end
 
     for j, w in ipairs(v.buttons) do
       local x, y = gui.get_pos(w)
-      love.graphics.rectangle("line", math.floor(x), math.floor(y), math.floor(w.w), math.floor(w.h))
+      love.graphics.setColor(menu_color)
+      love.graphics.rectangle("fill", math.floor(x), math.floor(y), math.floor(w.w), math.floor(w.h))
+
+      love.graphics.setColor(1, 1, 1)
       love.graphics.print(w.txt, math.floor(x+(w.w-font:getWidth(w.txt))/2), math.floor(y+(w.h-font:getHeight())/2))
     end
   end
@@ -62,7 +80,7 @@ gui.mousepressed = function(x, y, button)
     for j, w in ipairs(v.textboxes) do
       local w_x, w_y = gui.get_pos(w)
       if x >= screen.x+w_x*screen.scale and x <= screen.x+(w_x+w.w)*screen.scale and y >= screen.y+w_y*screen.scale and y <= screen.y+(w_y+w.h)*screen.scale then
-        gui.current_box = {i, j}
+        gui.current_box = {i, j, flash = 0}
         box_clicked = true
       end
     end

@@ -15,6 +15,8 @@ mainmenu.load = function()
   prompts[2].y = screen.h/2+button.border/2
   prompts[2].textboxes = {{x = {t = prompts[2], i = "x", o = textbox.border}, y = prompts[2].y+textbox.border, w = prompts[2].w-textbox.border*2, h = textbox.h, t = prompts[2], i = "ip", sample = "I.P. Address"},
                           {x = {t = prompts[2], i = "x", o = textbox.border}, y = prompts[2].y+textbox.border*2+textbox.h, w = prompts[2].w-textbox.border*2, h = textbox.h, t = prompts[2], i = "port", sample = "Port"}}
+
+  menu_color = {0.2, 0.4, 1}
 end
 
 mainmenu.start = function()
@@ -40,11 +42,11 @@ mainmenu.update = function(dt)
 end
 
 mainmenu.draw = function()
-  for i, v in ipairs(prompts) do
-    if v.x > button.w+button.border-v.w then
-      love.graphics.rectangle("line", v.x, v.y, v.w, button.h)
-    end
-  end
+--   for i, v in ipairs(prompts) do
+--     if v.x > button.w+button.border-v.w then
+--       love.graphics.rectangle("fill", v.x+2, v.y+2, v.w-4, button.h-4)
+--     end
+--   end
 end
 
 mainmenu.prompt = function(num)
