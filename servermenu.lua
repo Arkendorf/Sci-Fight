@@ -69,7 +69,7 @@ servermenu.start_game = function()
     if v.left then
       players[k] = nil
     else
-      players[k] = {x = 64, y = 64, z = 0, l = 24, w = 24, h = 24, xV = 0, yV = 0, zV = 0, jump = false}
+      players[k] = {x = 0, y = 0, z = 0, l = 24, w = 24, h = 24, xV = 0, yV = 0, zV = 0, jump = false}
     end
   end
   state = "servergame"

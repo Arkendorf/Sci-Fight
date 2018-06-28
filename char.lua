@@ -25,6 +25,10 @@ end
 
 char.update = function(dt)
   for i, v in pairs(players) do
+    -- disconnect animation
+    if v.left then
+      v.zV = v.zV - dt * 60
+    end
     -- gravity
     if v.zV < 10 then
       v.zV = v.zV + dt * 60 * 0.2
@@ -43,6 +47,10 @@ char.update = function(dt)
     v.yV = v.yV * 0.8
 
     v.z = v.z + v.zV * dt * 60
+
+    if v.left and v.y+v.z+v.l+v.h <= 0 then
+      players[i] = nil
+    end
   end
 end
 
