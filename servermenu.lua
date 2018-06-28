@@ -17,7 +17,11 @@ local server_hooks = {
   disconnect = function(data, client)
     local index = client:getIndex()
     if players[index] then
-      players[index].left = true
+      if state == "servermenu" then
+        players[index].left = true
+      else
+        players[index] = nil
+      end
       server:sendToAll("left", index)
     end
   end,

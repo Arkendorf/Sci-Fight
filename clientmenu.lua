@@ -19,7 +19,11 @@ local client_hooks = {
   end,
   -- when player leaves
   left = function(data)
-    players[data] = nil
+    if state == "clientmenu" then
+      players[data].left = true
+    else
+      players[data] = nil
+    end
   end,
   -- when server leaves
   disconnect = function(data)
