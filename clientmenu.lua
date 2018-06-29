@@ -75,13 +75,7 @@ clientmenu.ready = function()
 end
 
 clientmenu.start_game = function()
-  for k, v in pairs(players) do
-    if v.left then
-      players[k] = nil
-    else
-      players[k] = {x = 0, y = 0, z = 0, l = 24, w = 24, h = 24, xV = 0, yV = 0, zV = 0, jump = false}
-    end
-  end
+  menu.create_players()
   state = "clientgame"
   clientgame.start()
 end

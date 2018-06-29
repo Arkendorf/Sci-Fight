@@ -58,6 +58,8 @@ love.draw = function()
   wipe.draw()
   love.graphics.setCanvas()
   love.graphics.draw(screen.canvas, screen.x, screen.y, 0, screen.scale, screen.scale)
+
+  love.graphics.print(love.timer.getFPS(), 0, 0, 0, 2, 2)
 end
 
 love.mousepressed = function(x, y, button)
