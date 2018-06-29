@@ -56,8 +56,13 @@ end
 
 char.queue = function()
   for i, v in pairs(players) do
-    queue[#queue + 1] = {img = player_img, x = v.x, y = v.y, z = v.z+v.l-v.h, w = v.w, h = v.h, l = v.l, shadow = true}
+    queue[#queue + 1] = {img = player_img, x = v.x, y = v.y, z = v.z, w = v.w, h = v.h, l = v.l, shadow = true}
   end
+end
+
+char.mousepressed = function(x, y, button)
+  local m_x, m_y = game.mouse_pos()
+  bullet.new(players[id].x+players[id].l/2, players[id].y+players[id].z+players[id].w, m_x, m_y)
 end
 
 return char

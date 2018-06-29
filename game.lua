@@ -5,21 +5,24 @@ collision = require "collision"
 shader = require "shader"
 clientgame = require "clientgame"
 servergame = require "servergame"
+bullet = require "bullet"
 
 local game = {}
 
 game.load = function()
   map.load()
   char.load()
-  queue = {}
-
+  bullet.load()
   clientgame.load()
   servergame.load()
+
+  queue = {}
 end
 
 game.update = function(dt)
   -- normal updates
   char.update(dt)
+  bullet.update(dt)
   -- create drawing queue
   queue = {}
   char.queue()
@@ -27,8 +30,12 @@ game.update = function(dt)
   map.update_masks()
 end
 
+game.mousepressed = function(x, y, button)
+  char.mousepressed(x, y, button)
+end
+
 game.draw = function()
-  local offset = {math.floor(screen.w/2-players[id].x), math.floor(screen.h/2-players[id].y-players[id].z)}
+  local offset = {math.floor(screen.w/2-players[id].x-players[id].l/2), math.floor(screen.h/2-players[id].y-players[id].z-players[id].w)}
   shader.shadow:send("offset", offset)
   shader.layer:send("offset", offset)
   love.graphics.push()
@@ -37,10 +44,19 @@ game.draw = function()
   map.draw()
   -- draw shadows
   game.draw_shadows()
+  -- draw projectiles
+  bullet.draw()
   -- draw objects
   game.draw_queue()
 
+  local x, y = game.mouse_pos()
+  love.graphics.circle("line", x, y, 12, 24)
+
   love.graphics.pop()
+end
+
+game.mouse_pos = function()
+  return players[id].x+players[id].l/2+(love.mouse.getX())/screen.scale-screen.w/2, players[id].y+players[id].z+players[id].w+(love.mouse.getY())/screen.scale-screen.h/2
 end
 
 game.draw_queue = function()

@@ -63,6 +63,11 @@ love.draw = function()
 end
 
 love.mousepressed = function(x, y, button)
+  if state == "servergame" then
+    servergame.mousepressed(x, y, button)
+  elseif state == "clientgame" then
+    clientgame.mousepressed(x, y, button)
+  end
   gui.mousepressed(x, y, button)
 end
 

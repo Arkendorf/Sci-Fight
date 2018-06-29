@@ -36,6 +36,10 @@ servergame.draw = function()
   game.draw()
 end
 
+servergame.mousepressed = function(x, y, button)
+  game.mousepressed(x, y, button)
+end
+
 servergame.quit = function()
   server:sendToAll("disconnect")
   server:update()

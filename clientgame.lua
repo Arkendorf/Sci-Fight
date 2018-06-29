@@ -33,6 +33,10 @@ clientgame.draw = function()
   game.draw()
 end
 
+clientgame.mousepressed = function(x, y, button)
+  game.mousepressed(x, y, button)
+end
+
 clientgame.quit = function()
   client:disconnectNow()
   client = nil
