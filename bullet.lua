@@ -12,8 +12,17 @@ bullet.update = function(dt)
     v.y = v.y + v.yV * dt * 60
     v.z = v.z + v.zV * dt * 60
     -- collide with map
-    if collision.line_and_map({x = v.x, y = v.y, z = v.z}, {x = v.x+v.xV, y = v.y+v.yV, z = v.z+v.zV}) then
+    local p1, p2 = {x = v.x, y = v.y, z = v.z}, {x = v.x+v.xV, y = v.y+v.yV, z = v.z+v.zV}
+    if collision.line_and_map(p1, p2) then
       bullets[k] = nil
+    end
+    -- collide with players
+    for l, w in pairs(players) do
+      if l ~= v.parent and collision.line_and_cube(p1, p2, w) then
+        -- damage
+        bullets[k] = nil
+        break
+      end
     end
     -- collide with borders (twice as large as map)
     if not collision.in_bounds((v.x/tile_size+#grid[1][1])/2, (v.y/tile_size+#grid[1])/2, (v.z/tile_size+#grid)/2) then
