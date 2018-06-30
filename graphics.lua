@@ -3,7 +3,7 @@ local graphics = {}
 love.graphics.setDefaultFilter("nearest", "nearest")
 
 graphics.load = function()
-  love.window.setMode(1200, 800)
+  love.window.setMode(1000, 600)
   screen = {scale = 2, x = 0, y = 0}
   screen.w = love.graphics.getWidth() / screen.scale
   screen.h = love.graphics.getHeight() / screen.scale

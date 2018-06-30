@@ -65,51 +65,61 @@ collision.line_intersect = function(p1, p2, p3, p4)
   return false
 end
 
-collision.line_player = function(p1, p2)
-  for k, v in pairs(players) do
-    if collision.line_intersect(p1, p2, {x = v.x, y = v.y+v.z}, {x = v.x+v.l, y = v.y+v.z})
-    or collision.line_intersect(p1, p2, {x = v.x+v.l, y = v.y+v.z}, {x = v.x+v.l, y = v.y+v.z+v.w+v.h})
-    or collision.line_intersect(p1, p2, {x = v.x+v.l, y = v.y+v.z+v.w+v.h}, {x = v.x, y = v.y+v.z+v.w+v.h})
-    or collision.line_intersect(p1, p2, {x = v.x, y = v.y+v.z+v.w+v.h}, {x = v.x, y = v.y+v.z}) then
-      return k
+local corners = {{x = 0, y = 0}, {x = 1, y = 0}, {x = 1, y = 1}, {x = 0, y = 1}, {x = 0, y = 0}}
+local faces = {{x = "x", y = "y", w = "l", h = "w"}, {x = "x", y = "z", w = "l", h = "h"}, {x = "z", y = "y", w = "h", h = "w"}}
+collision.line_and_cube = function(p1, p2, c)
+  local progress = 0
+  for i, v in ipairs(faces) do
+    for j = 1, #corners - 1 do
+      if collision.line_intersect({x = p1[v.x], y = p1[v.y]}, {x = p2[v.x], y = p2[v.y]}, {x = c[v.x]+c[v.w]*corners[j].x, y = c[v.y]+c[v.h]*corners[j].y}, {x = c[v.x]+c[v.w]*corners[j+1].x, y = c[v.y]+c[v.h]*corners[j+1].y}) then
+        progress = progress + 1
+        break
+      end
+    end
+    if progress > 1 then
+      return true
     end
   end
   return false
 end
 
-collision.line_and_cube = function(p1, p2, p3, l, w, h)
-  local continue = false
-  for i = 0, 1 do
-    for j = 0, 1 do
-      if collision.line_intersect(p1, p2, {x = p3.x+l*j, y = p3.y+w*i}, {x = p3.x+l*collision.loop(j+1, 0, 1), y = p3.y+w*collision.loop(i+1, 0, 1)}) then
-        continue = true
-      end
-    end
-  end
-  if not continue then return false end
-  continue = false
-  local new_p = collision.swap(p3, "x", "z")
-  for i = 0, 1 do
-    for j = 0, 1 do
-      if collision.line_intersect(collision.swap(p1, "x", "z"), collision.swap(p2, "x", "z"), {x = new_p.x+l*j, y = new_p.y+h*i}, {x = new_p.x+l*collision.loop(j+1, 0, 1), y = new_p.y+h*collision.loop(i+1, 0, 1)}) then
-        continue = true
-      end
-    end
-  end
-  if not continue then return false end
-  continue = false
-  local new_p = collision.swap(p3, "z", "y")
-  for i = 0, 1 do
-    for j = 0, 1 do
-      if collision.line_intersect(collision.swap(p1, "z", "y"), collision.swap(p2, "z", "y"), {x = new_p.x+h*j, y = new_p.y+w*i}, {x = new_p.x+h*collision.loop(j+1, 0, 1), y = new_p.y+w*collision.loop(i+1, 0, 1)}) then
-        continue = true
-      end
-    end
-  end
-  return continue
-end
-
 collision.line_and_map = function(p1, p2)
+  local x_min, x_max = 0, 0
+  if p1.x < p2.x then
+    x_min = 1+math.floor(p1.x/tile_size)
+    x_max = 1+math.floor(p2.x/tile_size)
+  else
+    x_min = 1+math.floor(p2.x/tile_size)
+    x_max = 1+math.floor(p1.x/tile_size)
+  end
+  local y_min, y_max = 0, 0
+  if p1.y < p2.y then
+    y_min = 1+math.floor(p1.y/tile_size)
+    y_max = 1+math.floor(p2.y/tile_size)
+  else
+    y_min = 1+math.floor(p2.y/tile_size)
+    y_max = 1+math.floor(p1.y/tile_size)
+  end
+  local z_min, z_max = 0, 0
+  if p1.z < p2.z then
+    z_min = 1+math.floor(p1.z/tile_size)
+    z_max = 1+math.floor(p2.z/tile_size)
+  else
+    z_min = 1+math.floor(p2.z/tile_size)
+    z_max = 1+math.floor(p1.z/tile_size)
+  end
+  for z = z_min, z_max do
+    for y = y_min, y_max do
+      for x = x_max, x_max do
+        if collision.in_bounds(x, y, z) and grid[z][y][x] > 0 and tiles[grid[z][y][x]] > 0 then
+          if collision.line_and_cube(p1, p2, {x = (x-1)*tile_size, y = (y-1)*tile_size, z = (z-1)*tile_size, l = tile_size, w = tile_size, h = tile_size}) then
+            return true
+          end
+        end
+      end
+    end
+  end
+  return false
 end
 
 return collision
