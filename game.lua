@@ -100,12 +100,12 @@ game.draw_tiles = function(x, y, z, tile)
   if tile > 0 then
     -- floor
     if not map.floor_block(x, y, z) then
-      love.graphics.draw(tile_img[tile], tile_quad[tile][graphics.bitmask_floor(x, y, z)], (x-1)*tile_size, (y+z-2)*tile_size)
+      graphics.draw_floor(x, y, z, tile)
     end
 
     -- wall
     if not map.wall_block(x , y, z) then
-      love.graphics.draw(tile_img[tile], tile_quad[tile][16+graphics.bitmask_wall(x, y, z)], (x-1)*tile_size, (y+z-1)*tile_size)
+      graphics.draw_wall(x, y, z, tile)
     end
   end
 end
