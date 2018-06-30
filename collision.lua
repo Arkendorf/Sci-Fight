@@ -109,70 +109,7 @@ collision.line_and_cube = function(p1, p2, p3, l, w, h)
   return continue
 end
 
--- collision.triangle_area = function(p1, p2, p3)
---   return math.abs(0.5 * ((p2.x-p1.x) * (p3.y-p1.y) - (p3.x-p1.x) * (p2.y-p1.y)))
--- end
---
--- collision.quad_area = function(quad)
---   return collision.triangle_area(quad[1], quad[2], quad[3]) + collision.triangle_area(quad[3], quad[4], quad[1])
--- end
---
--- collision.point_in_quad = function(quad, p)
---   area1 = collision.quad_area(quad)
---
---   local area2 = 0
---   for i = 1, #quad do
---     area2 = area2 + collision.triangle_area(quad[i], p, quad[collision.loop(i+1, 1, #quad)])
---   end
---
---   return area1 == area2
--- end
---
--- collision.quad_and_square = function(quad, p, w, h)
---   for i = 0, 1 do
---     for j = 0, 1 do
---       if collision.point_in_quad(quad, {x = p.x+w*j, y = p.y+h*i}) then
---         return true
---       end
---       for k = 1, #quad do -- if square is bigger than quad we need to check line intersections
---         if collision.line_intersect(quad[k], quad[collision.loop(k+1, 1, #quad)], {x = p.x+w*j, y = p.y+h*i}, {x = p.x+w*collision.loop(j+1, 0, 1), y = p.y+h*collision.loop(i+1, 0, 1)}) then
---           return true
---         end
---       end
---     end
---   end
---   return false
--- end
---
--- collision.quad_and_cube = function(quad, p, l, w, h)
---   local quad2, p2 = collision.rearrange(quad, p, "x", "z")
---   local quad3, p3 = collision.rearrange(quad, p, "z", "y")
---   return collision.quad_and_square(quad, p, l, w) and collision.quad_and_square(quad2, p2, l, h) and collision.quad_and_square(quad3, p3, h, w)
--- end
---
-
---
--- collision.rearrange = function(quad, p, a, b)
---   local new_quad = {}
---   for i = 1, #quad do
---     new_quad[i] = collision.swap(quad[i], a, b)
---   end
---   local new_p = collision.swap(p, a, b)
---   return new_quad, new_p
--- end
---
--- collision.swap = function(p, a, b)
---   return {x = p[a], y = p[b]}
--- end
---
--- collision.loop = function(num, min, max)
---   if num > max then
---     return num - max
---   elseif num < min then
---     return num + min
---   else
---     return num
---   end
--- end
+collision.line_and_map = function(p1, p2)
+end
 
 return collision

@@ -18,6 +18,7 @@ graphics.load = function()
   love.graphics.setLineWidth(1)
 
   player_img = love.graphics.newImage("char.png")
+  laser_img = love.graphics.newImage("laser.png")
 end
 
 graphics.load_tiles = function(str)
@@ -91,12 +92,20 @@ graphics.draw = function(v, color)
       shader[v.shader.type]:send(w[1], w[2])
     end
   end
+  local angle = 0
+  if v.angle then
+    angle = v.angle
+  end
+  local ox, oy = 0, 0
+  if v.ox or v.oy then
+    ox, oy = v.ox, v.oy
+  end
   if v.quad then
-    love.graphics.draw(v.img, v.quad, math.ceil(v.x), math.ceil(v.y+v.z))
+    love.graphics.draw(v.img, v.quad, math.ceil(v.x), math.ceil(v.y+v.z), angle, 1, 1, ox, oy)
   elseif v.shape then
     love.graphics[v.shape]("fill", math.ceil(v.x), math.ceil(v.y+v.z), v.a, v.b)
   else
-    love.graphics.draw(v.img, math.ceil(v.x), math.ceil(v.y+v.z))
+    love.graphics.draw(v.img, math.ceil(v.x), math.ceil(v.y+v.z), angle, 1, 1, ox, oy)
   end
   love.graphics.setShader()
   love.graphics.setColor(1, 1, 1)

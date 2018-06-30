@@ -17,6 +17,8 @@ game.load = function()
   servergame.load()
 
   queue = {}
+
+  target = {x = 0, y = 0, z = 0}
 end
 
 game.update = function(dt)
@@ -49,8 +51,7 @@ game.draw = function()
   -- draw objects
   game.draw_queue()
 
-  local x, y = game.mouse_pos()
-  love.graphics.circle("line", x, y, 12, 24)
+  love.graphics.circle("line", target.x, target.y+target.z, 12, 24)
 
   love.graphics.pop()
 end

@@ -1,5 +1,8 @@
 local char = {}
 
+local target_range = 48
+local target_speed = 32
+
 char.load = function()
 end
 
@@ -21,14 +24,33 @@ char.input = function(dt)
     players[id].zV = players[id].zV - dt * 60 * 5
     players[id].jump = true
   end
+
+  -- target
+  local m_x, m_y = game.mouse_pos()
+  local current = {k = nil, dist = target_range}
+  for k, v in pairs(players) do
+    if k ~= id then
+      local x = v.x+v.l/2
+      local y = v.y+v.z+v.w
+      if math.sqrt((m_x-x)*(m_x-x)+(m_y-y)*(m_y-y)) < current.dist then
+        current.k = k
+      end
+    end
+  end
+  if current.k then
+    local v = players[current.k]
+    target.dX, target.dY, target.dZ = v.x+v.l/2, v.y+v.w/2, v.z+v.h/2
+  else
+    local z = players[id].z+players[id].h/2
+    target.dX, target.dY, target.dZ = m_x, m_y-z, z
+  end
+  target.x = target.x + (target.dX-target.x) * dt * target_speed
+  target.y = target.y + (target.dY-target.y) * dt * target_speed
+  target.z = target.z + (target.dZ-target.z) * dt * target_speed
 end
 
 char.update = function(dt)
-  for i, v in pairs(players) do
-    -- disconnect animation
-    if v.left then
-      v.zV = v.zV - dt * 60
-    end
+  for k, v in pairs(players) do
     -- gravity
     if v.zV < 10 then
       v.zV = v.zV + dt * 60 * 0.2
@@ -47,10 +69,6 @@ char.update = function(dt)
     v.yV = v.yV * 0.8
 
     v.z = v.z + v.zV * dt * 60
-
-    if v.left and v.y+v.z+v.l+v.h <= 0 then
-      players[i] = nil
-    end
   end
 end
 
@@ -61,8 +79,7 @@ char.queue = function()
 end
 
 char.mousepressed = function(x, y, button)
-  local m_x, m_y = game.mouse_pos()
-  bullet.new(players[id].x+players[id].l/2, players[id].y+players[id].z+players[id].w, m_x, m_y)
+  bullet.new(players[id], target)
 end
 
 return char

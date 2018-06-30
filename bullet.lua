@@ -7,38 +7,36 @@ bullet.load = function()
 end
 
 bullet.update = function(dt)
-  for i, v in pairs(bullets) do
-    v.x = v.x + v.xV
-    v.y = v.y + v.yV
+  for k, v in pairs(bullets) do
+    v.x = v.x + v.xV * dt * 60
+    v.y = v.y + v.yV * dt * 60
+    v.z = v.z + v.zV * dt * 60
     -- collide with players
-    local hit = collision.line_player({x = v.x, y = v.y}, {x = v.xV, y = v.yV})
-    if hit and hit ~= v.parent then
-      -- damage stuff
-      bullets[i] = nil
+    if collision.line_and_map({x = v.x, y = v.y, z = v.z}, {x = v.x+v.xV, y = v.y+v.yV, z = v.z+v.zV}) then
+      bullets[k] = nil
     end
+
     -- collide with borders (twice as large as map)
-    if v.x > #grid[1][1]*tile_size*2 or v.x < -#grid[1][1]*tile_size or v.y > #grid[1]*tile_size*2 or v.y < -#grid[1]*tile_size then
-      bullets[i] = nil
+    if not collision.in_bounds((v.x/tile_size+#grid[1][1])/2, (v.y/tile_size+#grid[1])/2, (v.z/tile_size+#grid)/2) then
+      bullets[k] = nil
     end
   end
+
 end
 
 bullet.draw = function()
-  for i, v in pairs(bullets) do
-    love.graphics.setLineWidth(6)
-    love.graphics.setColor(0, 1, 0)
-    love.graphics.line(v.x, v.y, v.x+v.xV*4, v.y+v.yV*4)
-    love.graphics.setLineWidth(2)
-    love.graphics.setColor(1, 1, 1)
-    love.graphics.line(v.x, v.y, v.x+v.xV*4, v.y+v.yV*4)
+  for k, v in pairs(bullets) do
+    queue[#queue + 1] = {img = laser_img, x = v.x, y = v.y, z = v.z, h = 0, ox = 16, oy = 16, angle = v.angle, shadow = false}
   end
-
-  love.graphics.print(#bullets)
 end
 
-bullet.new = function(x1, y1, x2, y2)
-  local angle = math.atan2(y2 - y1, x2 - x1)
-  bullets[#bullets+1] = {x = x1, y = y1, xV = math.cos(angle)*laser_speed, yV = math.sin(angle)*laser_speed, angle = angle, parent = id}
+bullet.new = function(p1, p2)
+  local x1, y1, z1 = p1.x+p1.l/2, p1.y+p1.w/2, p1.z+p1.h/2
+  local l_x, l_y, l_z = p2.x-x1, p2.y-y1, p2.z-z1
+  local ax = math.atan2(math.sqrt(l_y*l_y+l_z*l_z), l_x)
+  local ay = math.atan2(math.sqrt(l_z*l_z+l_x*l_x), l_y)
+  local az = math.atan2(math.sqrt(l_x*l_x+l_y*l_y), l_z)
+  bullets[#bullets+1] = {x = x1, y = y1, z = z1, xV = math.cos(ax)*laser_speed, yV = math.cos(ay)*laser_speed, zV = math.cos(az)*laser_speed, angle = math.atan2(math.cos(ay)+math.cos(az),  math.cos(ax)), parent = id}
 end
 
 return bullet
