@@ -16,6 +16,12 @@ map.load = function()
   shader.layer:send("mask_size", {x, y})
 
   shadow_canvas = love.graphics.newCanvas(x, y)
+
+  map_canvas = love.graphics.newCanvas(x, y)
+  love.graphics.setCanvas(map_canvas)
+  love.graphics.clear()
+  map.iterate(game.draw_tiles)
+  love.graphics.setCanvas()
 end
 
 map.update_masks = function()
@@ -37,7 +43,7 @@ end
 
 map.draw = function()
   -- map
-  map.iterate(game.draw_tiles)
+  love.graphics.draw(map_canvas)
 end
 
 map.wall_block = function(x, y, z)

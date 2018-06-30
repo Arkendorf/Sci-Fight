@@ -42,7 +42,7 @@ game.draw = function()
   shader.layer:send("offset", offset)
   love.graphics.push()
   love.graphics.translate(offset[1], offset[2])
-  -- draw tiles
+  -- draw map
   map.draw()
   -- draw shadows
   game.draw_shadows()
