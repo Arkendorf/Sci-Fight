@@ -9,19 +9,19 @@ end
 char.input = function(dt)
   --input
   if love.keyboard.isDown("w") then
-    players[id].yV = players[id].yV - dt * 60
+    players[id].yV = players[id].yV - 1
   end
   if love.keyboard.isDown("s") then
-    players[id].yV = players[id].yV + dt * 60
+    players[id].yV = players[id].yV + 1
   end
   if love.keyboard.isDown("a") then
-    players[id].xV = players[id].xV - dt * 60
+    players[id].xV = players[id].xV - 1
   end
   if love.keyboard.isDown("d") then
-    players[id].xV = players[id].xV + dt * 60
+    players[id].xV = players[id].xV + 1
   end
   if love.keyboard.isDown("space") and not players[id].jump then
-    players[id].zV = players[id].zV - dt * 60 * 5
+    players[id].zV = players[id].zV - 5
     players[id].jump = true
   end
 
@@ -53,7 +53,7 @@ char.update = function(dt)
   for k, v in pairs(players) do
     -- gravity
     if v.zV < 10 then
-      v.zV = v.zV + dt * 60 * 0.2
+      v.zV = v.zV + 0.2
     elseif v.zV > 10 then
       v.zV = 10
     end

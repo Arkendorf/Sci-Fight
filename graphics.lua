@@ -177,11 +177,11 @@ graphics.draw = function(v, color)
     ox, oy = v.ox, v.oy
   end
   if v.quad then
-    love.graphics.draw(v.img, v.quad, math.ceil(v.x), math.ceil(v.y+v.z), angle, 1, 1, ox, oy)
+    love.graphics.draw(v.img, v.quad, math.floor(v.x), math.floor(v.y+v.z), angle, 1, 1, ox, oy)
   elseif v.shape then
-    love.graphics[v.shape]("fill", math.ceil(v.x), math.ceil(v.y+v.z), v.a, v.b)
+    love.graphics[v.shape]("fill", math.floor(v.x), math.floor(v.y+v.z), v.a, v.b)
   else
-    love.graphics.draw(v.img, math.ceil(v.x), math.ceil(v.y+v.z), angle, 1, 1, ox, oy)
+    love.graphics.draw(v.img, math.floor(v.x), math.floor(v.y+v.z), angle, 1, 1, ox, oy)
   end
   love.graphics.setShader()
   love.graphics.setColor(1, 1, 1)

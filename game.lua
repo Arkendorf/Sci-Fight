@@ -36,14 +36,13 @@ game.mousepressed = function(x, y, button)
 end
 
 game.draw = function()
-  local offset = {math.floor(screen.w/2-players[id].x-players[id].l/2), math.floor(screen.h/2-players[id].y-players[id].z-players[id].w)}
+  local offset = {math.ceil(screen.w/2-players[id].x-players[id].l/2), math.ceil(screen.h/2-players[id].y-players[id].z-players[id].w)}
   shader.shadow:send("offset", offset)
   shader.layer:send("offset", offset)
   love.graphics.push()
   love.graphics.translate(offset[1], offset[2])
   -- draw map
   map.draw()
-  -- love.graphics.draw(layer_mask)
   -- draw shadows
   game.draw_shadows()
   -- draw projectiles
@@ -66,7 +65,7 @@ game.draw_queue = function()
 
   for i, v in ipairs(queue) do
     love.graphics.setShader(shader.layer)
-    shader.layer:send("coords", {0, 1+math.floor((v.y)/tile_size), 2+math.floor((v.z+v.h)/tile_size)})
+    shader.layer:send("coords", {0, 1+math.floor((v.y)/tile_size), 1+math.ceil((v.z+v.h)/tile_size)})
     graphics.draw(v)
     love.graphics.setShader()
   end
