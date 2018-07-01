@@ -17,9 +17,9 @@ collision.grid = function(obj)
             obj.z = z_new*tile_size
           end
           obj.zV = 0
+          -- recalculate z
+          z = collision.coord_to_tile(obj.z, obj.h, i)
         end
-        -- recalculate z
-        z = collision.coord_to_tile(obj.z, obj.h, i)
 
         local x_new = collision.coord_to_tile(obj.x+obj.xV, obj.l, k)
         if collision.in_bounds(x_new, y, z) and grid[z][y][x_new] > 0 and tiles[grid[z][y][x_new]] == 1 then
@@ -29,9 +29,9 @@ collision.grid = function(obj)
             obj.x = x_new*tile_size
           end
           obj.xV = 0
+          -- recalculate x
+          x = collision.coord_to_tile(obj.x, obj.l, k)
         end
-        -- recalculate x
-        local x = collision.coord_to_tile(obj.x, obj.l, k)
 
         local y_new = collision.coord_to_tile(obj.y+obj.yV, obj.w, j)
         if collision.in_bounds(x, y_new, z) and grid[z][y_new][x] > 0 and tiles[grid[z][y_new][x]] == 1 then
