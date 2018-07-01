@@ -25,7 +25,7 @@ bullet.update = function(dt)
       end
     end
     -- collide with borders (twice as large as map)
-    if not collision.in_bounds((v.x/tile_size+#grid[1][1])/2, (v.y/tile_size+#grid[1])/2, (v.z/tile_size+#grid)/2) then
+    if not collision.in_bounds((v.x/tile_size+#grid[1][1]/2)/2, (v.y/tile_size+#grid[1]/2)/2, (v.z/tile_size+#grid/2)/2) then
       bullets[k] = nil
     end
   end
@@ -44,7 +44,9 @@ bullet.new = function(p1, p2)
   local xV = math.cos(math.atan2(math.sqrt(l_y*l_y+l_z*l_z), l_x))
   local yV = math.cos(math.atan2(math.sqrt(l_z*l_z+l_x*l_x), l_y))
   local zV = math.cos(math.atan2(math.sqrt(l_x*l_x+l_y*l_y), l_z))
-  bullets[#bullets+1] = {x = x1, y = y1, z = z1, xV = xV*laser_speed, yV = yV*laser_speed, zV = zV*laser_speed, angle = math.atan2(yV+zV, xV), parent = id}
+  local spot = #bullets+1
+  bullets[spot] = {x = x1, y = y1, z = z1, xV = xV*laser_speed, yV = yV*laser_speed, zV = zV*laser_speed, angle = math.atan2(yV+zV, xV), parent = id}
+  return spot
 end
 
 return bullet

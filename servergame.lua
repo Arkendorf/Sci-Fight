@@ -15,6 +15,11 @@ local server_hooks = {
     players[index].zV = data.zV
     server:sendToAllBut(client, "pos", {index = index, pos = data})
   end,
+  bullet = function(data, client)
+    local index = client:getIndex()
+    bullets[#bullets+1] = data
+    server:sendToAllBut(client, "bullet", data)
+  end
 }
 
 servergame.start = function(port)
@@ -37,7 +42,8 @@ servergame.draw = function()
 end
 
 servergame.mousepressed = function(x, y, button)
-  game.mousepressed(x, y, button)
+  i = char.mousepressed(x, y, button)
+  server:sendToAll("bullet", bullets[i])
 end
 
 servergame.quit = function()

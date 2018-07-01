@@ -5,15 +5,28 @@ tile_size = 32
 map.load = function()
   -- maps must be within 100x100x100 for layering and shadows to work properly
   grid = love.filesystem.load("maps/time_machine.txt")()
-  tiles = {1, 1, 1}
+  tiles = {1, 1, 1, 1, 1}
 
   -- shader stuff
   local x, y = #grid[1][1]*tile_size, (#grid+#grid[1])*tile_size
   shadow_mask = love.graphics.newCanvas(x, y)
   shader.shadow:send("mask_size", {x, y})
+  -- draw shadow mask
+  love.graphics.setCanvas(shadow_mask)
+  map.iterate(game.draw_shadow_mask)
+  shader.shadow:send("mask", shadow_mask)
 
   layer_mask = love.graphics.newCanvas(x, y)
   shader.layer:send("mask_size", {x, y})
+  -- draw layer mask
+  love.graphics.setCanvas(layer_mask)
+  map.iterate(game.draw_layer_mask)
+  love.graphics.setShader()
+  shader.layer:send("mask", layer_mask)
+
+  -- reset
+  love.graphics.setColor(1, 1, 1)
+  love.graphics.setCanvas()
 
   shadow_canvas = love.graphics.newCanvas(x, y)
 
@@ -25,20 +38,6 @@ map.load = function()
 end
 
 map.update_masks = function()
-  -- draw layer mask
-  love.graphics.setCanvas(layer_mask)
-  map.iterate(game.draw_layer_mask)
-  shader.layer:send("mask", layer_mask)
-
-
-  -- draw shadow mask
-  love.graphics.setCanvas(shadow_mask)
-  map.iterate(game.draw_shadow_mask)
-  shader.shadow:send("mask", shadow_mask)
-
-  -- reset
-  love.graphics.setColor(1, 1, 1)
-  love.graphics.setCanvas()
 end
 
 map.draw = function()

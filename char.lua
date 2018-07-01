@@ -79,7 +79,7 @@ char.queue = function()
 end
 
 char.mousepressed = function(x, y, button)
-  bullet.new(players[id], target)
+  return bullet.new(players[id], target)
 end
 
 return char

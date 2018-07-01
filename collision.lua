@@ -9,7 +9,7 @@ collision.grid = function(obj)
         local z = 1+math.floor((obj.z + obj.h*i) / tile_size)
 
         local x_new = 1+math.floor((obj.x + obj.xV + obj.l*k) / tile_size)
-        if collision.in_bounds(x_new, y, z) and grid[z][y][x_new] > 0 and tiles[grid[z][y][x_new]] > 0 then
+        if collision.in_bounds(x_new, y, z) and grid[z][y][x_new] > 0 and tiles[grid[z][y][x_new]] == 1 then
           if obj.xV > 0 then
             obj.x = (x_new-1)*tile_size - obj.l - 0.1
           elseif obj.xV < 0 then
@@ -19,7 +19,7 @@ collision.grid = function(obj)
         end
 
         local y_new = 1+math.floor((obj.y + obj.yV + obj.w*j) / tile_size)
-        if collision.in_bounds(x, y_new, z) and grid[z][y_new][x] > 0 and tiles[grid[z][y_new][x]] > 0 then
+        if collision.in_bounds(x, y_new, z) and grid[z][y_new][x] > 0 and tiles[grid[z][y_new][x]] == 1 then
           if obj.yV > 0 then
             obj.y = (y_new-1)*tile_size - obj.w - 0.1
           elseif obj.yV < 0 then
@@ -29,7 +29,7 @@ collision.grid = function(obj)
         end
 
         local z_new = 1+math.floor((obj.z + obj.zV + obj.h*i) / tile_size)
-        if collision.in_bounds(x, y, z_new) and grid[z_new][y][x] > 0 and tiles[grid[z_new][y][x]] > 0 then
+        if collision.in_bounds(x, y, z_new) and grid[z_new][y][x] > 0 and tiles[grid[z_new][y][x]] == 1 then
           if obj.zV > 0 then
             obj.z = (z_new-1)*tile_size - obj.h - 0.1
             obj.jump = false
@@ -110,8 +110,8 @@ collision.line_and_map = function(p1, p2)
   end
   for z = z_min, z_max do
     for y = y_min, y_max do
-      for x = x_max, x_max do
-        if collision.in_bounds(x, y, z) and grid[z][y][x] > 0 and tiles[grid[z][y][x]] > 0 then
+      for x = x_min, x_max do
+        if collision.in_bounds(x, y, z) and grid[z][y][x] > 0 and tiles[grid[z][y][x]] == 1 then
           if collision.line_and_cube(p1, p2, {x = (x-1)*tile_size, y = (y-1)*tile_size, z = (z-1)*tile_size, l = tile_size, w = tile_size, h = tile_size}) then
             return true
           end

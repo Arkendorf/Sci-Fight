@@ -33,7 +33,6 @@ game.update = function(dt)
 end
 
 game.mousepressed = function(x, y, button)
-  char.mousepressed(x, y, button)
 end
 
 game.draw = function()
@@ -44,6 +43,7 @@ game.draw = function()
   love.graphics.translate(offset[1], offset[2])
   -- draw map
   map.draw()
+  -- love.graphics.draw(layer_mask)
   -- draw shadows
   game.draw_shadows()
   -- draw projectiles
@@ -62,7 +62,7 @@ end
 
 game.draw_queue = function()
   table.sort(queue, function(a, b) return a.y < b.y end)
-  shader.layer:send("xray_color", {.5, .5, .5, .5})
+  shader.layer:send("xray_color", {.2, .2, .3, 1})
 
   for i, v in ipairs(queue) do
     love.graphics.setShader(shader.layer)
@@ -98,14 +98,17 @@ end
 -- map functions
 game.draw_tiles = function(x, y, z, tile)
   if tile > 0 then
-    -- floor
-    if not map.floor_block(x, y, z) then
-      graphics.draw_floor(x, y, z, tile)
-    end
+    if tiles[tile] == 3 then
+    else
+      -- floor
+      if not map.floor_block(x, y, z) then
+        graphics.draw_floor(x, y, z, tile)
+      end
 
-    -- wall
-    if not map.wall_block(x , y, z) then
-      graphics.draw_wall(x, y, z, tile)
+      -- wall
+      if not map.wall_block(x , y, z) then
+        graphics.draw_wall(x, y, z, tile)
+      end
     end
   end
 end
