@@ -6,6 +6,7 @@ shader = require "shader"
 clientgame = require "clientgame"
 servergame = require "servergame"
 bullet = require "bullet"
+abilities = require "abilities"
 
 local game = {}
 
@@ -19,6 +20,8 @@ game.load = function()
   queue = {}
 
   target = {x = 0, y = 0, z = 0}
+
+  ability_keys = {{"button", 1}, {"button", 2}, {"key", "q"}, {"key", "e"}, {"key", "f"}}
 end
 
 game.update = function(dt)
@@ -30,9 +33,6 @@ game.update = function(dt)
   char.queue()
   -- update masks (e.g. layer and shadow)
   map.update_masks()
-end
-
-game.mousepressed = function(x, y, button)
 end
 
 game.draw = function()
@@ -53,6 +53,17 @@ game.draw = function()
   love.graphics.circle("line", target.x, target.y+target.z, 12, 24)
 
   love.graphics.pop()
+end
+
+game.mousepressed = function(x, y, button)
+end
+
+game.abilities = function(mode, button, func)
+  for i, v in ipairs(ability_keys) do
+    if v[1] == mode and button == v[2] then
+      func(i)
+    end
+  end
 end
 
 game.mouse_pos = function()

@@ -71,8 +71,29 @@ love.mousepressed = function(x, y, button)
   gui.mousepressed(x, y, button)
 end
 
+love.mousereleased = function(x, y, button)
+  if state == "servergame" then
+    servergame.mousereleased(x, y, button)
+  elseif state == "clientgame" then
+    clientgame.mousereleased(x, y, button)
+  end
+end
+
 love.keypressed = function(key)
+  if state == "servergame" then
+    servergame.keypressed(key)
+  elseif state == "clientgame" then
+    clientgame.keypressed(key)
+  end
   gui.keypressed(key)
+end
+
+love.keyreleased = function(key)
+  if state == "servergame" then
+    servergame.keyreleased(key)
+  elseif state == "clientgame" then
+    clientgame.keyreleased(key)
+  end
 end
 
 love.textinput = function(text)

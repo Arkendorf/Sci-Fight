@@ -63,7 +63,7 @@ menu.create_players = function()
     if v.left then
       players[k] = nil
     else
-      players[k] = char.new()
+      players[k] = char.new(k+1)
     end
   end
 end

@@ -1,8 +1,7 @@
 local char = {}
 
-local target_range = 48
+local target_range = 32
 local target_speed = 32
-local shot_delay = 0.2
 
 char.load = function()
 end
@@ -71,23 +70,52 @@ char.update = function(dt)
 
     v.z = v.z + v.zV * dt * 60
 
-    -- attacking
-    if v.delay > 0 then
-      v.delay = v.delay - dt
+    -- abilities
+    for i, w in ipairs(v.abilities) do
+      if w.delay > 0 then
+        w.delay = w.delay - dt
+      end
     end
   end
 end
 
-char.fire = function(index, target)
-  if players[index].delay <= 0 then
-    players[index].delay = shot_delay
-    return bullet.new(players[index], target, index)
+char.use_ability = function(player, index, target, num)
+  if player.abilities[num].delay <= 0 then
+    player.abilities[num].active = abilities[player.abilities[num].type].press_func(player, index, target)
+    if not player.abilities[num].active then -- initiate cooldown if ability isn't channelled
+      player.abilities[num].delay = abilities[player.abilities[num].type].delay
+    end
+  end
+end
+
+char.update_abilities = function(player, index, target)
+  for i, v in ipairs(player.abilities) do
+    if v.active and abilities[player.abilities[i].type].update_func then
+      abilities[player.abilities[i].type].update_func(player, index, target)
+    end
+  end
+end
+
+char.stop_ability = function(player, index, num)
+  if player.abilities[num].active then
+    player.abilities[num].active = false
+    player.abilities[num].delay = abilities[player.abilities[num].type].delay-- initiate cooldown
+  end
+end
+
+char.ability_check = function(player, index)
+  for i, v in ipairs(player.abilities) do
+    if v.active and abilities[player.abilities[i].type].update_func then
+      return true
+    end
   end
   return false
 end
 
-char.new = function()
-  return {x = #grid[1][1]*tile_size*0.5, y = #grid[1]*tile_size*0.5, z = -tile_size, l = 24, w = 24, h = 24, xV = 0, yV = 0, zV = 0, jump = false, delay = 0}
+
+char.new = function(weapon)
+  return {x = #grid[1][1]*tile_size*0.5, y = #grid[1]*tile_size*0.5, z = -tile_size, l = 24, w = 24, h = 24, xV = 0, yV = 0, zV = 0, jump = false,
+  abilities = {{type = 1, active = false, delay = 0}, {type = 1, active = false, delay = 0}, {type = 1, active = false, delay = 0}, {type = 1, active = false, delay = 0}, {type = 1, active = false, delay = 0}}}
 end
 
 char.queue = function()
