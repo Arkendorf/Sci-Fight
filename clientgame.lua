@@ -13,8 +13,11 @@ local client_hooks = {
     players[data.index].zV = data.pos.zV
   end,
   bullet = function(data)
-    bullets[#bullets+1] = data
-  end
+    bullets[data.i] = data.info
+  end,
+  delay = function(data)
+    players[id].delay = data
+  end,
 }
 
 clientgame.start = function(port)
@@ -37,8 +40,7 @@ clientgame.draw = function()
 end
 
 clientgame.mousepressed = function(x, y, button)
-  i = char.mousepressed(x, y, button)
-  client:send("bullet", bullets[i])
+  client:send("click", target)
 end
 
 clientgame.quit = function()

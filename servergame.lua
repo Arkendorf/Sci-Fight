@@ -15,11 +15,14 @@ local server_hooks = {
     players[index].zV = data.zV
     server:sendToAllBut(client, "pos", {index = index, pos = data})
   end,
-  bullet = function(data, client)
+  click = function(data, client)
     local index = client:getIndex()
-    bullets[#bullets+1] = data
-    server:sendToAllBut(client, "bullet", data)
-  end
+    local i = char.fire(index, data)
+    if i then
+      server:sendToAll("bullet", {info = bullets[i], i = i})
+      server:sendToPeer(server:getPeerByIndex(index), "delay", players[index].delay)
+    end
+  end,
 }
 
 servergame.start = function(port)
@@ -42,8 +45,10 @@ servergame.draw = function()
 end
 
 servergame.mousepressed = function(x, y, button)
-  i = char.mousepressed(x, y, button)
-  server:sendToAll("bullet", bullets[i])
+  local i = char.fire(id, target)
+  if i then
+    server:sendToAll("bullet", {info = bullets[i], i = i})
+  end
 end
 
 servergame.quit = function()

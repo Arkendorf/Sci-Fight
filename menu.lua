@@ -63,7 +63,7 @@ menu.create_players = function()
     if v.left then
       players[k] = nil
     else
-      players[k] = {x = #grid[1][1]*tile_size*0.5, y = #grid[1]*tile_size*0.5, z = -tile_size, l = 24, w = 24, h = 24, xV = 0, yV = 0, zV = 0, jump = false}
+      players[k] = char.new()
     end
   end
 end

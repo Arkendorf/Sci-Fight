@@ -2,6 +2,7 @@ local char = {}
 
 local target_range = 48
 local target_speed = 32
+local shot_delay = 0.2
 
 char.load = function()
 end
@@ -69,7 +70,24 @@ char.update = function(dt)
     v.yV = v.yV * 0.8
 
     v.z = v.z + v.zV * dt * 60
+
+    -- attacking
+    if v.delay > 0 then
+      v.delay = v.delay - dt
+    end
   end
+end
+
+char.fire = function(index, target)
+  if players[index].delay <= 0 then
+    players[index].delay = shot_delay
+    return bullet.new(players[index], target, index)
+  end
+  return false
+end
+
+char.new = function()
+  return {x = #grid[1][1]*tile_size*0.5, y = #grid[1]*tile_size*0.5, z = -tile_size, l = 24, w = 24, h = 24, xV = 0, yV = 0, zV = 0, jump = false, delay = 0}
 end
 
 char.queue = function()
@@ -79,7 +97,6 @@ char.queue = function()
 end
 
 char.mousepressed = function(x, y, button)
-  return bullet.new(players[id], target)
 end
 
 return char
