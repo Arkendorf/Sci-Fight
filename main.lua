@@ -19,6 +19,12 @@ love.load = function()
 end
 
 love.update = function(dt)
+  if server then
+    server:update()
+  end
+  if client then
+    client:update()
+  end
   if state == "mainmenu" then
     mainmenu.update(dt)
   elseif state == "clientmenu" then
@@ -31,12 +37,6 @@ love.update = function(dt)
     servergame.update(dt)
   end
   gui.update(dt)
-  if server then
-    server:update()
-  end
-  if client then
-    client:update()
-  end
   wipe.update(dt)
 end
 

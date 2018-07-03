@@ -16,8 +16,13 @@ local client_hooks = {
     bullets[data.k] = data.info
   end,
   ability_info = function(data)
-    players[id].abilities[data.num].delay = data.delay
-    players[id].abilities[data.num].active = data.active
+    if data.num then
+      players[id].abilities[data.num].delay = data.delay
+      players[id].abilities[data.num].active = data.active
+    end
+    if data.energy then
+      players[id].energy = data.energy
+    end
   end,
 }
 
@@ -35,9 +40,7 @@ clientgame.update = function(dt)
   char.input(dt)
   client:send("pos", {x = players[id].x, y = players[id].y, z = players[id].z, xV = players[id].xV, yV = players[id].yV, zV = players[id].zV})
   --client's abilities
-  if char.ability_check(players[id], id) then
-    client:send("update_abilities", target)
-  end
+  game.update_abilities(clientgame.update_ability)
   -- game updating
   game.update(dt)
 end
@@ -64,6 +67,10 @@ end
 
 clientgame.use_ability = function(num)
   client:send("use_ability", {target = target, num = num})
+end
+
+clientgame.update_ability = function(num)
+  client:send("update_ability", {target = target, num = num})
 end
 
 clientgame.stop_ability = function(num)

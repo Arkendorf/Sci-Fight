@@ -7,7 +7,8 @@ press_func = function(player, index, target)
   return false
 end,
 update_func = nil;
-delay = 0.2
+delay = 0.2,
+energy = 5
 }
 
 -- laser deflect
@@ -31,7 +32,8 @@ end
 abilities[2] = {
 press_func = abilities.deflect,
 update_func = abilities.deflect,
-delay = 0.2
+delay = 1,
+energy = 0.2
 }
 
 return abilities

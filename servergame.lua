@@ -18,11 +18,18 @@ local server_hooks = {
   use_ability = function(data, client)
     local index = client:getIndex()
     char.use_ability(players[index], index, data.target, data.num)
-    server:sendToPeer(server:getPeerByIndex(index), "ability_info", {num = data.num, delay = players[index].abilities[data.num].delay, active = players[index].abilities[data.num].active})
+    local ability = players[index].abilities[data.num]
+    server:sendToPeer(server:getPeerByIndex(index), "ability_info", {num = data.num, delay = ability.delay, active = ability.active, energy = players[index].energy})
   end,
-  update_abilities = function(data, client)
+  update_ability = function(data, client)
     local index = client:getIndex()
-    char.update_abilities(players[index], index, data)
+    local stop = char.update_ability(players[index], index, data.target, data.num)
+    if stop then
+      local ability = players[index].abilities[data.num]
+      server:sendToPeer(server:getPeerByIndex(index), "ability_info", {num = data.num, delay = ability.delay, active = ability.active, energy = players[index].energy})
+    else
+      server:sendToPeer(server:getPeerByIndex(index), "ability_info", {energy = players[index].energy})
+    end
   end,
   stop_ability = function(data, client)
     local index = client:getIndex()
@@ -45,7 +52,7 @@ servergame.update = function(dt)
   char.input(dt)
   server:sendToAll("pos", {index = id, pos = {x = players[id].x, y = players[id].y, z = players[id].z, xV = players[id].xV, yV = players[id].yV, zV = players[id].zV}})
   -- server's abilities
-  char.update_abilities(players[id], id, target)
+  game.update_abilities(servergame.update_ability)
   -- game updating
   game.update(dt)
 end
@@ -72,6 +79,10 @@ end
 
 servergame.use_ability = function(num)
   char.use_ability(players[id], id, target, num)
+end
+
+servergame.update_ability = function(num)
+  char.update_ability(players[id], id, target, num)
 end
 
 servergame.stop_ability = function(num)

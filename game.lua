@@ -7,6 +7,7 @@ clientgame = require "clientgame"
 servergame = require "servergame"
 bullet = require "bullet"
 abilities = require "abilities"
+hud = require "hud"
 
 local game = {}
 
@@ -28,6 +29,7 @@ game.update = function(dt)
   -- normal updates
   char.update(dt)
   bullet.update(dt)
+  hud.update(dt)
   -- create drawing queue
   queue = {}
   char.queue()
@@ -49,10 +51,13 @@ game.draw = function()
   bullet.draw()
   -- draw objects
   game.draw_queue()
-
+  -- target
   love.graphics.circle("line", target.x, target.y+target.z, 12, 24)
 
   love.graphics.pop()
+  -- draw hud
+  hud.draw()
+
 end
 
 game.mousepressed = function(x, y, button)
@@ -61,6 +66,14 @@ end
 game.abilities = function(mode, button, func)
   for i, v in ipairs(ability_keys) do
     if v[1] == mode and button == v[2] then
+      func(i)
+    end
+  end
+end
+
+game.update_abilities = function(func)
+  for i, v in ipairs(players[id].abilities) do
+    if v.active and abilities[players[id].abilities[i].type].update_func then
       func(i)
     end
   end

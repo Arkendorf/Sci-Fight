@@ -2,6 +2,9 @@ local char = {}
 
 local target_range = 32
 local target_speed = 32
+energy_max = 100
+local energy_increase = 0.1
+hp_max = 3
 
 char.load = function()
 end
@@ -76,24 +79,33 @@ char.update = function(dt)
         w.delay = w.delay - dt
       end
     end
+    if v.energy < energy_max then
+      v.energy = v.energy + energy_increase
+    end
   end
 end
 
 char.use_ability = function(player, index, target, num)
-  if player.abilities[num].delay <= 0 then
+  if player.abilities[num].delay <= 0 and player.energy >= abilities[player.abilities[num].type].energy then
     player.abilities[num].active = abilities[player.abilities[num].type].press_func(player, index, target)
     if not player.abilities[num].active then -- initiate cooldown if ability isn't channelled
       player.abilities[num].delay = abilities[player.abilities[num].type].delay
+      player.energy = player.energy - abilities[player.abilities[num].type].energy
     end
   end
 end
 
-char.update_abilities = function(player, index, target)
-  for i, v in ipairs(player.abilities) do
-    if v.active and abilities[player.abilities[i].type].update_func then
-      abilities[player.abilities[i].type].update_func(player, index, target)
+char.update_ability = function(player, index, target, num)
+  if player.abilities[num].active and abilities[player.abilities[num].type].update_func then
+    if player.energy >= abilities[player.abilities[num].type].energy then
+      abilities[player.abilities[num].type].update_func(player, index, target)
+      player.energy = player.energy - abilities[player.abilities[num].type].energy
+      return true
+    else
+      char.stop_ability(player, index, num)
     end
   end
+  return false
 end
 
 char.stop_ability = function(player, index, num)
@@ -112,9 +124,18 @@ char.ability_check = function(player, index)
   return false
 end
 
+char.death = function(player, killer)
+  player.hp = hp_max
+  player.x = #grid[1][1]*tile_size*0.5
+  player.y = #grid[1]*tile_size*0.5
+  player.z = -player.h
+  if killer.score then
+    killer.score = killer.score + 1
+  end
+end
 
 char.new = function(weapon)
-  return {x = #grid[1][1]*tile_size*0.5, y = #grid[1]*tile_size*0.5, z = -tile_size, l = 24, w = 24, h = 24, xV = 0, yV = 0, zV = 0, jump = false,
+  return {x = #grid[1][1]*tile_size*0.5, y = #grid[1]*tile_size*0.5, z = -24, l = 24, w = 24, h = 24, xV = 0, yV = 0, zV = 0, hp = hp_max, energy = energy_max, score = 0, jump = false,
   abilities = {{type = 1, active = false, delay = 0}, {type = 2, active = false, delay = 0}, {type = 1, active = false, delay = 0}, {type = 1, active = false, delay = 0}, {type = 1, active = false, delay = 0}}}
 end
 

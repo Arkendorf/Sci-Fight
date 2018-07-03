@@ -19,7 +19,10 @@ bullet.update = function(dt)
     -- collide with players
     for l, w in pairs(players) do
       if l ~= v.parent and collision.line_and_cube(p1, p2, w) then
-        -- damage
+        w.hp = w.hp - 1
+        if w.hp <= 0 then
+          char.death(w, players[v.parent])
+        end
         bullets[k] = nil
         break
       end

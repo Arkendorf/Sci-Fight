@@ -1,0 +1,33 @@
+SCI-FIGHT (AKA The Star Wars Game 4.0)
+
+Gamemodes:
+	Duel (PvP with optional teams)
+	Survival (PvE)
+
+Mechanics:
+	Customizable loadouts
+	Selectable maps
+
+Customization:
+	Choose from abilities, 2 locked to weapon and 3 separate
+	3 presets created from main menu or edited pre-game
+	Selectable skins for character
+
+Maps:
+	Volcanic Shore
+	Throne Room
+	Time Machine Interior
+	Spaceship Bridge
+	Cryofreeze Chamber
+	
+Abilities:
+	Blaster:
+		Shoot Laser
+		Stun
+
+	Saber:
+		Attack
+		Deflect Laser (channeled)
+		Throw Saber
+	Leap
+	Speed (channeled)
