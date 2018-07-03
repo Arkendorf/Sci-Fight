@@ -13,7 +13,7 @@ local client_hooks = {
     players[data.index].zV = data.pos.zV
   end,
   bullet = function(data)
-    bullets[data.i] = data.info
+    bullets[data.k] = data.info
   end,
   ability_info = function(data)
     players[id].abilities[data.num].delay = data.delay

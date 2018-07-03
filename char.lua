@@ -115,7 +115,7 @@ end
 
 char.new = function(weapon)
   return {x = #grid[1][1]*tile_size*0.5, y = #grid[1]*tile_size*0.5, z = -tile_size, l = 24, w = 24, h = 24, xV = 0, yV = 0, zV = 0, jump = false,
-  abilities = {{type = 1, active = false, delay = 0}, {type = 1, active = false, delay = 0}, {type = 1, active = false, delay = 0}, {type = 1, active = false, delay = 0}, {type = 1, active = false, delay = 0}}}
+  abilities = {{type = 1, active = false, delay = 0}, {type = 2, active = false, delay = 0}, {type = 1, active = false, delay = 0}, {type = 1, active = false, delay = 0}, {type = 1, active = false, delay = 0}}}
 end
 
 char.queue = function()

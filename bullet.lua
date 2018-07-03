@@ -12,7 +12,7 @@ bullet.update = function(dt)
     v.y = v.y + v.yV * dt * 60
     v.z = v.z + v.zV * dt * 60
     -- collide with map
-    local p1, p2 = {x = v.x, y = v.y, z = v.z}, {x = v.x+v.xV, y = v.y+v.yV, z = v.z+v.zV}
+    local p1, p2 = bullet.get_points(v)
     if collision.line_and_map(p1, p2) then
       bullets[k] = nil
     end
@@ -36,6 +36,10 @@ bullet.draw = function()
   for k, v in pairs(bullets) do
     queue[#queue + 1] = {img = laser_img, x = v.x, y = v.y, z = v.z, h = 0, ox = 16, oy = 16, angle = v.angle, shadow = false}
   end
+end
+
+bullet.get_points = function(v)
+  return {x = v.x, y = v.y, z = v.z}, {x = v.x+v.xV, y = v.y+v.yV, z = v.z+v.zV}
 end
 
 bullet.new = function(p1, p2, parent)

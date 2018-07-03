@@ -155,4 +155,10 @@ game.draw_shadow_mask = function(x, y, z, tile)
   end
 end
 
+game.target_norm = function(p, t)
+  local x, y, z = t.x-p.x-p.l/2, t.y-p.y-p.w/2, t.z-p.z-p.h/2
+  local denom = math.sqrt(x*x+y*y+z*z)
+  return {x = x/denom, y = y/denom, z = z/denom}
+end
+
 return game

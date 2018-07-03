@@ -77,6 +77,42 @@ collision.line_intersect = function(p1, p2, p3, p4)
   return false
 end
 
+collision.line_and_circle = function(p1, p2, p3, r)
+  local d = {x = p2.x-p1.x, y = p2.y-p1.y}
+  local f = {x = p1.x-p3.x, y = p1.y-p3.y}
+  local a = d.x*d.x + d.y*d.y
+  local b = 2*(f.x*d.x+f.y*d.y)
+  local c = f.x*f.x + f.y*f.y - r*r ;
+  local  disc = b*b-4*a*c;
+  if disc >= 0 then
+    disc = math.sqrt(disc)
+    local t1 = (-b - disc)/(2*a)
+    local t2 = (-b + disc)/(2*a)
+    if (( t1 >= 0 and t1 <= 1 ) or ( t2 >= 0 and t2 <= 1 )) then
+      return true
+    end
+  end
+  return false
+end
+
+collision.line_and_sphere = function(p1, p2, p3, r)
+  local d = {x = p2.x-p1.x, y = p2.y-p1.y, z = p2.z-p1.z}
+  local f = {x = p1.x-p3.x, y = p1.y-p3.y, z = p1.z-p3.z}
+  local a = d.x*d.x + d.y*d.y + d.z*d.z
+  local b = 2*(f.x*d.x + f.y*d.y + f.z*d.z)
+  local c = f.x*f.x + f.y*f.y + f.z*f.z - r*r
+  local  disc = b*b-4*a*c
+  if disc >= 0 then
+    disc = math.sqrt(disc)
+    local t1 = (-b - disc)/(2*a)
+    local t2 = (-b + disc)/(2*a)
+    if (( t1 >= 0 and t1 <= 1 ) or ( t2 >= 0 and t2 <= 1 )) then
+      return true
+    end
+  end
+  return false
+end
+
 local corners = {{x = 0, y = 0}, {x = 1, y = 0}, {x = 1, y = 1}, {x = 0, y = 1}, {x = 0, y = 0}}
 local faces = {{x = "x", y = "y", w = "l", h = "w"}, {x = "x", y = "z", w = "l", h = "h"}, {x = "z", y = "y", w = "h", h = "w"}}
 collision.line_and_cube = function(p1, p2, c)
@@ -96,30 +132,12 @@ collision.line_and_cube = function(p1, p2, c)
 end
 
 collision.line_and_map = function(p1, p2)
-  local x_min, x_max = 0, 0
-  if p1.x < p2.x then
-    x_min = 1+math.floor(p1.x/tile_size)
-    x_max = 1+math.floor(p2.x/tile_size)
-  else
-    x_min = 1+math.floor(p2.x/tile_size)
-    x_max = 1+math.floor(p1.x/tile_size)
-  end
-  local y_min, y_max = 0, 0
-  if p1.y < p2.y then
-    y_min = 1+math.floor(p1.y/tile_size)
-    y_max = 1+math.floor(p2.y/tile_size)
-  else
-    y_min = 1+math.floor(p2.y/tile_size)
-    y_max = 1+math.floor(p1.y/tile_size)
-  end
-  local z_min, z_max = 0, 0
-  if p1.z < p2.z then
-    z_min = 1+math.floor(p1.z/tile_size)
-    z_max = 1+math.floor(p2.z/tile_size)
-  else
-    z_min = 1+math.floor(p2.z/tile_size)
-    z_max = 1+math.floor(p1.z/tile_size)
-  end
+  local x1, x2 = 1+math.floor(p1.x/tile_size), 1+math.floor(p2.x/tile_size)
+  local x_min, x_max = math.min(x1, x2), math.max(x1, x2)
+  local y1, y2 = 1+math.floor(p1.y/tile_size), 1+math.floor(p2.y/tile_size)
+  local y_min, y_max = math.min(y1, y2), math.max(y1, y2)
+  local z1, z2 = 1+math.floor(p1.z/tile_size), 1+math.floor(p2.z/tile_size)
+  local z_min, z_max = math.min(z1, z2), math.max(z1, z2)
   for z = z_min, z_max do
     for y = y_min, y_max do
       for x = x_min, x_max do
