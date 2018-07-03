@@ -79,7 +79,7 @@ char.update = function(dt)
         w.delay = w.delay - dt
       end
     end
-    if v.energy < energy_max then
+    if v.energy < energy_max and not char.ability_check(v) then
       v.energy = v.energy + energy_increase
     end
   end
@@ -115,7 +115,7 @@ char.stop_ability = function(player, index, num)
   end
 end
 
-char.ability_check = function(player, index)
+char.ability_check = function(player)
   for i, v in ipairs(player.abilities) do
     if v.active and abilities[player.abilities[i].type].update_func then
       return true
