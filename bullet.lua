@@ -1,32 +1,22 @@
-local bullet = {}
+local bullet_ai = require "bullet_ai"
 
-local laser_speed = 6
+local bullet = {}
 
 bullet.load = function()
   bullets = {}
+
+  bullet_info = {}
+  bullet_info[1] = {ai = 1, speed = 6, r = 0, persistant = false, img = 1}
+  bullet_info[2] = {ai = 2, speed = 6, r = 16, persistant = true, img = 2}
 end
 
 bullet.update = function(dt)
   for k, v in pairs(bullets) do
-    v.x = v.x + v.xV * dt * 60
-    v.y = v.y + v.yV * dt * 60
-    v.z = v.z + v.zV * dt * 60
+    bullet_ai[bullet_info[v.type].ai](k, v, dt)
     -- collide with map
-    local p1, p2 = bullet.get_points(v)
-    if collision.line_and_map(p1, p2) then
-      bullets[k] = nil
-    end
+    bullet.map_collide(k, v)
     -- collide with players
-    for l, w in pairs(players) do
-      if l ~= v.parent and collision.line_and_cube(p1, p2, w) then
-        w.hp = w.hp - 1
-        if w.hp <= 0 then
-          char.death(w, players[v.parent])
-        end
-        bullets[k] = nil
-        break
-      end
-    end
+    bullet.player_collide(k, v)
     -- collide with borders (twice as large as map)
     if not collision.in_bounds((v.x/tile_size+#grid[1][1]/2)/2, (v.y/tile_size+#grid[1]/2)/2, (v.z/tile_size+#grid/2)/2) then
       bullets[k] = nil
@@ -37,7 +27,7 @@ end
 
 bullet.draw = function()
   for k, v in pairs(bullets) do
-    queue[#queue + 1] = {img = laser_img, x = v.x, y = v.y, z = v.z, h = 0, ox = 16, oy = 16, angle = v.angle, shadow = false}
+    queue[#queue + 1] = {img = bullet_img[bullet_info[v.type].img], x = v.x, y = v.y, z = v.z, h = 0, ox = 16, oy = 16, angle = v.angle, shadow = false}
   end
 end
 
@@ -45,14 +35,61 @@ bullet.get_points = function(v)
   return {x = v.x, y = v.y, z = v.z}, {x = v.x+v.xV, y = v.y+v.yV, z = v.z+v.zV}
 end
 
-bullet.new = function(p1, p2, parent)
+bullet.map_collide = function(k, v)
+  local p1, p2 = bullet.get_points(v)
+  if collision.line_and_map(p1, p2) then
+    bullet.destroy(k, v)
+  end
+end
+
+bullet.player_collide = function(k, v)
+  for l, w in pairs(players) do
+    if l ~= v.parent and bullet.cube_collide(k, v, c) then
+      w.hp = w.hp - 1
+      if w.hp <= 0 then
+        char.death(w, players[v.parent])
+      end
+      bullet.destroy(k, v)
+      break
+    end
+  end
+end
+
+bullet.cube_collide = function(k, v, c)
+  local p1, p2 = bullet.get_points(v)
+  return (collision.line_and_cube(p1, p2, c) or (v.r and (collision.sphere_and_cube(p1, c, v.r) or collision.sphere_and_cube(p2, c, v.r))))
+end
+
+bullet.circle_collide = function(v, p, r)
+  local p1, p2 = bullet.get_points(v)
+  return (collision.line_and_sphere(p1, p2, p, r) or (v.r and (collision.sphere_and_sphere(p, p1, r, v.r) or collision.sphere_and_sphere(p, p2, r, v.r))))
+end
+
+bullet.destroy = function(k, v)
+  if v.persistant then
+    bullet.reverse(v)
+  else
+    bullets[k] = nil
+  end
+end
+
+bullet.reverse = function(v)
+  local xV = math.cos(math.pi-math.atan2(math.sqrt(v.yV*v.yV+v.zV*v.zV), v.xV))
+  local yV = math.cos(math.pi-math.atan2(math.sqrt(v.zV*v.zV+v.xV*v.xV), v.yV))
+  local zV = math.cos(math.pi-math.atan2(math.sqrt(v.xV*v.xV+v.yV*v.yV), v.zV))
+  local mag = math.sqrt(v.xV*v.xV+v.yV*v.yV+v.zV*v.zV)
+  v.xV, v.yV, v.zV = xV*mag, yV*mag, zV*mag
+end
+
+bullet.new = function(p1, p2, parent, type, extra)
   local x1, y1, z1 = p1.x+p1.l/2, p1.y+p1.w/2, p1.z+p1.h/2
   local l_x, l_y, l_z = p2.x-x1, p2.y-y1, p2.z-z1
   local xV = math.cos(math.atan2(math.sqrt(l_y*l_y+l_z*l_z), l_x))
   local yV = math.cos(math.atan2(math.sqrt(l_z*l_z+l_x*l_x), l_y))
   local zV = math.cos(math.atan2(math.sqrt(l_x*l_x+l_y*l_y), l_z))
+  local info = bullet_info[type]
   local spot = #bullets+1
-  bullets[spot] = {x = x1, y = y1, z = z1, xV = xV*laser_speed, yV = yV*laser_speed, zV = zV*laser_speed, angle = math.atan2(yV+zV, xV), parent = parent}
+  bullets[spot] = {x = x1, y = y1, z = z1, xV = xV*info.speed, yV = yV*info.speed, zV = zV*info.speed, angle = math.atan2(yV+zV, xV), parent = parent, r = info.r, persistant = info.persistant, type = type, info = extra}
   return spot
 end
 

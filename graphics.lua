@@ -18,11 +18,12 @@ graphics.load = function()
   love.graphics.setLineWidth(1)
 
   player_img = love.graphics.newImage("char.png")
-  laser_img = love.graphics.newImage("laser.png")
 
   -- load tile images
   tile_img = graphics.load_folder("tiles")
   tile_quad = graphics.load_tile_quad(tile_size)
+
+  bullet_img = graphics.load_folder("bullets")
 end
 
 graphics.load_folder = function(str)

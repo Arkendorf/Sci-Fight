@@ -95,6 +95,22 @@ collision.line_and_circle = function(p1, p2, p3, r)
   return false
 end
 
+collision.circle_and_square = function(p, c, r)
+  local dist = {}
+  dist.x = math.abs(p.x - c.x-c.w/2)
+  dist.y = math.abs(p.y - c.y-c.h/2)
+
+  if (dist.x > c.w/2 + r) or (dist.y > c.h/2 + r) then
+    return false
+  end
+  if (dist.x <= c.w/2) or (dist.y <= c.h/2) then
+    return true
+  end
+
+  corner_dist = (dist.x - c.w/2)*(dist.x - c.w/2) + (dist.y - c.h/2)*(dist.y - c.h/2)
+  return (corner_dist <= r*r)
+end
+
 collision.line_and_sphere = function(p1, p2, p3, r)
   local d = {x = p2.x-p1.x, y = p2.y-p1.y, z = p2.z-p1.z}
   local f = {x = p1.x-p3.x, y = p1.y-p3.y, z = p1.z-p3.z}
@@ -129,6 +145,28 @@ collision.line_and_cube = function(p1, p2, c)
     end
   end
   return false
+end
+
+collision.sphere_and_cube = function(p, c, r)
+  local progress = 0
+  for i, v in ipairs(faces) do
+    for j = 1, #corners - 1 do
+      if collision.circle_and_square({x = p[v.x], y = p[v.y]}, {x = c[v.x], y = c[v.y], w = c[v.w], h = c[v.h]}, r) then
+        progress = progress + 1
+        break
+      end
+    end
+    if progress > 1 then
+      return true
+    end
+  end
+  return false
+end
+
+collision.sphere_and_sphere = function(p1, p2, r1, r2)
+  local x, y, z = p2.x-p1.x, p2.y-p1.y, p2.z-p1.z
+  local dist = math.sqrt(x*x+y*y+z*z)
+  return dist < r1+r2
 end
 
 collision.line_and_map = function(p1, p2)

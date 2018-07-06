@@ -86,7 +86,7 @@ char.update = function(dt)
 end
 
 char.use_ability = function(player, index, target, num)
-  if player.abilities[num].delay <= 0 and player.energy >= abilities[player.abilities[num].type].energy then
+  if player.abilities[num].delay <= 0 and player.energy >= abilities[player.abilities[num].type].energy and not (num < 3 and player.weapon.active) then
     player.abilities[num].active = abilities[player.abilities[num].type].press_func(player, index, target)
     if not player.abilities[num].active then -- initiate cooldown if ability isn't channelled
       player.abilities[num].delay = abilities[player.abilities[num].type].delay
@@ -135,8 +135,8 @@ char.death = function(player, killer)
 end
 
 char.new = function(weapon)
-  return {x = #grid[1][1]*tile_size*0.5, y = #grid[1]*tile_size*0.5, z = -24, l = 24, w = 24, h = 24, xV = 0, yV = 0, zV = 0, hp = hp_max, energy = energy_max, score = 0, jump = false,
-  abilities = {{type = 1, active = false, delay = 0}, {type = 2, active = false, delay = 0}, {type = 1, active = false, delay = 0}, {type = 1, active = false, delay = 0}, {type = 1, active = false, delay = 0}}}
+  return {x = #grid[1][1]*tile_size*0.5, y = #grid[1]*tile_size*0.5, z = -24, l = 24, w = 24, h = 24, xV = 0, yV = 0, zV = 0, hp = hp_max, energy = energy_max, score = 0, jump = false, weapon = {type = 1, active = false},
+  abilities = {{type = 3, active = false, delay = 0}, {type = 2, active = false, delay = 0}, {type = 1, active = false, delay = 0}, {type = 1, active = false, delay = 0}, {type = 1, active = false, delay = 0}}}
 end
 
 char.queue = function()
