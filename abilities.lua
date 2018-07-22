@@ -6,7 +6,7 @@ press_func = function(player, index, target)
   server:sendToAll("bullet", {info = bullets[k], k = k})
   return false
 end,
-update_func = nil;
+update_func = nil,
 delay = 0.2,
 energy = 5
 }
@@ -43,7 +43,7 @@ press_func = function(player, index, target)
   player.weapon.active = true
   return false
 end,
-update_func = nil;
+update_func = nil,
 delay = 0.2,
 energy = 5
 }

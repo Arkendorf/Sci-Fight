@@ -6,8 +6,8 @@ bullet.load = function()
   bullets = {}
 
   bullet_info = {}
-  bullet_info[1] = {ai = 1, speed = 6, r = 0, persistant = false, img = 1}
-  bullet_info[2] = {ai = 2, speed = 6, r = 16, persistant = true, img = 2}
+  bullet_info[1] = {ai = 1, speed = 6, r = 0, persistant = true, img = 1, shadow = false}
+  bullet_info[2] = {ai = 2, speed = 4, r = 16, persistant = true, img = 2, shadow = true}
 end
 
 bullet.update = function(dt)
@@ -22,12 +22,11 @@ bullet.update = function(dt)
       bullets[k] = nil
     end
   end
-
 end
 
-bullet.draw = function()
+bullet.queue = function()
   for k, v in pairs(bullets) do
-    queue[#queue + 1] = {img = bullet_img[bullet_info[v.type].img], x = v.x, y = v.y, z = v.z, h = 0, ox = 16, oy = 16, angle = v.angle, shadow = false}
+    queue[#queue + 1] = {img = bullet_img[bullet_info[v.type].img], x = v.x, y = v.y, z = v.z, h = 0, w = 0, l = 0, r = v.r/2, ox = 16, oy = 16, angle = v.angle, shadow = bullet_info[v.type].shadow}
   end
 end
 
@@ -36,9 +35,10 @@ bullet.get_points = function(v)
 end
 
 bullet.map_collide = function(k, v)
-  local p1, p2 = bullet.get_points(v)
-  if collision.line_and_map(p1, p2) then
+  if collision.bullet_and_map(k, v) then
     bullet.destroy(k, v)
+  else
+    v.collide = false
   end
 end
 
@@ -55,30 +55,33 @@ bullet.player_collide = function(k, v)
   end
 end
 
-bullet.cube_collide = function(k, v, c)
-  local p1, p2 = bullet.get_points(v)
-  return (collision.line_and_cube(p1, p2, c) or (v.r and (collision.sphere_and_cube(p1, c, v.r) or collision.sphere_and_cube(p2, c, v.r))))
-end
-
 bullet.circle_collide = function(v, p, r)
   local p1, p2 = bullet.get_points(v)
-  return (collision.line_and_sphere(p1, p2, p, r) or (v.r and (collision.sphere_and_sphere(p, p1, r, v.r) or collision.sphere_and_sphere(p, p2, r, v.r))))
+  return collision.line_and_sphere(p1, p2, p, r)
 end
 
 bullet.destroy = function(k, v)
-  if v.persistant then
-    bullet.reverse(v)
-  else
+  if not v.persistant then
     bullets[k] = nil
   end
 end
 
-bullet.reverse = function(v)
-  local xV = math.cos(math.pi-math.atan2(math.sqrt(v.yV*v.yV+v.zV*v.zV), v.xV))
-  local yV = math.cos(math.pi-math.atan2(math.sqrt(v.zV*v.zV+v.xV*v.xV), v.yV))
-  local zV = math.cos(math.pi-math.atan2(math.sqrt(v.xV*v.xV+v.yV*v.yV), v.zV))
-  local mag = math.sqrt(v.xV*v.xV+v.yV*v.yV+v.zV*v.zV)
-  v.xV, v.yV, v.zV = xV*mag, yV*mag, zV*mag
+bullet.reverse = function(v, face)
+  if not v.collide then
+    v.collide = true
+    local x_angle = math.atan2(math.sqrt(v.yV*v.yV+v.zV*v.zV), v.xV)
+    local xV = math.cos((math.pi-x_angle)*face.x+x_angle*(1-face.x))
+
+    local y_angle = math.atan2(math.sqrt(v.zV*v.zV+v.xV*v.xV), v.yV)
+    local yV = math.cos((math.pi-y_angle)*face.y+y_angle*(1-face.y))
+
+    local z_angle = math.atan2(math.sqrt(v.xV*v.xV+v.yV*v.yV), v.zV)
+    local zV = math.cos((math.pi-z_angle)*face.z+z_angle*(1-face.z))
+
+    local mag = math.sqrt(v.xV*v.xV+v.yV*v.yV+v.zV*v.zV)
+    v.xV, v.yV, v.zV = xV*mag, yV*mag, zV*mag
+    v.angle = math.atan2(yV+zV, xV)
+  end
 end
 
 bullet.new = function(p1, p2, parent, type, extra)
@@ -89,7 +92,7 @@ bullet.new = function(p1, p2, parent, type, extra)
   local zV = math.cos(math.atan2(math.sqrt(l_x*l_x+l_y*l_y), l_z))
   local info = bullet_info[type]
   local spot = #bullets+1
-  bullets[spot] = {x = x1, y = y1, z = z1, xV = xV*info.speed, yV = yV*info.speed, zV = zV*info.speed, angle = math.atan2(yV+zV, xV), parent = parent, r = info.r, persistant = info.persistant, type = type, info = extra}
+  bullets[spot] = {x = x1, y = y1, z = z1, xV = xV*info.speed, yV = yV*info.speed, zV = zV*info.speed, angle = math.atan2(yV+zV, xV), r = info.r, parent = parent, persistant = info.persistant, type = type, info = extra}
   return spot
 end
 

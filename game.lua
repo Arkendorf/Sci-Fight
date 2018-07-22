@@ -33,6 +33,7 @@ game.update = function(dt)
   -- create drawing queue
   queue = {}
   char.queue()
+  bullet.queue()
   -- update masks (e.g. layer and shadow)
   map.update_masks()
 end
@@ -47,8 +48,6 @@ game.draw = function()
   map.draw()
   -- draw shadows
   game.draw_shadows()
-  -- draw projectiles
-  bullet.draw()
   -- draw objects
   game.draw_queue()
   -- target
@@ -58,6 +57,7 @@ game.draw = function()
   -- draw hud
   hud.draw()
 
+  if blah ~= nil then love.graphics.print(tostring(blah), 32, 0) end
 end
 
 game.mousepressed = function(x, y, button)
@@ -100,6 +100,9 @@ game.shadow = function(v)
   for z_offset = 1+math.floor((v.z+v.h*0.5)/tile_size), #grid-1 do
     local diffuse = (z_offset*tile_size-(v.z+v.h))/tile_size/3
     local r = v.l/2
+    if v.r then
+      r = v.r
+    end
     shader.shadow:send("z", z_offset+1)
     love.graphics.setColor(0.2, 0.2, 0.3, 1-diffuse)
     love.graphics.circle("fill", math.ceil(v.x+v.l/2), math.ceil(v.y+v.w/2+z_offset*tile_size), r*(1+diffuse), 24)

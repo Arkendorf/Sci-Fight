@@ -130,28 +130,35 @@ collision.line_and_sphere = function(p1, p2, p3, r)
 end
 
 local corners = {{x = 0, y = 0}, {x = 1, y = 0}, {x = 1, y = 1}, {x = 0, y = 1}, {x = 0, y = 0}}
-local faces = {{x = "x", y = "y", w = "l", h = "w"}, {x = "x", y = "z", w = "l", h = "h"}, {x = "z", y = "y", w = "h", h = "w"}}
-collision.line_and_cube = function(p1, p2, c)
-  local progress = 0
-  for i, v in ipairs(faces) do
-    for j = 1, #corners - 1 do
-      if collision.line_intersect({x = p1[v.x], y = p1[v.y]}, {x = p2[v.x], y = p2[v.y]}, {x = c[v.x]+c[v.w]*corners[j].x, y = c[v.y]+c[v.h]*corners[j].y}, {x = c[v.x]+c[v.w]*corners[j+1].x, y = c[v.y]+c[v.h]*corners[j+1].y}) then
-        progress = progress + 1
-        break
-      end
-    end
-    if progress > 1 then
+collision.line_and_square = function(p1, p2, c)
+  for j = 1, #corners - 1 do
+    if collision.line_intersect(p1, p2, {x = c.x+c.w*corners[j].x, y = c.y+c.h*corners[j].y}, {x = c.x+c.w*corners[j+1].x, y = c.y+c.h*corners[j+1].y}) then
       return true
     end
   end
   return false
 end
 
+local faces = {{x = "x", y = "y", z = "z", w = "l", h = "w", r = "xR"}, {x = "x", y = "z", z = "y", w = "l", h = "h", r = "zR"}, {x = "z", y = "y", z = "x", w = "h", h = "w", r = "zR"}}
+collision.line_and_cube = function(p1, p2, c)
+  local progress = 0
+  for i, v in ipairs(faces) do
+    if collision.line_and_square({x = p1[v.x], y = p1[v.y]}, {x = p2[v.x], y = p2[v.y]}, {x = c[v.x], y = c[v.y], w = c[v.w], h = c[v.h]}) then
+      progress = progress + 1
+    end
+  end
+  if progress > 1 then
+    return true
+  else
+    return false
+  end
+end
+
 collision.sphere_and_cube = function(p, c, r)
   local progress = 0
   for i, v in ipairs(faces) do
     for j = 1, #corners - 1 do
-      if collision.circle_and_square({x = p[v.x], y = p[v.y]}, {x = c[v.x], y = c[v.y], w = c[v.w], h = c[v.h]}, r) then
+      if collision.circle_and_square({x = p[v.x], y = p[v.y]}, {x = c[v.x], y = c[v.y], w = c[v.w], h = c[v.h]}, r[v.r]) then
         progress = progress + 1
         break
       end
@@ -188,6 +195,86 @@ collision.line_and_map = function(p1, p2)
     end
   end
   return false
+end
+
+collision.line_and_tile = function(p1, p2, t)
+  local progress = 0
+  local face_collide = {false, false, false}
+  for i, v in ipairs(faces) do
+    for j = 1, #corners - 1 do
+      if collision.line_intersect({x = p1[v.x], y = p1[v.y]}, {x = p2[v.x], y = p2[v.y]}, {x = c[v.x]+c[v.w]*corners[j].x, y = c[v.y]+c[v.h]*corners[j].y}, {x = c[v.x]+c[v.w]*corners[j+1].x, y = c[v.y]+c[v.h]*corners[j+1].y}) then
+        progress = progress + 1
+        face_collide[i] = true
+        break
+      end
+    end
+  end
+  if progress > 1 then
+    return true, collision.face(face_collide)
+  else
+    return false
+  end
+end
+
+collision.bullet_and_cube = function(k, v, c)
+  local p1, p2 = bullet.get_points(v)
+  return collision.line_and_cube(p1, p2, c)
+end
+
+collision.bullet_and_map = function(k, v)
+  local p1, p2 = bullet.get_points(v)
+  local x_min = 1+math.floor(math.min(p1.x, p2.x)/tile_size)
+  local x_max = 1+math.floor(math.max(p1.x, p2.x)/tile_size)
+  local y_min = 1+math.floor(math.min(p1.y, p2.y)/tile_size)
+  local y_max = 1+math.floor(math.max(p1.y, p2.y)/tile_size)
+  local z_min = 1+math.floor(math.min(p1.z, p2.z)/tile_size)
+  local z_max = 1+math.floor(math.max(p1.z, p2.z)/tile_size)
+
+  for z = z_min, z_max do
+    for y = y_min, y_max do
+      for x = x_min, x_max do
+        if collision.in_bounds(x, y, z) and grid[z][y][x] > 0 and tiles[grid[z][y][x]] == 1 then
+          local cube = {x = (x-1)*tile_size, y = (y-1)*tile_size, z = (z-1)*tile_size, l = tile_size, w = tile_size, h = tile_size}
+          if collision.bullet_and_cube(k, v, cube) then
+            face = collision.bullet_face(p1, p2, cube)
+            if face then
+              bullet.reverse(v, face)
+            end
+            return true
+          end
+        end
+      end
+    end
+  end
+  return false
+end
+
+collision.bullet_face = function(p1, p2, t)
+  for i, v in ipairs(faces) do
+    for j = 1, #corners - 1 do
+      local corner1 = corners[j]
+      local corner2 = corners[j+1]
+      local x_offset = corner2.y-corner1.y
+      local y_offset = corner1.x-corner2.x
+      if x_offset * (p2[v.x]-p1[v.x]) < 0 or y_offset * (p2[v.y]-p1[v.y]) < 0 then -- make sure edge is in LoS
+        local tile = collision.get_tile({[v.x] = 1+math.floor(t[v.x]/tile_size)+x_offset, [v.y] = 1+math.floor(t[v.y]/tile_size)+y_offset, [v.z] = 1+math.floor(t[v.z]/tile_size)})
+        if tile == 0 then --no adjacent tile to edge
+          if collision.line_intersect(p1, p2, {x = t[v.x]+tile_size*corner1.x, y = t[v.y]+tile_size*corner1.y}, {x = t[v.x]+tile_size*corner2.x, y = t[v.y]+tile_size*corner2.y}) then
+            return {[v.x] = math.abs(x_offset), [v.y] = math.abs(y_offset), [v.z] = 0}
+          end
+        end
+      end
+    end
+    return false
+  end
+end
+
+collision.get_tile = function(coords)
+  if collision.in_bounds(coords.x, coords.y, coords.z) then
+    return grid[coords.z][coords.y][coords.x]
+  else
+    return 0
+  end
 end
 
 return collision
