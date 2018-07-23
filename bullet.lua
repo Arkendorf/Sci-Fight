@@ -12,7 +12,6 @@ end
 
 bullet.update = function(dt)
   for k, v in pairs(bullets) do
-    bullet_ai[bullet_info[v.type].ai](k, v, dt)
     -- collide with map
     bullet.map_collide(k, v)
     -- collide with players
@@ -21,6 +20,8 @@ bullet.update = function(dt)
     if not collision.in_bounds((v.x/tile_size+#grid[1][1]/2)/2, (v.y/tile_size+#grid[1]/2)/2, (v.z/tile_size+#grid/2)/2) then
       bullets[k] = nil
     end
+    --update
+    bullet_ai[bullet_info[v.type].ai](k, v, dt)
   end
 end
 
@@ -30,26 +31,38 @@ bullet.queue = function()
   end
 end
 
-bullet.get_points = function(v)
-  return {x = v.x, y = v.y, z = v.z}, {x = v.x+v.xV, y = v.y+v.yV, z = v.z+v.zV}
+bullet.get_points = function(v, dt)
+  return {x = v.x, y = v.y, z = v.z}, {x = v.x+v.xV*global_dt*60, y = v.y+v.yV*global_dt*60, z = v.z+v.zV*global_dt*60}
 end
 
 bullet.map_collide = function(k, v)
-  if collision.bullet_and_map(k, v) then
-    bullet.destroy(k, v)
+  p1, p2 = bullet.get_points(v)
+  collide, face, frac = collision.line_and_map(p1, p2)
+  if collide then
+    if not v.persistant then
+      bullet.destroy(k, v)
+    elseif face then
+      v.x = v.x + v.xV*frac
+      v.y = v.y + v.yV*frac
+      v.z = v.z + v.zV*frac
+      bullet.reverse(v, face)
+    end
   else
     v.collide = false
   end
 end
 
 bullet.player_collide = function(k, v)
+  p1, p2 = bullet.get_points(v)
   for l, w in pairs(players) do
-    if l ~= v.parent and bullet.cube_collide(k, v, c) then
+    if l ~= v.parent and collision.line_and_cube(p1, p2, w) then
       w.hp = w.hp - 1
       if w.hp <= 0 then
         char.death(w, players[v.parent])
       end
-      bullet.destroy(k, v)
+      if not v.persistant then
+        bullet.destroy(k, v)
+      end
       break
     end
   end
@@ -61,9 +74,7 @@ bullet.circle_collide = function(v, p, r)
 end
 
 bullet.destroy = function(k, v)
-  if not v.persistant then
-    bullets[k] = nil
-  end
+  bullets[k] = nil
 end
 
 bullet.reverse = function(v, face)

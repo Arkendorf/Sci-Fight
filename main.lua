@@ -16,9 +16,11 @@ love.load = function()
 
   state = "mainmenu"
   mainmenu.start()
+  global_dt = 0
 end
 
 love.update = function(dt)
+  global_dt = dt
   if server then
     server:update()
   end
