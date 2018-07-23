@@ -30,8 +30,8 @@ local deflect = function(player, index, target)
   return true
 end
 abilities[2] = {
-press_func = abilities.deflect,
-update_func = abilities.deflect,
+press_func = deflect,
+update_func = deflect,
 delay = 1,
 energy = 0.2
 }
