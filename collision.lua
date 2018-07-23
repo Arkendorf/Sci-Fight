@@ -234,9 +234,9 @@ collision.line_and_map = function(p1, p2)
       for x = x_min, x_max do
         if collision.in_bounds(x, y, z) and grid[z][y][x] > 0 and tiles[grid[z][y][x]] == 1 then
           local cube = {x = (x-1)*tile_size, y = (y-1)*tile_size, z = (z-1)*tile_size, l = tile_size, w = tile_size, h = tile_size}
-          if collision.line_and_cube(p1, p2, cube) then
-            face, frac = collision.face(p1, p2, cube)
-            return true, face, frac
+          face, frac = collision.face(p1, p2, cube)
+          if face then
+            return face, frac
           end
         end
       end
@@ -264,7 +264,7 @@ collision.face = function(p1, p2, t)
       end
     end
   end
-  return false, 0
+  return false
 end
 
 collision.get_tile = function(coords)

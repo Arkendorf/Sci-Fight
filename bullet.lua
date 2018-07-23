@@ -37,8 +37,8 @@ end
 
 bullet.map_collide = function(k, v)
   p1, p2 = bullet.get_points(v)
-  collide, face, frac = collision.line_and_map(p1, p2)
-  if collide then
+  face, frac = collision.line_and_map(p1, p2)
+  if face then
     if not v.persistant then
       bullet.destroy(k, v)
     elseif face then
