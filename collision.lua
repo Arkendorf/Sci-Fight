@@ -176,27 +176,6 @@ collision.sphere_and_sphere = function(p1, p2, r1, r2)
   return dist < r1+r2
 end
 
-collision.line_and_map = function(p1, p2)
-  local x1, x2 = 1+math.floor(p1.x/tile_size), 1+math.floor(p2.x/tile_size)
-  local x_min, x_max = math.min(x1, x2), math.max(x1, x2)
-  local y1, y2 = 1+math.floor(p1.y/tile_size), 1+math.floor(p2.y/tile_size)
-  local y_min, y_max = math.min(y1, y2), math.max(y1, y2)
-  local z1, z2 = 1+math.floor(p1.z/tile_size), 1+math.floor(p2.z/tile_size)
-  local z_min, z_max = math.min(z1, z2), math.max(z1, z2)
-  for z = z_min, z_max do
-    for y = y_min, y_max do
-      for x = x_min, x_max do
-        if collision.in_bounds(x, y, z) and grid[z][y][x] > 0 and tiles[grid[z][y][x]] == 1 then
-          if collision.line_and_cube(p1, p2, {x = (x-1)*tile_size, y = (y-1)*tile_size, z = (z-1)*tile_size, l = tile_size, w = tile_size, h = tile_size}) then
-            return true
-          end
-        end
-      end
-    end
-  end
-  return false
-end
-
 collision.line_and_tile = function(p1, p2, t)
   local progress = 0
   local face_collide = {false, false, false}
@@ -229,23 +208,43 @@ collision.line_and_map = function(p1, p2)
   local z_min = 1+math.floor(math.min(p1.z, p2.z)/tile_size)
   local z_max = 1+math.floor(math.max(p1.z, p2.z)/tile_size)
 
+  local face = {x = 0, y = 0, z = 0}
+  local frac = 1
+  local hits = {}
   for z = z_min, z_max do
     for y = y_min, y_max do
       for x = x_min, x_max do
-        if collision.in_bounds(x, y, z) and grid[z][y][x] > 0 and tiles[grid[z][y][x]] == 1 then
+        if collision.in_bounds(x, y, z) and tiles[grid[z][y][x]] == 1 then
           local cube = {x = (x-1)*tile_size, y = (y-1)*tile_size, z = (z-1)*tile_size, l = tile_size, w = tile_size, h = tile_size}
-          face, frac = collision.face(p1, p2, cube)
-          if face then
-            return face, frac
+          if collision.line_and_cube(p1, p2, cube) then
+            hits[#hits+1] = {x = x, y = y, z = z}
+            local new_face, new_frac = collision.find_face(p1, p2, cube)
+            if new_face then
+              for k, v in pairs(new_face) do
+                if v > 0 then
+                  face[k] = 1
+                end
+              end
+              if new_frac < frac then
+                frac = new_frac
+              end
+            end
           end
         end
       end
     end
   end
-  return false
+  if face.x+face.y+face.z > 1 then
+    blah = hits
+  end
+  if face.x > 0 or face.y > 0 or face.z > 0 then
+    return face, frac
+  else
+    return false
+  end
 end
 
-collision.face = function(p1, p2, t)
+collision.find_face = function(p1, p2, t)
   for i, v in ipairs(faces) do
     for j = 1, #corners - 1 do
       local corner1 = corners[j]
@@ -254,11 +253,10 @@ collision.face = function(p1, p2, t)
       local y_offset = corner1.x-corner2.x
       if x_offset * (p2[v.x]-p1[v.x]) < 0 or y_offset * (p2[v.y]-p1[v.y]) < 0 then -- make sure edge is in LoS
         local tile = collision.get_tile({[v.x] = 1+math.floor(t[v.x]/tile_size)+x_offset, [v.y] = 1+math.floor(t[v.y]/tile_size)+y_offset, [v.z] = 1+math.floor(t[v.z]/tile_size)})
-        if tile == 0 then --no adjacent tile to edge
-          blah = math.random(1, 400)
+        if tiles[tile] == 0 then --no adjacent tile to edge
           local collide, frac = collision.line_intersect({x = p1[v.x], y = p1[v.y]}, {x = p2[v.x], y = p2[v.y]}, {x = t[v.x]+tile_size*corner1.x, y = t[v.y]+tile_size*corner1.y}, {x = t[v.x]+tile_size*corner2.x, y = t[v.y]+tile_size*corner2.y})
           if collide then
-            return {[v.x] = math.abs(x_offset), [v.y] = math.abs(y_offset), [v.z] = 0}, frac
+            return {[v.x] = math.abs(x_offset), [v.y] = math.abs(y_offset)}, frac
           end
         end
       end

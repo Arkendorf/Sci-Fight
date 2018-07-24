@@ -57,7 +57,15 @@ game.draw = function()
   -- draw hud
   hud.draw()
 
-  if blah ~= nil then love.graphics.print(tostring(blah), 32, 0) end
+  if blah ~= nil then
+    for i, v in ipairs(blah) do
+      str = ""
+      for k, w in pairs(v) do
+        str = str..k..": "..w..", "
+      end
+      love.graphics.print(tostring(str), 32, 16*(i-1))
+    end
+  end
 end
 
 game.mousepressed = function(x, y, button)
