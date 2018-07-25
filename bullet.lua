@@ -40,6 +40,7 @@ bullet.map_collide = function(k, v)
     local p1, p2 = bullet.get_points(v)
     local face, frac = collision.line_and_map(p1, p2)
     if face then
+      v.collide = true
       v.x, v.y, v.z = v.x+v.xV*frac, v.y+v.yV*frac, v.z+v.zV*frac
       if bullet.destroy(k, v, face) then
         break
