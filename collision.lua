@@ -210,14 +210,12 @@ collision.line_and_map = function(p1, p2)
 
   local face = {x = 0, y = 0, z = 0}
   local frac = 1
-  local hits = {}
   for z = z_min, z_max do
     for y = y_min, y_max do
       for x = x_min, x_max do
         if collision.in_bounds(x, y, z) and tiles[grid[z][y][x]] == 1 then
           local cube = {x = (x-1)*tile_size, y = (y-1)*tile_size, z = (z-1)*tile_size, l = tile_size, w = tile_size, h = tile_size}
           if collision.line_and_cube(p1, p2, cube) then
-            hits[#hits+1] = {x = x, y = y, z = z}
             local new_face, new_frac = collision.find_face(p1, p2, cube)
             if new_face then
               for k, v in pairs(new_face) do
@@ -233,9 +231,6 @@ collision.line_and_map = function(p1, p2)
         end
       end
     end
-  end
-  if face.x+face.y+face.z > 1 then
-    blah = hits
   end
   if face.x > 0 or face.y > 0 or face.z > 0 then
     return face, frac

@@ -2,11 +2,13 @@ local bullet_ai = require "bullet_ai"
 
 local bullet = {}
 
+local tile_buffer = 12
+
 bullet.load = function()
   bullets = {}
 
   bullet_info = {}
-  bullet_info[1] = {ai = 1, speed = 6, r = 0, persistant = true, img = 1, shadow = false}
+  bullet_info[1] = {ai = 1, speed = 6, r = 0, img = 1, shadow = false}
   bullet_info[2] = {ai = 2, speed = 4, r = 16, persistant = true, img = 2, shadow = true}
 end
 
@@ -16,10 +18,8 @@ bullet.update = function(dt)
     bullet.map_collide(k, v)
     -- collide with players
     bullet.player_collide(k, v)
-    -- collide with borders (twice as large as map)
-    if not collision.in_bounds((v.x/tile_size+#grid[1][1]/2)/2, (v.y/tile_size+#grid[1]/2)/2, (v.z/tile_size+#grid/2)/2) then
-      bullets[k] = nil
-    end
+    -- collide with borders
+    bullet.bound_collide(k, v)
     --update
     bullet_ai[bullet_info[v.type].ai](k, v, dt)
   end
@@ -36,19 +36,15 @@ bullet.get_points = function(v, dt)
 end
 
 bullet.map_collide = function(k, v)
-  local p1, p2 = bullet.get_points(v)
-  local face, frac = collision.line_and_map(p1, p2)
-  if face then
-    if not v.persistant then
-      bullet.destroy(k, v)
-    elseif face then
-      v.x = v.x + v.xV*frac
-      v.y = v.y + v.yV*frac
-      v.z = v.z + v.zV*frac
-      bullet.reverse(v, face)
+  for i = 1, 3 do -- one for each face
+    local p1, p2 = bullet.get_points(v)
+    local face, frac = collision.line_and_map(p1, p2)
+    if face then
+      v.x, v.y, v.z = v.x+v.xV*frac, v.y+v.yV*frac, v.z+v.zV*frac
+      if bullet.destroy(k, v, face) then
+        break
+      end
     end
-  else
-    v.collide = false
   end
 end
 
@@ -60,11 +56,17 @@ bullet.player_collide = function(k, v)
       if w.hp <= 0 then
         char.death(w, players[v.parent])
       end
-      if not v.persistant then
-        bullet.destroy(k, v)
-      end
+      bullet.destroy(k, v)
       break
     end
+  end
+end
+
+bullet.bound_collide = function(k, v)
+  if v.z < -tile_buffer*tile_size or v.z > (#grid+tile_buffer)*tile_size
+  or v.y < -tile_buffer*tile_size or v.y > (#grid[1]+tile_buffer)*tile_size
+  or v.x < -tile_buffer*tile_size or v.x > (#grid[1][1]+tile_buffer)*tile_size then
+    bullet.destroy(k, v)
   end
 end
 
@@ -73,26 +75,29 @@ bullet.circle_collide = function(v, p, r)
   return collision.line_and_sphere(p1, p2, p, r)
 end
 
-bullet.destroy = function(k, v)
-  bullets[k] = nil
+bullet.destroy = function(k, v, face)
+  if not v.persistant then
+    bullets[k] = nil
+    return true
+  elseif face then
+    bullet.reverse(v, face)
+  end
+  return false
 end
 
 bullet.reverse = function(v, face)
-  if not v.collide then
-    v.collide = true
-    local x_angle = math.atan2(math.sqrt(v.yV*v.yV+v.zV*v.zV), v.xV)
-    local xV = math.cos((math.pi-x_angle)*face.x+x_angle*(1-face.x))
+  local x_angle = math.atan2(math.sqrt(v.yV*v.yV+v.zV*v.zV), v.xV)
+  local xV = math.cos((math.pi-x_angle)*face.x+x_angle*(1-face.x))
 
-    local y_angle = math.atan2(math.sqrt(v.zV*v.zV+v.xV*v.xV), v.yV)
-    local yV = math.cos((math.pi-y_angle)*face.y+y_angle*(1-face.y))
+  local y_angle = math.atan2(math.sqrt(v.zV*v.zV+v.xV*v.xV), v.yV)
+  local yV = math.cos((math.pi-y_angle)*face.y+y_angle*(1-face.y))
 
-    local z_angle = math.atan2(math.sqrt(v.xV*v.xV+v.yV*v.yV), v.zV)
-    local zV = math.cos((math.pi-z_angle)*face.z+z_angle*(1-face.z))
+  local z_angle = math.atan2(math.sqrt(v.xV*v.xV+v.yV*v.yV), v.zV)
+  local zV = math.cos((math.pi-z_angle)*face.z+z_angle*(1-face.z))
 
-    local mag = math.sqrt(v.xV*v.xV+v.yV*v.yV+v.zV*v.zV)
-    v.xV, v.yV, v.zV = xV*mag, yV*mag, zV*mag
-    v.angle = math.atan2(yV+zV, xV)
-  end
+  local mag = math.sqrt(v.xV*v.xV+v.yV*v.yV+v.zV*v.zV)
+  v.xV, v.yV, v.zV = xV*mag, yV*mag, zV*mag
+  v.angle = math.atan2(yV+zV, xV)
 end
 
 bullet.new = function(p1, p2, parent, type, extra)
