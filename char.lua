@@ -73,6 +73,11 @@ char.update = function(dt)
 
     v.z = v.z + v.zV * dt * 60
 
+    --invulnerability
+    if v.inv > 0 then
+      v.inv = v.inv - dt
+    end
+
     -- abilities
     for i, w in ipairs(v.abilities) do
       if w.delay > 0 then
@@ -135,7 +140,7 @@ char.death = function(player, killer)
 end
 
 char.new = function(weapon)
-  return {x = #grid[1][1]*tile_size*0.5, y = #grid[1]*tile_size*0.5, z = -24, l = 24, w = 24, h = 24, xV = 0, yV = 0, zV = 0, hp = hp_max, energy = energy_max, score = 0, jump = false, weapon = {type = 1, active = false},
+  return {x = #grid[1][1]*tile_size*0.5, y = #grid[1]*tile_size*0.5, z = -24, l = 24, w = 24, h = 24, xV = 0, yV = 0, zV = 0, hp = hp_max, energy = energy_max, score = 0, jump = false, inv = 0, weapon = {type = 1, active = false},
   abilities = {{type = 3, active = false, delay = 0}, {type = 2, active = false, delay = 0}, {type = 1, active = false, delay = 0}, {type = 1, active = false, delay = 0}, {type = 1, active = false, delay = 0}}}
 end
 

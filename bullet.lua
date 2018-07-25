@@ -3,6 +3,7 @@ local bullet_ai = require "bullet_ai"
 local bullet = {}
 
 local tile_buffer = 12
+local inv_time = 1
 
 bullet.load = function()
   bullets = {}
@@ -52,8 +53,9 @@ end
 bullet.player_collide = function(k, v)
   p1, p2 = bullet.get_points(v)
   for l, w in pairs(players) do
-    if l ~= v.parent and collision.line_and_cube(p1, p2, w) then
+    if l ~= v.parent and w.inv <= 0 and collision.line_and_cube(p1, p2, w) then
       w.hp = w.hp - 1
+      w.inv = inv_time
       if w.hp <= 0 then
         char.death(w, players[v.parent])
       end
