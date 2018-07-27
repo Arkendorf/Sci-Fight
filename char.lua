@@ -12,19 +12,19 @@ end
 char.input = function(dt)
   --input
   if love.keyboard.isDown("w") then
-    players[id].yV = players[id].yV - 1
+    players[id].yV = players[id].yV - .5
   end
   if love.keyboard.isDown("s") then
-    players[id].yV = players[id].yV + 1
+    players[id].yV = players[id].yV + 0.5
   end
   if love.keyboard.isDown("a") then
-    players[id].xV = players[id].xV - 1
+    players[id].xV = players[id].xV - 0.5
   end
   if love.keyboard.isDown("d") then
-    players[id].xV = players[id].xV + 1
+    players[id].xV = players[id].xV + 0.5
   end
   if love.keyboard.isDown("space") and not players[id].jump then
-    players[id].zV = players[id].zV - 5
+    players[id].zV = players[id].zV - 4
     players[id].jump = true
   end
 

@@ -4,7 +4,7 @@ local button = {w = 64, h = 48, border = 2}
 local button2 = {w = 82, h = 32, border = 4}
 local icon = {w = 32, h = 32, border = 4}
 local current_loadout = 1
-local current_slot = {type = 0, num = 0}
+local current_slot = 0
 local offsets = {weapon = {x = 35, y = 5}, abilities = {{x = 35, y = 43}, {x = 73, y = 43}, {x = 111, y = 25}, {x = 149, y = 25}, {x = 187, y = 25}}}
 local loadout_pos = {}
 local option_pos = {}
@@ -46,7 +46,7 @@ custom.draw = function()
     love.graphics.draw(ability_img[loadouts[current_loadout].abilities[i]], loadout_pos.x+v.x, loadout_pos.y+v.y)
   end
   for i, v in ipairs(icons) do
-    if current_slot.type == "weapon" then
+    if current_slot == "weapon" then
       love.graphics.draw(weapon_img[v.num], v.x, v.y)
     elseif custom.ability_used(v.num) then
       love.graphics.setColor(0.6, 0.6, 0.6)
@@ -61,7 +61,7 @@ end
 custom.set_current_loadout = function(num)
   current_loadout = num
   gui.remove(3)
-  current_slot.type = 0
+  icons = {}
   gui.remove(4)
   local pos = loadout_pos
   local buttons = {}
@@ -73,8 +73,7 @@ custom.set_current_loadout = function(num)
 end
 
 custom.set_current_slot = function(type)
-  current_slot.type = type
-  current_slot.num = num
+  current_slot = type
   icons = custom.get_icon_pos(type)
   local buttons = {}
   for i, v in ipairs(icons) do
