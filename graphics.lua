@@ -26,6 +26,8 @@ graphics.load = function()
   bullet_img = graphics.load_folder("bullets")
 
   ability_img = graphics.load_folder("abilityicons")
+  weapon_img = graphics.load_folder("weaponicons")
+
 end
 
 graphics.load_folder = function(str)

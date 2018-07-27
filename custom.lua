@@ -40,16 +40,14 @@ custom.draw = function()
   love.graphics.rectangle("fill", loadout_pos.x, loadout_pos.y, loadout_pos.w, loadout_pos.h)
   love.graphics.setColor(1, 1, 1)
   love.graphics.rectangle("fill", option_pos.x, option_pos.y, option_pos.w, option_pos.h)
+
+  love.graphics.draw(weapon_img[loadouts[current_loadout].weapon], loadout_pos.x+offsets.weapon.x, loadout_pos.y+offsets.weapon.y)
   for i, v in ipairs(offsets.abilities) do
-    local img = ability_img[loadouts[current_loadout].abilities[i]]
-    if img then
-      love.graphics.draw(img, loadout_pos.x+v.x, loadout_pos.y+v.y)
-    end
+    love.graphics.draw(ability_img[loadouts[current_loadout].abilities[i]], loadout_pos.x+v.x, loadout_pos.y+v.y)
   end
   for i, v in ipairs(icons) do
     if current_slot.type == "weapon" then
-      love.graphics.setColor(menu_color)
-      love.graphics.rectangle("fill", v.x, v.y, v.w, v.h)
+      love.graphics.draw(weapon_img[v.num], v.x, v.y)
     elseif custom.ability_used(v.num) then
       love.graphics.setColor(0.6, 0.6, 0.6)
       love.graphics.draw(ability_img[v.num], v.x, v.y)
@@ -67,7 +65,7 @@ custom.set_current_loadout = function(num)
   gui.remove(4)
   local pos = loadout_pos
   local buttons = {}
-  buttons[1] = {x = pos.x+offsets.weapon.x, y = pos.y+offsets.weapon.y, w = 70, h = 32, txt = "Weapon", func = custom.set_current_slot, args = {"weapon"}}
+  buttons[1] = {x = pos.x+offsets.weapon.x, y = pos.y+offsets.weapon.y, w = 70, h = 32, txt = "Weapon", func = custom.set_current_slot, args = {"weapon"}, hide = true}
   for i, v in ipairs(offsets.abilities) do
     buttons[i+1]  = {x = pos.x+v.x, y = pos.y+v.y, w = 32, h = 32, txt = tostring(i), func = custom.set_current_slot, args = {i}, hide = true}
   end
@@ -140,6 +138,20 @@ custom.ability_used = function(ability)
 end
 
 custom.change_weapon = function(weapon)
+  local old_type = weapons[loadouts[current_loadout].weapon].type  -- don't allow weapon to have abilities from another type of weapon
+  local new_type = weapons[weapon].type
+  local ability = 1
+  if old_type ~= new_type then
+    for i, v in ipairs(abilities) do
+      if v.type and v.type == new_type then
+        loadouts[current_loadout].abilities[ability] = i
+        ability = ability + 1
+      end
+      if ability > 2 then
+        break
+      end
+    end
+  end
   loadouts[current_loadout].weapon = weapon
 end
 
