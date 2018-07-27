@@ -8,4 +8,8 @@ weapons[2] = { -- blaster
   type = 2
 }
 
+weapons[3] = { -- blaster
+  type = 1
+}
+
 return weapons

@@ -51,4 +51,7 @@ energy = 25,
 type = 1
 }
 
+abilities[4] = { -- filler
+}
+
 return abilities

@@ -24,6 +24,8 @@ graphics.load = function()
   tile_quad = graphics.load_tile_quad(tile_size)
 
   bullet_img = graphics.load_folder("bullets")
+
+  ability_img = graphics.load_folder("abilityicons")
 end
 
 graphics.load_folder = function(str)
