@@ -4,24 +4,33 @@ local prompts = {{num = 1, active = false, x = -128, y = 0, w = 64, port = "2556
 local button = {w = 64, h = 48, border = 2}
 local textbox = {h = 16}
 local name_box = {w = 96, h = 16}
+local button_num = 3
 
 mainmenu.load = function()
   username = {"Placeholder"}
 
   textbox.border = (button.h-textbox.h*2)/3
-  prompts[1].y = screen.h/2-button.h-button.border/2
+  prompts[1].y = mainmenu.button_y(1, button_num)
   prompts[1].textboxes = {{x = {t = prompts[1], i = "x", o = textbox.border}, y = prompts[1].y+(button.h-textbox.h)/2, w = prompts[1].w-textbox.border*2, h = textbox.h, t = prompts[1], i = "port", sample = "Port"}}
 
-  prompts[2].y = screen.h/2+button.border/2
+  prompts[2].y = mainmenu.button_y(2, button_num)
   prompts[2].textboxes = {{x = {t = prompts[2], i = "x", o = textbox.border}, y = prompts[2].y+textbox.border, w = prompts[2].w-textbox.border*2, h = textbox.h, t = prompts[2], i = "ip", sample = "I.P. Address"},
                           {x = {t = prompts[2], i = "x", o = textbox.border}, y = prompts[2].y+textbox.border*2+textbox.h, w = prompts[2].w-textbox.border*2, h = textbox.h, t = prompts[2], i = "port", sample = "Port"}}
 
   menu_color = {0.2, 0.4, 1}
 end
 
+mainmenu.button_y = function(num, max)
+  return (screen.h-max*(button.h+button.border))/2+(button.h+button.border)*(num-1)
+end
+
+
 mainmenu.start = function()
+  state = "mainmenu"
+  gui.clear()
   gui.add(3, {{x = button.border, y = prompts[1].y, w = button.w, h = button.h, txt = "Host", func = mainmenu.prompt, args = {1}},
-              {x = button.border, y = prompts[2].y, w = button.w, h = button.h, txt ="Join", func = mainmenu.prompt, args = {2}}},
+              {x = button.border, y = prompts[2].y, w = button.w, h = button.h, txt ="Join", func = mainmenu.prompt, args = {2}},
+              {x = button.border, y = mainmenu.button_y(3, button_num), w = button.w, h = button.h, txt ="Loadouts", func = wipe.start, args = {mainmenu.custom_start}}},
              {{x = (screen.w-name_box.w)/2, y = screen.h-name_box.h*2-button.border, w = name_box.w, h = name_box.h, t = username, i = 1, sample = "Username"}})
 
   for i, v in ipairs(prompts) do
@@ -70,6 +79,11 @@ end
 mainmenu.prompt_start[2] = function()
   state = "clientmenu"
   clientmenu.start(prompts[2].ip, tonumber(prompts[2].port))
+end
+
+mainmenu.custom_start = function()
+  state = "custom"
+  custom.start()
 end
 
 return mainmenu

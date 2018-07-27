@@ -8,7 +8,8 @@ press_func = function(player, index, target)
 end,
 update_func = nil,
 delay = 0.2,
-energy = 5
+energy = 5,
+type = 2
 }
 
 -- laser deflect
@@ -33,7 +34,8 @@ abilities[2] = {
 press_func = deflect,
 update_func = deflect,
 delay = 1,
-energy = 0.2
+energy = 0.2,
+type = 1
 }
 
 abilities[3] = { -- throw saber
@@ -45,7 +47,8 @@ press_func = function(player, index, target)
 end,
 update_func = nil,
 delay = 0.2,
-energy = 5
+energy = 25,
+type = 1
 }
 
 return abilities

@@ -55,6 +55,8 @@ servergame.update = function(dt)
   game.update_abilities(servergame.update_ability)
   -- game updating
   game.update(dt)
+  -- send stuff
+
 end
 
 servergame.draw = function()

@@ -35,7 +35,11 @@ local client_hooks = {
   end,
   -- if a player presses ready
   ready = function(data, client)
-    players[data.index].ready = data.value
+    players[data.index].ready = data.ready
+  end,
+  -- players with added data
+  updatedplayers = function(data, client)
+    new_players = data
   end,
 }
 
@@ -71,11 +75,11 @@ end
 
 clientmenu.ready = function()
   players[id].ready = not players[id].ready
-  client:send("ready", players[id].ready)
+  client:send("ready", {ready = players[id].ready, loadout = custom.get_loadout()})
 end
 
 clientmenu.start_game = function()
-  menu.create_players()
+  players = new_players
   state = "clientgame"
   clientgame.start()
 end

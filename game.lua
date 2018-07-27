@@ -6,7 +6,6 @@ shader = require "shader"
 clientgame = require "clientgame"
 servergame = require "servergame"
 bullet = require "bullet"
-abilities = require "abilities"
 hud = require "hud"
 
 local game = {}

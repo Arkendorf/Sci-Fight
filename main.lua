@@ -5,6 +5,9 @@ enet = require "enet"
 sock = require "sock"
 menu = require "menu"
 wipe = require "wipe"
+custom = require "custom"
+abilities = require "abilities"
+weapons = require "weapons"
 
 love.load = function()
   graphics.load()
@@ -13,6 +16,7 @@ love.load = function()
   mainmenu.load()
   menu.load()
   game.load()
+  custom.load()
 
   state = "mainmenu"
   mainmenu.start()
@@ -37,6 +41,8 @@ love.update = function(dt)
     clientgame.update(dt)
   elseif state == "servergame" then
     servergame.update(dt)
+  elseif state == "custom" then
+    custom.update(dt)
   end
   gui.update(dt)
   wipe.update(dt)
@@ -55,6 +61,8 @@ love.draw = function()
     clientgame.draw()
   elseif state == "servergame" then
     servergame.draw()
+  elseif state == "custom" then
+    custom.draw()
   end
   gui.draw()
   wipe.draw()

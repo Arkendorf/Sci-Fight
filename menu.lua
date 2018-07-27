@@ -58,14 +58,4 @@ menu.draw_list = function()
   end
 end
 
-menu.create_players = function()
-  for k, v in pairs(players) do
-    if v.left then
-      players[k] = nil
-    else
-      players[k] = char.new(k+1)
-    end
-  end
-end
-
 return menu

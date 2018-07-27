@@ -28,8 +28,9 @@ local server_hooks = {
   -- if a player presses ready
   ready = function(data, client)
     local index = client:getIndex()
-    players[index].ready = data
-    server:sendToAll("ready", {index = index, value = data})
+    players[index].ready = data.ready
+    players[index].loadout = data.loadout
+    server:sendToAll("ready", {index = index, ready = data.ready})
   end,
 }
 
@@ -60,12 +61,15 @@ servermenu.draw = function()
 end
 
 servermenu.all_ready = function()
+  new_players = servermenu.create_players()
+  server:sendToAll("updatedplayers", new_players)
+
   server:sendToAll("startgame")
   wipe.start(servermenu.start_game, {"server"})
 end
 
 servermenu.start_game = function()
-  menu.create_players()
+  players = new_players
   state = "servergame"
   servergame.start()
 end
@@ -78,7 +82,20 @@ end
 
 servermenu.ready = function()
   players[id].ready = not players[id].ready
-  server:sendToAll("ready", {index = id, value = players[id].ready})
+  players[id].loadout = custom.get_loadout()
+  server:sendToAll("ready", {index = id, ready = players[id].ready})
+end
+
+servermenu.create_players = function()
+  local new_players = {}
+  for k, v in pairs(players) do
+    if v.left then
+      new_players[k] = nil
+    else
+      new_players[k] = char.new(v.loadout)
+    end
+  end
+  return new_players
 end
 
 servermenu.quit = function()
