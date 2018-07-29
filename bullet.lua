@@ -17,12 +17,30 @@ bullet.update = function(dt)
   for k, v in pairs(bullets) do
     -- collide with map
     bullet.map_collide(k, v)
-    -- collide with players
-    bullet.player_collide(k, v)
     -- collide with borders
     bullet.bound_collide(k, v)
-    --update
+    -- update pos
+    v.x = v.x + v.xV * dt * 60
+    v.y = v.y + v.yV * dt * 60
+    v.z = v.z + v.zV * dt * 60
+  end
+end
+
+bullet.serverupdate = function(dt)
+  for k, v in pairs(bullets) do
+    -- collide with players
+    bullet.player_collide(k, v)
+    -- update velocity
     bullet_ai[bullet_info[v.type].ai](k, v, dt)
+    -- send update info
+    if bullets[k] then
+      if not v.old or v.x ~= v.old.x or v.y ~= v.old.y or v.z ~= v.old.z or v.xV ~= v.old.xV or v.yV ~= v.old.yV or v.zV ~= v.old.yV or v.angle ~= v.old.angle then
+        server:sendToAll("bulletupdate", {index = k, pos = {x = v.x, y = v.y, z = v.z, xV = v.xV, yV = v.yV, zV = v.zV, angle = v.angle}})
+        v.old = {x = v.x, y = v.y, z = v.z, xV = v.xV, yV = v.yV, zV = v.zV, angle = v.angle}
+      end
+    else -- delete bullet
+      server:sendToAll("bullet", {k = k, info = nil})
+    end
   end
 end
 
@@ -50,18 +68,24 @@ bullet.map_collide = function(k, v)
   end
 end
 
-bullet.player_collide = function(k, v)
+bullet.player_collide = function(k, v) -- only server should do this
   p1, p2 = bullet.get_points(v)
   for l, w in pairs(players) do
     if l ~= v.parent and w.inv <= 0 and collision.line_and_cube(p1, p2, w) then
-      w.hp = w.hp - 1
-      w.inv = inv_time
-      if w.hp <= 0 then
-        char.death(w, players[v.parent])
-      end
+      local num = w.hp - 1
+      bullet.damage(w, num, v.parent)
+      server:sendToAll("hit", {index = l, num = num, parent = v.parent})
       bullet.destroy(k, v)
       break
     end
+  end
+end
+
+bullet.damage = function(player, num, parent)
+  player.hp = num
+  player.inv = inv_time
+  if player.hp <= 0 then
+    char.death(player, players[parent])
   end
 end
 
@@ -71,11 +95,6 @@ bullet.bound_collide = function(k, v)
   or v.x < -tile_buffer*tile_size or v.x > (#grid[1][1]+tile_buffer)*tile_size then
     bullet.destroy(k, v)
   end
-end
-
-bullet.circle_collide = function(v, p, r)
-  local p1, p2 = bullet.get_points(v)
-  return collision.line_and_sphere(p1, p2, p, r)
 end
 
 bullet.destroy = function(k, v, face)

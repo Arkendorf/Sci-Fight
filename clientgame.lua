@@ -5,15 +5,16 @@ end
 
 local client_hooks = {
   pos = function(data)
-    players[data.index].x = data.pos.x
-    players[data.index].y = data.pos.y
-    players[data.index].z = data.pos.z
-    players[data.index].xV = data.pos.xV
-    players[data.index].yV = data.pos.yV
-    players[data.index].zV = data.pos.zV
+    players[data.index].x, players[data.index].y, players[data.index].z = data.pos.x, data.pos.y, data.pos.z
+    players[data.index].xV, players[data.index].yV, players[data.index].zV = data.pos.xV, data.pos.yV, data.pos.zV
   end,
   bullet = function(data)
     bullets[data.k] = data.info
+  end,
+  bulletupdate = function(data)
+    bullets[data.index].x, bullets[data.index].y, bullets[data.index].z = data.pos.x, data.pos.y, data.pos.z
+    bullets[data.index].xV, bullets[data.index].yV, bullets[data.index].zV = data.pos.xV, data.pos.yV, data.pos.zV
+    bullets[data.index].angle = data.pos.angle
   end,
   ability_info = function(data)
     if data.num then
@@ -23,6 +24,9 @@ local client_hooks = {
     if data.energy then
       players[id].energy = data.energy
     end
+  end,
+  hit = function(data)
+    bullet.damage(players[data.index], data.num, data.parent)
   end,
 }
 

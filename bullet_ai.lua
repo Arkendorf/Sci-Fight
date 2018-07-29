@@ -1,16 +1,14 @@
 local bullet_ai = {}
 
 bullet_ai[1] = function(k, v, dt)
-  v.x = v.x + v.xV * dt * 60
-  v.y = v.y + v.yV * dt * 60
-  v.z = v.z + v.zV * dt * 60
 end
 
 bullet_ai[2] = function(k, v, dt)
-  -- update position (called now because collision has just been checked)
-  bullet_ai[1](k, v, dt)
-
   local player = players[v.info]
+  if not player then -- owner has left
+    bullets[k] = nil
+  end
+  v.parent = v.info -- in case it's reflected
   if not v.start then
     v.start = {x = player.x+player.l/2, y = player.y+player.w/2, z = player.z+player.h/2}
   end

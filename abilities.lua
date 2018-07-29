@@ -20,13 +20,13 @@ local deflect = function(player, index, target)
   local bubble = {x = player.x+player.l/2+dir.x*force_range, y= player.y+player.w/2+dir.y*force_range, z = player.z+player.h/2+dir.z*force_range}
   for k, v in pairs(bullets) do
     local p1, p2 = bullet.get_points(v)
-    if v.parent ~= index and bullet.circle_collide(v, bubble, force_radius) then
+    if v.parent ~= index and collision.line_and_sphere(p1, p2, bubble, force_radius) then
       local mag = math.sqrt(v.xV*v.xV+v.yV*v.yV+v.zV*v.zV)
       v.xV, v.yV, v.zV = dir.x*mag, dir.y*mag, dir.z*mag
       v.angle = math.atan2(dir.y+dir.z, dir.x)
       v.parent = index
     end
-    server:sendToAll("bullet", {info = bullets[k], k = k})
+    server:sendToAll("bulletupdate", {pos = {x = v.x, y = v.y, z = v.z, xV = v.xV, yV = v.yV, zV = v.zV}, index = k})
   end
   return true
 end

@@ -131,8 +131,8 @@ end
 
 char.death = function(player, killer)
   player.hp = hp_max
-  player.x = #grid[1][1]*tile_size*0.5
-  player.y = #grid[1]*tile_size*0.5
+  player.x = #grid[1][1]*tile_size*0.5-player.l/2
+  player.y = #grid[1]*tile_size*0.5-player.w/2
   player.z = -player.h
   if killer.score then
     killer.score = killer.score + 1
