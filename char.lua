@@ -64,7 +64,7 @@ char.update = function(dt)
     -- collision
     collision.grid(v)
 
-    -- movemwnt and friction
+    -- movement and friction
     v.x = v.x + v.xV * dt * 60
     v.xV = v.xV * 0.8
 
@@ -87,6 +87,12 @@ char.update = function(dt)
     if v.energy < energy_max and not char.ability_check(v) then
       v.energy = v.energy + energy_increase
     end
+  end
+end
+
+char.serverupdate = function(dt)
+  for k, v in pairs(players) do
+    server:sendToAll("pos", {index = k, pos = {x = v.x, y = v.y, z = v.z, xV = v.xV, yV = v.yV, zV = v.zV, jump = v.jump}})
   end
 end
 

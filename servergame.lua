@@ -7,13 +7,8 @@ local server_hooks = {
   -- player sends position
   pos = function(data, client)
     local index = client:getIndex()
-    players[index].x = data.x
-    players[index].y = data.y
-    players[index].z = data.z
-    players[index].xV = data.xV
-    players[index].yV = data.yV
-    players[index].zV = data.zV
-    server:sendToAllBut(client, "pos", {index = index, pos = data})
+    -- players[index].x, players[index].y, players[index].z = data.x, data.y, data.z
+    players[index].xV, players[index].yV, players[index].zV = data.xV, data.yV, data.zV
   end,
   use_ability = function(data, client)
     local index = client:getIndex()
@@ -55,6 +50,10 @@ servergame.update = function(dt)
   game.update_abilities(servergame.update_ability)
   -- game updating
   game.update(dt)
+
+  -- server specific stuff
+  -- update players
+  char.serverupdate(dt)
   -- update bullets
   bullet.serverupdate(dt)
 end

@@ -7,6 +7,7 @@ bullet_ai[2] = function(k, v, dt)
   local player = players[v.info]
   if not player then -- owner has left
     bullets[k] = nil
+    return
   end
   v.parent = v.info -- in case it's reflected
   if not v.start then
