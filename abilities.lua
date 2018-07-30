@@ -9,7 +9,8 @@ end,
 update_func = nil,
 delay = 0.2,
 energy = 5,
-type = 2
+type = 2,
+desc = "Fire laser",
 }
 
 -- laser deflect
@@ -35,7 +36,8 @@ press_func = deflect,
 update_func = deflect,
 delay = 1,
 energy = 0.2,
-type = 1
+type = 1,
+desc = "Deflect incoming projectiles in the direction of the mouse cursor",
 }
 
 abilities[3] = { -- throw saber
@@ -48,10 +50,12 @@ end,
 update_func = nil,
 delay = 0.2,
 energy = 25,
-type = 1
+type = 1,
+desc = "Throw saber",
 }
 
 abilities[4] = { -- filler
+desc = "pls ignore",
 }
 
 return abilities

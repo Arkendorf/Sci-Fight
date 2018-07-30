@@ -4,7 +4,7 @@ tile_size = 32
 
 map.load = function()
   -- maps must be within 100x100x100 for layering and shadows to work properly
-  grid = love.filesystem.load("maps/time_machine.txt")()
+  grid = maps[1].grid
   tiles = {[0] = 0, 1, 1, 1, 1, 1, 1}
 
   -- shader stuff

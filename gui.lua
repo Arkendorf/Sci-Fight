@@ -9,6 +9,28 @@ gui.update = function(dt)
   if gui.current_box then
     gui.current_box.flash = gui.current_box.flash + dt
   end
+  local m_x, m_y = love.mouse.getPosition()
+  for i, v in pairs(gui.menus) do
+    for j, w in ipairs(v.infoboxes) do
+      if not w.a then
+        w.a = 0
+      end
+      local w_x, w_y = gui.get_pos(w)
+      if m_x >= screen.x+w_x*screen.scale and m_x <= screen.x+(w_x+w.w)*screen.scale and m_y >= screen.y+w_y*screen.scale and m_y <= screen.y+(w_y+w.h)*screen.scale then
+        if w.a < 1 then
+          w.a = w.a + dt * 4
+        else
+          w.a = 1
+        end
+      else
+        if w.a > 0 then
+          w.a = w.a - dt * 4
+        else
+          w.a = 0
+        end
+      end
+    end
+  end
 end
 
 gui.draw = function()
@@ -46,11 +68,32 @@ gui.draw = function()
         love.graphics.print(w.txt, math.floor(x+(w.w-font:getWidth(w.txt))/2), math.floor(y+(w.h-font:getHeight())/2))
       end
     end
+
+    for j, w in ipairs(v.infoboxes) do
+      local m_x, m_y = love.mouse.getPosition()
+      local x, y = m_x/screen.scale-screen.x+6, m_y/screen.scale-screen.y+6
+      love.graphics.setColor(menu_color[1], menu_color[2], menu_color[3], w.a)
+      love.graphics.rectangle("fill", math.floor(x), math.floor(y), math.floor(w.tw), math.floor(w.th))
+      love.graphics.setColor(1, 1, 1, w.a)
+      love.graphics.printf(w.txt, math.floor(x+2), math.floor(y+2), math.floor(w.tw))
+    end
   end
 end
 
-gui.add = function(num, buttons, textboxes)
-  gui.menus[num] = {buttons = buttons, textboxes = textboxes}
+gui.add = function(num, buttons, textboxes, infoboxes)
+  local b = {}
+  if buttons then
+    b = buttons
+  end
+  local t = {}
+  if textboxes then
+    t = textboxes
+  end
+  local i = {}
+  if infoboxes then
+    i = infoboxes
+  end
+  gui.menus[num] = {buttons = b, textboxes = t, infoboxes = i}
 end
 
 gui.remove = function(num)

@@ -13,17 +13,17 @@ local icons = {}
 custom.start = function(buttons)
   gui.clear()
   if buttons then
-    gui.add(1, buttons, {})
+    gui.add(1, buttons)
   else
     local buttons = sidebar.new({{txt = "Done", func = wipe.start, args = {mainmenu.start}}})
-    gui.add(1, buttons, {})
+    gui.add(1, buttons)
   end
 
   local buttons = {}
   for i, v in ipairs(loadouts) do
     buttons[i] = {x = (screen.w-(button2.w+button2.border)*#loadouts+button2.border)/2+(i-1)*(button2.w+button2.border), y = (screen.h-256)/2, w = button2.w, h = button2.h, txt = "Loadout "..tostring(i), func = custom.set_current_loadout, args = {i}}
   end
-  gui.add(2, buttons, {})
+  gui.add(2, buttons)
   custom.set_current_loadout(current_loadout)
 end
 
@@ -70,26 +70,32 @@ custom.set_current_loadout = function(num)
   gui.remove(4)
   local pos = loadout_pos
   local buttons = {}
-  buttons[1] = {x = pos.x+offsets.weapon.x, y = pos.y+offsets.weapon.y, w = 70, h = 32, txt = "Weapon", func = custom.set_current_slot, args = {"weapon"}, hide = true}
+  local infoboxes = {}
+  buttons[1] = {x = pos.x+offsets.weapon.x, y = pos.y+offsets.weapon.y, w = 70, h = icon.h, txt = "Weapon", func = custom.set_current_slot, args = {"weapon"}, hide = true}
+  infoboxes[#infoboxes+1] = {x = pos.x+offsets.weapon.x, y = pos.y+offsets.weapon.y, w = 70, h = icon.h, tw = 128, th = 64, txt = weapons[loadouts[current_loadout].weapon].desc}
   for i, v in ipairs(offsets.abilities) do
-    buttons[i+1]  = {x = pos.x+v.x, y = pos.y+v.y, w = 32, h = 32, txt = tostring(i), func = custom.set_current_slot, args = {i}, hide = true}
+    buttons[i+1]  = {x = pos.x+v.x, y = pos.y+v.y, w = icon.w, h = icon.h, txt = tostring(i), func = custom.set_current_slot, args = {i}, hide = true}
+    infoboxes[#infoboxes+1] = {x = pos.x+v.x, y = pos.y+v.y, w = icon.w, h = icon.h, tw = 128, th = 64, txt = abilities[loadouts[current_loadout].abilities[i]].desc}
   end
-  gui.add(3, buttons, {})
+  gui.add(3, buttons, {}, infoboxes)
 end
 
 custom.set_current_slot = function(type)
   current_slot = type
   icons = custom.get_icon_pos(type)
   local buttons = {}
+  local infoboxes = {}
   for i, v in ipairs(icons) do
     if type == "weapon" then
       buttons[#buttons+1] = {x = v.x, y = v.y, w= v.w, h = v.h, txt = tostring(v.num), func = custom.change_weapon, args = {v.num}, hide = true}
+      infoboxes[#infoboxes+1] = {x = v.x, y = v.y, w= v.w, h = v.h, tw = 128, th = 64, txt = weapons[v.num].desc}
     else
       buttons[#buttons+1] = {x = v.x, y = v.y, w= v.w, h = v.h, txt = tostring(v.num), func = custom.change_ability, args = {v.num, type}, hide = true}
+      infoboxes[#infoboxes+1] = {x = v.x, y = v.y, w= v.w, h = v.h, tw = 128, th = 64, txt = abilities[v.num].desc}
     end
   end
 
-  gui.add(4, buttons, {})
+  gui.add(4, buttons, {}, infoboxes)
 end
 
 custom.get_icon_pos = function(type)

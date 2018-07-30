@@ -21,8 +21,8 @@ end
 
 menu.start_gui = function()
   gui.clear()
-  gui.add(1, menu.buttons, {})
-  gui.add(2, menu.player_gui, {})
+  gui.add(1, menu.buttons)
+  gui.add(2, menu.player_gui)
 end
 
 menu.update = function(dt)

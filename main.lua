@@ -7,6 +7,7 @@ menu = require "menu"
 wipe = require "wipe"
 sidebar = require "sidebar"
 custom = require "custom"
+mapselect = require "mapselect"
 abilities = require "abilities"
 weapons = require "weapons"
 
@@ -14,10 +15,12 @@ love.load = function()
   graphics.load()
   gui.load()
 
+  mapselect.load()
   mainmenu.load()
   menu.load()
   game.load()
   custom.load()
+
 
   state = "mainmenu"
   mainmenu.start()
