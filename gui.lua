@@ -73,9 +73,9 @@ gui.draw = function()
       local m_x, m_y = love.mouse.getPosition()
       local x, y = m_x/screen.scale-screen.x+6, m_y/screen.scale-screen.y+6
       love.graphics.setColor(menu_color[1], menu_color[2], menu_color[3], w.a)
-      love.graphics.rectangle("fill", math.floor(x), math.floor(y), math.floor(w.tw), math.floor(w.th))
+      love.graphics.rectangle("fill", math.floor(x), math.floor(y), math.floor(w.box.w), math.floor(w.box.h))
       love.graphics.setColor(1, 1, 1, w.a)
-      love.graphics.printf(w.txt, math.floor(x+2), math.floor(y+2), math.floor(w.tw))
+      love.graphics.printf(w.txt, math.floor(x+2), math.floor(y+2), math.floor(w.box.w))
     end
   end
 end
@@ -166,6 +166,16 @@ gui.get_pos = function(w)
   if type(w.x) == "number" then x = w.x else x = w.x.t[w.x.i]+w.x.o end
   if type(w.y) == "number" then y = w.y else y = w.y.t[w.y.i]+w.y.o end
   return x, y
+end
+
+gui.text_size = function(txt, limit)
+  local w = font:getWidth(txt)
+  if w <= limit then
+    return {w = w+4, h = font:getHeight()+4}
+  else
+    w, wrap = font:getWrap(txt, limit)
+    return {w = w+4, h = #wrap*font:getHeight()+4}
+  end
 end
 
 return gui

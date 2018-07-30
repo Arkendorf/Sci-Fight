@@ -65,17 +65,23 @@ end
 
 custom.set_current_loadout = function(num)
   current_loadout = num
-  gui.remove(3)
   icons = {}
   gui.remove(4)
+  custom.update_loadout_gui()
+end
+
+custom.update_loadout_gui = function()
+  gui.remove(3)
   local pos = loadout_pos
   local buttons = {}
   local infoboxes = {}
   buttons[1] = {x = pos.x+offsets.weapon.x, y = pos.y+offsets.weapon.y, w = 70, h = icon.h, txt = "Weapon", func = custom.set_current_slot, args = {"weapon"}, hide = true}
-  infoboxes[#infoboxes+1] = {x = pos.x+offsets.weapon.x, y = pos.y+offsets.weapon.y, w = 70, h = icon.h, tw = 128, th = 64, txt = weapons[loadouts[current_loadout].weapon].desc}
+  local txt = weapons[loadouts[current_loadout].weapon].desc
+  infoboxes[#infoboxes+1] = {x = pos.x+offsets.weapon.x, y = pos.y+offsets.weapon.y, w = 70, h = icon.h, box = gui.text_size(txt, 128), txt = txt}
   for i, v in ipairs(offsets.abilities) do
     buttons[i+1]  = {x = pos.x+v.x, y = pos.y+v.y, w = icon.w, h = icon.h, txt = tostring(i), func = custom.set_current_slot, args = {i}, hide = true}
-    infoboxes[#infoboxes+1] = {x = pos.x+v.x, y = pos.y+v.y, w = icon.w, h = icon.h, tw = 128, th = 64, txt = abilities[loadouts[current_loadout].abilities[i]].desc}
+    txt = abilities[loadouts[current_loadout].abilities[i]].desc
+    infoboxes[#infoboxes+1] = {x = pos.x+v.x, y = pos.y+v.y, w = icon.w, h = icon.h, box = gui.text_size(txt, 128), txt = txt}
   end
   gui.add(3, buttons, {}, infoboxes)
 end
@@ -88,10 +94,12 @@ custom.set_current_slot = function(type)
   for i, v in ipairs(icons) do
     if type == "weapon" then
       buttons[#buttons+1] = {x = v.x, y = v.y, w= v.w, h = v.h, txt = tostring(v.num), func = custom.change_weapon, args = {v.num}, hide = true}
-      infoboxes[#infoboxes+1] = {x = v.x, y = v.y, w= v.w, h = v.h, tw = 128, th = 64, txt = weapons[v.num].desc}
+      local txt = weapons[v.num].desc
+      infoboxes[#infoboxes+1] = {x = v.x, y = v.y, w= v.w, h = v.h, box = gui.text_size(txt, 128), txt = txt}
     else
       buttons[#buttons+1] = {x = v.x, y = v.y, w= v.w, h = v.h, txt = tostring(v.num), func = custom.change_ability, args = {v.num, type}, hide = true}
-      infoboxes[#infoboxes+1] = {x = v.x, y = v.y, w= v.w, h = v.h, tw = 128, th = 64, txt = abilities[v.num].desc}
+      local txt =  abilities[v.num].desc
+      infoboxes[#infoboxes+1] = {x = v.x, y = v.y, w= v.w, h = v.h, box = gui.text_size(txt, 128), txt = txt}
     end
   end
 
@@ -136,6 +144,7 @@ custom.change_ability = function(ability, slot)
     loadouts[current_loadout].abilities[slot] = ability
     loadouts[current_loadout].abilities[used] = old
   end
+  custom.update_loadout_gui()
 end
 
 custom.ability_used = function(ability)
@@ -163,6 +172,7 @@ custom.change_weapon = function(weapon)
     end
   end
   loadouts[current_loadout].weapon = weapon
+  custom.update_loadout_gui()
 end
 
 custom.get_loadout = function()
