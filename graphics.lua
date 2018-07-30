@@ -20,13 +20,14 @@ graphics.load = function()
   player_img = love.graphics.newImage("char.png")
 
   -- load tile images
-  tile_img = graphics.load_folder("tiles")
+  tile_img = graphics.load_folder("art/tiles")
   tile_quad = graphics.load_tile_quad(tile_size)
 
-  bullet_img = graphics.load_folder("bullets")
+  bullet_img = graphics.load_folder("art/bullets")
 
-  ability_img = graphics.load_folder("abilityicons")
-  weapon_img = graphics.load_folder("weaponicons")
+  ability_img = graphics.load_folder("art/abilityicons")
+  weapon_img = graphics.load_folder("art/weaponicons")
+  map_img = graphics.load_folder("art/mapicons")
 
 end
 
@@ -36,7 +37,11 @@ graphics.load_folder = function(str)
   local files = love.filesystem.getDirectoryItems(str)
   for i, v in ipairs(files) do
     local name = tonumber(string.sub(v, 1, -5))
-    img[name] = love.graphics.newImage(str.."/"..v)
+    if name then
+      img[name] = love.graphics.newImage(str.."/"..v)
+    else
+      img[#img+1] = love.graphics.newImage(str.."/"..v)
+    end
   end
   return img
 end

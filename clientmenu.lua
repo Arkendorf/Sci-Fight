@@ -31,15 +31,12 @@ local client_hooks = {
   end,
   -- when game starts
   startgame = function(data)
-    wipe.start(clientmenu.start_game, {"client"})
+    new_players = data.players
+    wipe.start(clientmenu.start_game, {data.map})
   end,
   -- if a player presses ready
   ready = function(data, client)
     players[data.index].ready = data.ready
-  end,
-  -- players with added data
-  updatedplayers = function(data, client)
-    new_players = data
   end,
 }
 
@@ -55,7 +52,7 @@ clientmenu.start = function(ip, port)
 
   menu.buttons = sidebar.new({{txt = "Players", func = menu.swap_mode, args = {1}},
                                {txt ="Loadout", func = menu.swap_mode, args = {2}},
-                               --{txt ="Map", func = menu.swap_mode, args = {3}},
+                               {txt ="Map", func = menu.swap_mode, args = {3}},
                                {txt ="Leave", func = wipe.start, args = {servermenu.leave}}})
   menu.player_gui = {{x = (screen.w-64)/2, y = (screen.h+256)/2-32, w = 64, h = 32, txt = "Ready", func = clientmenu.ready, args = {id}}}
   menu.start()
@@ -82,10 +79,11 @@ end
 
 clientmenu.ready = function()
   players[id].ready = not players[id].ready
-  client:send("ready", {ready = players[id].ready, loadout = custom.get_loadout()})
+  client:send("ready", {ready = players[id].ready, loadout = custom.get_loadout(), map = mapselect.get_map()})
 end
 
-clientmenu.start_game = function()
+clientmenu.start_game = function(map_num)
+  map.set(map_num)
   players = new_players
   state = "clientgame"
   clientgame.start()

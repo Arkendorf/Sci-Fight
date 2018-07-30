@@ -12,6 +12,7 @@ abilities = require "abilities"
 weapons = require "weapons"
 
 love.load = function()
+  math.randomseed(os.time())
   graphics.load()
   gui.load()
 

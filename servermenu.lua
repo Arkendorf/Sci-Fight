@@ -30,6 +30,7 @@ local server_hooks = {
     local index = client:getIndex()
     players[index].ready = data.ready
     players[index].loadout = data.loadout
+    players[index].map = data.map
     server:sendToAll("ready", {index = index, ready = data.ready})
   end,
 }
@@ -44,7 +45,7 @@ servermenu.start = function(port)
 
   menu.buttons = sidebar.new({{txt = "Players", func = menu.swap_mode, args = {1}},
                                {txt ="Loadout", func = menu.swap_mode, args = {2}},
-                               --{txt ="Map", func = menu.swap_mode, args = {3}},
+                               {txt ="Map", func = menu.swap_mode, args = {3}},
                                {txt ="Leave", func = wipe.start, args = {servermenu.leave}}})
   menu.player_gui = {{x = (screen.w-64)/2, y = (screen.h+256)/2-32, w = 64, h = 32, txt = "Ready", func = servermenu.ready, args = {id}}}
   menu.start()
@@ -68,14 +69,14 @@ servermenu.draw = function()
 end
 
 servermenu.all_ready = function()
-  new_players = servermenu.create_players()
-  server:sendToAll("updatedplayers", new_players)
-
-  server:sendToAll("startgame")
-  wipe.start(servermenu.start_game, {"server"})
+  local map_num = mapselect.choose_map(players)
+  new_players = servermenu.create_players(players)
+  server:sendToAll("startgame", {players = new_players, map = map_num})
+  wipe.start(servermenu.start_game, {map_num})
 end
 
-servermenu.start_game = function()
+servermenu.start_game = function(map_num)
+  map.set(map_num)
   players = new_players
   state = "servergame"
   servergame.start()
@@ -90,10 +91,11 @@ end
 servermenu.ready = function()
   players[id].ready = not players[id].ready
   players[id].loadout = custom.get_loadout()
+  players[id].map = mapselect.get_map()
   server:sendToAll("ready", {index = id, ready = players[id].ready})
 end
 
-servermenu.create_players = function()
+servermenu.create_players = function(players)
   local new_players = {}
   for k, v in pairs(players) do
     if v.left then

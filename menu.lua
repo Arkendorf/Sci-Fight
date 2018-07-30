@@ -25,12 +25,6 @@ menu.start_gui = function()
   gui.add(2, menu.player_gui)
 end
 
-menu.update = function(dt)
-end
-
-menu.draw = function()
-end
-
 menu.new_player = function(i, name)
   players[i] = {name = name, ready = false, x = -font:getWidth(name), y = i * 16, left = false}
 end
@@ -55,6 +49,8 @@ end
 menu.update = function(dt)
   if menu.mode == 2 then
     custom.update(dt)
+  elseif menu.mode == 3 then
+    mapselect.update(dt)
   end
 end
 
@@ -79,27 +75,31 @@ end
 menu.draw = function()
   if menu.mode == 2 then
     custom.draw()
+  elseif menu.mode == 3 then
+    mapselect.draw()
   end
 end
 
 menu.swap_mode = function(num)
   if menu.mode ~= num and not players[id].ready then
-    if num == 1 then
-      wipe.start(menu.start_default)
-    elseif num == 2 then
-      wipe.start(menu.start_custom)
-    end
+    wipe.start(menu.mode_start[num])
   end
 end
 
-menu.start_default = function()
+menu.mode_start = {}
+menu.mode_start[1] = function()
   menu.mode = 1
   menu.start_gui()
 end
 
-menu.start_custom = function()
+menu.mode_start[2] = function()
   menu.mode = 2
   custom.start(menu.buttons)
+end
+
+menu.mode_start[3] = function()
+  menu.mode = 3
+  mapselect.start(menu.buttons)
 end
 
 return menu

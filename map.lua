@@ -4,37 +4,8 @@ tile_size = 32
 
 map.load = function()
   -- maps must be within 100x100x100 for layering and shadows to work properly
-  grid = maps[1].grid
   tiles = {[0] = 0, 1, 1, 1, 1, 1, 1}
-
-  -- shader stuff
-  local x, y = #grid[1][1]*tile_size, (#grid+#grid[1])*tile_size
-  shadow_mask = love.graphics.newCanvas(x, y)
-  shader.shadow:send("mask_size", {x, y})
-  -- draw shadow mask
-  love.graphics.setCanvas(shadow_mask)
-  map.iterate(game.draw_shadow_mask)
-  shader.shadow:send("mask", shadow_mask)
-
-  layer_mask = love.graphics.newCanvas(x, y)
-  shader.layer:send("mask_size", {x, y})
-  -- draw layer mask
-  love.graphics.setCanvas(layer_mask)
-  map.iterate(game.draw_layer_mask)
-  love.graphics.setShader()
-  shader.layer:send("mask", layer_mask)
-
-  -- reset
-  love.graphics.setColor(1, 1, 1)
-  love.graphics.setCanvas()
-
-  shadow_canvas = love.graphics.newCanvas(x, y)
-
-  map_canvas = love.graphics.newCanvas(x, y)
-  love.graphics.setCanvas(map_canvas)
-  love.graphics.clear()
-  map.iterate(game.draw_tiles)
-  love.graphics.setCanvas()
+  map.set(1)
 end
 
 map.update_masks = function()
@@ -84,6 +55,39 @@ map.iterate = function(func)
       end
     end
   end
+end
+
+map.set = function(num)
+  grid = maps[num].grid
+
+  -- shader stuff
+  local x, y = #grid[1][1]*tile_size, (#grid+#grid[1])*tile_size
+  shadow_mask = love.graphics.newCanvas(x, y)
+  shader.shadow:send("mask_size", {x, y})
+  -- draw shadow mask
+  love.graphics.setCanvas(shadow_mask)
+  map.iterate(game.draw_shadow_mask)
+  shader.shadow:send("mask", shadow_mask)
+
+  layer_mask = love.graphics.newCanvas(x, y)
+  shader.layer:send("mask_size", {x, y})
+  -- draw layer mask
+  love.graphics.setCanvas(layer_mask)
+  map.iterate(game.draw_layer_mask)
+  love.graphics.setShader()
+  shader.layer:send("mask", layer_mask)
+
+  -- reset
+  love.graphics.setColor(1, 1, 1)
+  love.graphics.setCanvas()
+
+  shadow_canvas = love.graphics.newCanvas(x, y)
+
+  map_canvas = love.graphics.newCanvas(x, y)
+  love.graphics.setCanvas(map_canvas)
+  love.graphics.clear()
+  map.iterate(game.draw_tiles)
+  love.graphics.setCanvas()
 end
 
 return map
