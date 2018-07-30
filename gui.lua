@@ -57,6 +57,14 @@ gui.remove = function(num)
   gui.menus[num] = nil
 end
 
+gui.exists = function(num)
+  if gui.menus[num] then
+    return true
+  else
+    return false
+  end
+end
+
 gui.clear = function()
   gui.menus = {}
   gui.current_box = nil

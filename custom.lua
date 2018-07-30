@@ -10,9 +10,14 @@ local loadout_pos = {}
 local option_pos = {}
 local icons = {}
 
-custom.start = function()
+custom.start = function(buttons)
   gui.clear()
-  gui.add(1, {{x = button.border, y = mainmenu.button_y(1, 1), w = button.w, h = button.h, txt = "Done", func = wipe.start, args = {mainmenu.start}}}, {})
+  if buttons then
+    gui.add(1, buttons, {})
+  else
+    local buttons = sidebar.new({{txt = "Done", func = wipe.start, args = {mainmenu.start}}})
+    gui.add(1, buttons, {})
+  end
 
   local buttons = {}
   for i, v in ipairs(loadouts) do

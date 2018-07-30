@@ -53,18 +53,25 @@ clientmenu.start = function(ip, port)
     client:on(k, v)
   end
 
+  menu.buttons = sidebar.new({{txt = "Players", func = menu.swap_mode, args = {1}},
+                               {txt ="Loadout", func = menu.swap_mode, args = {2}},
+                               --{txt ="Map", func = menu.swap_mode, args = {3}},
+                               {txt ="Leave", func = wipe.start, args = {servermenu.leave}}})
+  menu.player_gui = {{x = (screen.w-64)/2, y = (screen.h+256)/2-32, w = 64, h = 32, txt = "Ready", func = clientmenu.ready, args = {id}}}
   menu.start()
-
-  gui.clear()
-  gui.add(1, {{x = (screen.w)/2-65, y= screen.h-48, w = 64, h = 32, txt = "Leave", func = wipe.start, args = {clientmenu.leave}}, {x = (screen.w)/2+1, y= screen.h-48, w = 64, h = 32, txt = "Ready", func = clientmenu.ready, args = {id}}}, {})
 end
 
 clientmenu.update = function(dt)
   menu.update_list(dt)
+  menu.update()
 end
 
 clientmenu.draw = function()
-  menu.draw_list()
+  if menu.mode == 1 then
+    menu.draw_list()
+  else
+    menu.draw()
+  end
 end
 
 clientmenu.leave = function()
