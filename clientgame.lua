@@ -9,7 +9,6 @@ local client_hooks = {
     if data.index ~= id then
       players[data.index].xV, players[data.index].yV, players[data.index].zV = data.pos.xV, data.pos.yV, data.pos.zV
     end
-    players[data.index].jump = data.pos.jump
   end,
   bullet = function(data)
     bullets[data.k] = data.info
