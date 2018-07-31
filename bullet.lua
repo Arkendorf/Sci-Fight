@@ -9,8 +9,8 @@ bullet.load = function()
   bullets = {}
 
   bullet_info = {}
-  bullet_info[1] = {ai = 1, speed = 6, r = 0, img = 1, shadow = false}
-  bullet_info[2] = {ai = 2, speed = 4, r = 16, persistant = true, img = 2, shadow = true}
+  bullet_info[1] = {ai = 1, speed = 6, r = 0, dmg = 25, img = 1, shadow = false}
+  bullet_info[2] = {ai = 2, speed = 4, r = 16, dmg = 25, persistant = true, img = 2, shadow = true}
 end
 
 bullet.update = function(dt)
@@ -46,7 +46,7 @@ end
 
 bullet.queue = function()
   for k, v in pairs(bullets) do
-    queue[#queue + 1] = {img = bullet_img[bullet_info[v.type].img], x = v.x, y = v.y, z = v.z, h = 0, w = 0, l = 0, r = v.r/2, ox = 16, oy = 16, angle = v.angle, shadow = bullet_info[v.type].shadow}
+    queue[#queue + 1] = {img = bullet_img[bullet_info[v.type].img], x = v.x, y = v.y, z = v.z, h = 0, w = 0, l = 0, r = bullet_info[v.type].r/2, ox = 16, oy = 16, angle = v.angle, shadow = bullet_info[v.type].shadow}
   end
 end
 
@@ -72,7 +72,7 @@ bullet.player_collide = function(k, v) -- only server should do this
   p1, p2 = bullet.get_points(v)
   for l, w in pairs(players) do
     if l ~= v.parent and w.inv <= 0 and collision.line_and_cube(p1, p2, w) then
-      local num = w.hp - 1
+      local num = w.hp - bullet_info[v.type].dmg*weapons[players[v.parent].weapon.type].dmg -- bullet damage * weapon modifier
       bullet.damage(w, num, v.parent)
       server:sendToAll("hit", {index = l, num = num, parent = v.parent})
       bullet.destroy(k, v)
@@ -98,7 +98,7 @@ bullet.bound_collide = function(k, v)
 end
 
 bullet.destroy = function(k, v, face)
-  if not v.persistant then
+  if not bullet_info[v.type].persistant then
     bullets[k] = nil
     return true
   elseif face then
@@ -130,7 +130,7 @@ bullet.new = function(p1, p2, parent, type, extra)
   local zV = math.cos(math.atan2(math.sqrt(l_x*l_x+l_y*l_y), l_z))
   local info = bullet_info[type]
   local spot = #bullets+1
-  bullets[spot] = {x = x1, y = y1, z = z1, xV = xV*info.speed, yV = yV*info.speed, zV = zV*info.speed, angle = math.atan2(yV+zV, xV), r = info.r, parent = parent, persistant = info.persistant, type = type, info = extra}
+  bullets[spot] = {x = x1, y = y1, z = z1, xV = xV*info.speed, yV = yV*info.speed, zV = zV*info.speed, angle = math.atan2(yV+zV, xV), parent = parent, type = type, info = extra}
   return spot
 end
 

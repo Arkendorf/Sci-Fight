@@ -4,7 +4,7 @@ local target_range = 32
 local target_speed = 32
 energy_max = 100
 local energy_increase = 0.1
-hp_max = 3
+hp_max = 100
 
 char.load = function()
 end
@@ -85,7 +85,7 @@ char.update = function(dt)
       end
     end
     if v.energy < energy_max and not char.ability_check(v) then
-      v.energy = v.energy + energy_increase
+      v.energy = v.energy + energy_increase*weapons[v.weapon.type].regen
     end
   end
 end
