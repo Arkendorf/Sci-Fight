@@ -15,16 +15,13 @@ local server_hooks = {
     char.use_ability(players[index], index, data.target, data.num)
     local ability = players[index].abilities[data.num]
     server:sendToPeer(server:getPeerByIndex(index), "ability_info", {num = data.num, delay = ability.delay, active = ability.active, energy = players[index].energy})
+    if ability.active then
+      players[index].target = data.target
+    end
   end,
   update_ability = function(data, client)
     local index = client:getIndex()
-    local stop = char.update_ability(players[index], index, data.target, data.num)
-    if stop then
-      local ability = players[index].abilities[data.num]
-      server:sendToPeer(server:getPeerByIndex(index), "ability_info", {num = data.num, delay = ability.delay, active = ability.active, energy = players[index].energy})
-    else
-      server:sendToPeer(server:getPeerByIndex(index), "ability_info", {energy = players[index].energy})
-    end
+    players[index].target = data.target
   end,
   stop_ability = function(data, client)
     local index = client:getIndex()
@@ -42,6 +39,7 @@ servergame.start = function(port)
   end
 
   gui.clear()
+  bullets = {}
 end
 
 servergame.update = function(dt)
@@ -49,7 +47,7 @@ servergame.update = function(dt)
   char.input(dt)
   server:sendToAll("pos", {index = id, pos = {x = players[id].x, y = players[id].y, z = players[id].z, xV = players[id].xV, yV = players[id].yV, zV = players[id].zV}})
   -- server's abilities
-  game.update_abilities(servergame.update_ability)
+  game.update_abilities(servergame.update_ability, id)
   -- game updating
   game.update(dt)
 
@@ -94,6 +92,16 @@ end
 
 servergame.update_ability = function(num)
   char.update_ability(players[id], id, target, num)
+end
+
+servergame.update_client_ability = function(num, k)
+  local stop = char.update_ability(players[k], k, players[k].target, num)
+  if stop then
+    local ability = players[k].abilities[num]
+    server:sendToPeer(server:getPeerByIndex(k), "ability_info", {num = num, delay = ability.delay, active = ability.active, energy = players[k].energy})
+  else
+    server:sendToPeer(server:getPeerByIndex(k), "ability_info", {energy = players[k].energy})
+  end
 end
 
 servergame.stop_ability = function(num)

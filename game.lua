@@ -68,10 +68,10 @@ game.abilities = function(mode, button, func)
   end
 end
 
-game.update_abilities = function(func)
-  for i, v in ipairs(players[id].abilities) do
-    if v.active and abilities[players[id].abilities[i].type].update_func then
-      func(i)
+game.update_abilities = function(func, k)
+  for i, v in ipairs(players[k].abilities) do
+    if v.active and abilities[players[k].abilities[i].type].update_func then
+      func(i, k)
     end
   end
 end

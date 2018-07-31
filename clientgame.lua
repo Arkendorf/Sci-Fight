@@ -14,9 +14,11 @@ local client_hooks = {
     bullets[data.k] = data.info
   end,
   bulletupdate = function(data)
-    bullets[data.index].x, bullets[data.index].y, bullets[data.index].z = data.pos.x, data.pos.y, data.pos.z
-    bullets[data.index].xV, bullets[data.index].yV, bullets[data.index].zV = data.pos.xV, data.pos.yV, data.pos.zV
-    bullets[data.index].angle = data.pos.angle
+    if bullets[data.index] then
+      bullets[data.index].x, bullets[data.index].y, bullets[data.index].z = data.pos.x, data.pos.y, data.pos.z
+      bullets[data.index].xV, bullets[data.index].yV, bullets[data.index].zV = data.pos.xV, data.pos.yV, data.pos.zV
+      bullets[data.index].angle = data.pos.angle
+    end
   end,
   ability_info = function(data)
     if data.num then
@@ -43,6 +45,7 @@ clientgame.start = function(port)
   end
 
   gui.clear()
+  bullets = {}
 end
 
 clientgame.update = function(dt)
@@ -50,7 +53,7 @@ clientgame.update = function(dt)
   char.input(dt)
   client:send("pos", {x = players[id].x, y = players[id].y, z = players[id].z, xV = players[id].xV, yV = players[id].yV, zV = players[id].zV})
   --client's abilities
-  game.update_abilities(clientgame.update_ability)
+  game.update_abilities(clientgame.update_ability, id)
   -- game updating
   game.update(dt)
 end

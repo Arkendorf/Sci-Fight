@@ -16,7 +16,7 @@ weapons[2] = { -- blaster
 
 weapons[3] = { -- blaster
   type = 1,
-  desc = "Saber (Red)",
+  desc = "Saber (Red)\nDoes more damage than its counterpart, but has slower energy regen",
   dmg = 1.2,
   regen = 0.8,
 }

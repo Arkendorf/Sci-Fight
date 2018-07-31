@@ -93,6 +93,9 @@ end
 char.serverupdate = function(dt)
   for k, v in pairs(players) do
     server:sendToAll("pos", {index = k, pos = {x = v.x, y = v.y, z = v.z, xV = v.xV, yV = v.yV, zV = v.zV}})
+    if k ~= id then
+      game.update_abilities(servergame.update_client_ability, k)
+    end
   end
 end
 
