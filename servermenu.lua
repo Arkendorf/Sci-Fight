@@ -101,7 +101,7 @@ servermenu.create_players = function(players)
     if v.left then
       new_players[k] = nil
     else
-      new_players[k] = char.new(v.loadout)
+      new_players[k] = char.new(v.name, v.loadout)
     end
   end
   return new_players

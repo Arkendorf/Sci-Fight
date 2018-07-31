@@ -31,6 +31,10 @@ local client_hooks = {
   hit = function(data)
     bullet.damage(players[data.index], data.num, data.parent)
   end,
+  gameover = function(data)
+    players = data
+    wipe.start(clientgame.start_end)
+  end
 }
 
 clientgame.start = function(port)
@@ -82,6 +86,14 @@ end
 
 clientgame.stop_ability = function(num)
   client:send("stop_ability", num)
+end
+
+clientgame.start_end = function()
+  client:disconnectNow()
+  client = nil
+
+  state = "endmenu"
+  endmenu.start()
 end
 
 clientgame.quit = function()

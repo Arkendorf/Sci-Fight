@@ -33,6 +33,8 @@ local server_hooks = {
   end,
 }
 
+local win_score = 1
+
 servergame.start = function(port)
   -- initialize server hooks
   for k,v in pairs(server_hooks) do
@@ -56,6 +58,14 @@ servergame.update = function(dt)
   char.serverupdate(dt)
   -- update bullets
   bullet.serverupdate(dt)
+
+  for k, v in pairs(players) do
+    if v.score >= win_score then
+      server:sendToAll("gameover", players)
+      wipe.start(servergame.start_end)
+      break
+    end
+  end
 end
 
 servergame.draw = function()
@@ -88,6 +98,15 @@ end
 
 servergame.stop_ability = function(num)
   char.stop_ability(players[id], id, num)
+end
+
+servergame.start_end = function()
+  server:update()
+  server:destroy()
+  server = nil
+
+  state = "endmenu"
+  endmenu.start()
 end
 
 servergame.quit = function()

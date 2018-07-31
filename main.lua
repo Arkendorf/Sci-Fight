@@ -10,6 +10,7 @@ custom = require "custom"
 mapselect = require "mapselect"
 abilities = require "abilities"
 weapons = require "weapons"
+endmenu = require "endmenu"
 
 love.load = function()
   math.randomseed(os.time())
@@ -21,6 +22,7 @@ love.load = function()
   menu.load()
   game.load()
   custom.load()
+  endmenu.load()
 
 
   state = "mainmenu"
@@ -48,6 +50,8 @@ love.update = function(dt)
     servergame.update(dt)
   elseif state == "custom" then
     custom.update(dt)
+  elseif state == "endmenu" then
+    endmenu.update(dt)
   end
   gui.update(dt)
   wipe.update(dt)
@@ -68,6 +72,8 @@ love.draw = function()
     servergame.draw()
   elseif state == "custom" then
     custom.draw()
+  elseif state == "endmenu" then
+    endmenu.draw()
   end
   gui.draw()
   wipe.draw()
