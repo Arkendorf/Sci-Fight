@@ -116,4 +116,16 @@ energy = 0,
 desc = "pls ignore",
 }
 
+abilities[8] = { -- blaster shot
+press_func = function(player, index, target)
+  local k = bullet.new(players[index], target, index, 4)
+  server:sendToAll("bullet", {info = bullets[k], k = k})
+  return false
+end,
+delay = 1,
+energy = 10,
+desc = "Throw grenade",
+}
+
+
 return abilities

@@ -43,5 +43,28 @@ bullet_ai[2] = function(k, v, dt)
   end
 end
 
+bullet_ai[3] = function(k, v, dt)
+  if not v.bounce_num then
+    v.zV = v.zV - 3
+    v.bounce_num = 0
+  end
+  if v.zV < 10 then
+    v.zV = v.zV + 0.2
+  elseif v.zV > 10 then
+    v.zV = 10
+  end
+  if v.collide then
+    v.xV = v.xV *0.7
+    v.yV = v.yV *0.7
+    v.zV = v.zV *0.7
+    v.collide = false
+
+    v.bounce_num = v.bounce_num + 1
+    if v.bounce_num > 3 then
+      bullet.explode(k, v)
+    end
+  end
+end
+
 
 return bullet_ai

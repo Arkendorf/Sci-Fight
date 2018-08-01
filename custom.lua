@@ -30,7 +30,7 @@ end
 custom.load = function()
   loadouts = {}
   for i = 1, 3 do
-    loadouts[i] = {weapon = 1, abilities = {2, 3, 4, 4, 4}}
+    loadouts[i] = {weapon = 1, abilities = {2, 3, 8, 8, 8}}
   end
   loadout_pos = {x = (screen.w-256)/2, y = (screen.h-256)/2+button2.h+button2.border, w = 256, h = 80}
   option_pos = {x = loadout_pos.x, y = loadout_pos.y+loadout_pos.h+button2.border, w = loadout_pos.w, h = 256-loadout_pos.h-button2.h-button2.border*2}
