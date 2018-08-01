@@ -14,6 +14,33 @@ type = 2,
 desc = "Fire laser",
 }
 
+abilities[6] = { -- rapid reload
+press_func = function() end,
+delay = 7,
+energy = -25,
+type = 2,
+desc = "Rapidly reload and gain a burst of energy",
+}
+
+abilities[7] = { -- tri shot
+press_func = function(player, index, target)
+  local dif = {x = target.x-(player.x+player.l/2), y = target.y-(player.y+player.w/2), z = target.z-(player.z+player.h/2)}
+  local base_angle = math.atan2(dif.y, dif.x)-math.rad(20)
+  local mag = math.sqrt(dif.x*dif.x+dif.y*dif.y)
+  for i = 1, 3 do
+    local angle = base_angle+math.rad(10)*i
+    local dir = game.target_pos(player, {x = math.cos(angle), y = math.sin(angle), z = dif.z/mag})
+    local k = bullet.new(players[index], dir, index, 3)
+    server:sendToAll("bullet", {info = bullets[k], k = k})
+  end
+  return false
+end,
+delay = 3,
+energy = 15,
+type = 2,
+desc = "Fire three high-damage lasers in an arc",
+}
+
 
 
 -- saber abilities

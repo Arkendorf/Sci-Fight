@@ -86,6 +86,8 @@ char.update = function(dt)
     end
     if v.energy < energy_max and not char.ability_check(v) then
       v.energy = v.energy + energy_increase*weapons[v.weapon.type].regen
+    elseif v.energy > energy_max then
+      v.energy = energy_max
     end
   end
 end
