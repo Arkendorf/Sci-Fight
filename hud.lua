@@ -23,10 +23,15 @@ hud.draw = function()
   love.graphics.rectangle("fill", pos.x, pos.y+bar.h+bar.border, math.floor(energy/energy_max*bar.w), bar.h)
   love.graphics.setColor(1, 1, 1)
   for i, v in ipairs(players[id].abilities) do
+    local x, y = icon.border+(i-1)*(icon.w+icon.border), screen.h-(icon.h+icon.border)
     if v.delay > 0 or abilities[v.type].energy > players[id].energy or (i < 3 and players[id].weapon.active) then
       love.graphics.setShader(shader.greyscale)
     end
-    local x, y = icon.border+(i-1)*(icon.w+icon.border), screen.h-(icon.h+icon.border)
+    if v.active then -- border if ability in use
+      love.graphics.setColor(0, 1, 1)
+      love.graphics.rectangle("fill", x-icon.border, y-icon.border, icon.w+icon.border*2, icon.h+icon.border*2)
+      love.graphics.setColor(1, 1, 1)
+    end
     love.graphics.draw(ability_img[v.type], x, y)
     love.graphics.setShader()
     if v.delay > 0 then
@@ -35,6 +40,7 @@ hud.draw = function()
       love.graphics.setColor(1, 1, 1)
       love.graphics.printf(math.floor(v.delay*10)/10, x, y+12, icon.w, "center")
     end
+    love.graphics.setColor(1, 1, 1)
   end
 end
 
