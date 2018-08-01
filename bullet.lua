@@ -9,7 +9,7 @@ bullet.load = function()
   bullets = {}
 
   bullet_info = {}
-  bullet_info[1] = {ai = 1, speed = 6, r = 0, dmg = 25, img = 1, shadow = false}
+  bullet_info[1] = {ai = 1, speed = 6, r = 0, dmg = 10, img = 1, shadow = false}
   bullet_info[2] = {ai = 2, speed = 4, r = 16, dmg = 25, persistant = true, img = 2, shadow = true}
 end
 

@@ -175,4 +175,11 @@ game.target_norm = function(p, t)
   return {x = x/denom, y = y/denom, z = z/denom}
 end
 
+game.target_pos = function(p, t, range)
+  if not range then
+    range = 1
+  end
+  return {x = p.x+p.l/2+t.x*range, y= p.y+p.w/2+t.y*range, z = p.z+p.h/2+t.z*range}
+end
+
 return game

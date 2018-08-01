@@ -158,7 +158,7 @@ collision.sphere_and_cube = function(p, c, r)
   local progress = 0
   for i, v in ipairs(faces) do
     for j = 1, #corners - 1 do
-      if collision.circle_and_square({x = p[v.x], y = p[v.y]}, {x = c[v.x], y = c[v.y], w = c[v.w], h = c[v.h]}, r[v.r]) then
+      if collision.circle_and_square({x = p[v.x], y = p[v.y]}, {x = c[v.x], y = c[v.y], w = c[v.w], h = c[v.h]}, r) then
         progress = progress + 1
         break
       end
