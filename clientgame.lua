@@ -10,6 +10,20 @@ local client_hooks = {
       players[data.index].xV, players[data.index].yV, players[data.index].zV = data.pos.xV, data.pos.yV, data.pos.zV
     end
   end,
+  v = function(data)
+    if data.xV then
+      players[data.index].xV = data.xV
+    end
+    if data.yV then
+      players[data.index].yV = data.yV
+    end
+    if data.zV then
+      players[data.index].zV = data.zV
+    end
+  end,
+  speed = function(data)
+    players[data.index].speed = data.speed
+  end,
   bullet = function(data)
     bullets[data.k] = data.info
   end,
@@ -35,6 +49,9 @@ local client_hooks = {
   gameover = function(data)
     players = data
     wipe.start(clientgame.start_end)
+  end,
+  hp = function(data)
+    players[data.index].hp = data.hp
   end
 }
 

@@ -47,7 +47,7 @@ servergame.update = function(dt)
   char.input(dt)
   server:sendToAll("pos", {index = id, pos = {x = players[id].x, y = players[id].y, z = players[id].z, xV = players[id].xV, yV = players[id].yV, zV = players[id].zV}})
   -- server's abilities
-  game.update_abilities(servergame.update_ability, id)
+  game.update_abilities(servergame.update_ability, id, dt)
   -- game updating
   game.update(dt)
 
@@ -90,12 +90,12 @@ servergame.use_ability = function(num)
   char.use_ability(players[id], id, target, num)
 end
 
-servergame.update_ability = function(num)
-  char.update_ability(players[id], id, target, num)
+servergame.update_ability = function(num, k, dt)
+  char.update_ability(players[id], id, target, num, dt)
 end
 
-servergame.update_client_ability = function(num, k)
-  local stop = char.update_ability(players[k], k, players[k].target, num)
+servergame.update_client_ability = function(num, k, dt)
+  local stop = char.update_ability(players[k], k, players[k].target, num, dt)
   if stop then
     local ability = players[k].abilities[num]
     server:sendToPeer(server:getPeerByIndex(k), "ability_info", {num = num, delay = ability.delay, active = ability.active, energy = players[k].energy})

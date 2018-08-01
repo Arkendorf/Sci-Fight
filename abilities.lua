@@ -116,15 +116,79 @@ energy = 0,
 desc = "pls ignore",
 }
 
-abilities[8] = { -- blaster shot
+abilities[8] = {
 press_func = function(player, index, target)
   local k = bullet.new(players[index], target, index, 4)
   server:sendToAll("bullet", {info = bullets[k], k = k})
   return false
 end,
-delay = 1,
+delay = 10,
 energy = 10,
 desc = "Throw grenade",
+}
+
+abilities[9] = {
+press_func = function(player, index, target)
+  player.zV = -8
+  server:sendToAll("v", {index = index, zV = player.zV})
+  return false
+end,
+delay = 6,
+energy = 15,
+desc = "Super leap",
+}
+
+abilities[10] = {
+press_func = function(player, index, target)
+  player.speed = 2
+  server:sendToAll("speed", {index = index, speed = player.speed})
+  return true
+end,
+stop_func = function(player, index)
+  player.speed = 1
+  server:sendToAll("speed", {index = index, speed = player.speed})
+end,
+delay = 2,
+energy = 0.3,
+desc = "Super speed",
+}
+
+local fly = function(player, index, target)
+  if player.zV > -5 then
+    player.zV = player.zV - 0.3
+  else
+    player.zV = -5
+  end
+  server:sendToAll("v", {index = index, zV = player.zV})
+  return true
+end
+abilities[11] = {
+press_func = fly,
+update_func = fly,
+delay = 0.2,
+energy = 0.4,
+desc = "Jetpack",
+}
+
+local heal = function(player, index, target, dt)
+  if player.hp < hp_max then
+    if dt then
+      player.hp = player.hp + 0.2*dt*60
+    else
+      player.hp = player.hp + 0.2
+    end
+  else
+    player.hp = hp_max
+  end
+  server:sendToAll("hp", {index = index, hp = player.hp})
+  return true
+end
+abilities[12] = {
+press_func = heal,
+update_func = heal,
+delay = 8,
+energy = 0.4,
+desc = "Heal",
 }
 
 

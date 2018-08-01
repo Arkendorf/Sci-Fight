@@ -12,16 +12,16 @@ end
 char.input = function(dt)
   --input
   if love.keyboard.isDown("w") then
-    players[id].yV = players[id].yV - .5
+    players[id].yV = players[id].yV - .5 * players[id].speed
   end
   if love.keyboard.isDown("s") then
-    players[id].yV = players[id].yV + 0.5
+    players[id].yV = players[id].yV + 0.5 * players[id].speed
   end
   if love.keyboard.isDown("a") then
-    players[id].xV = players[id].xV - 0.5
+    players[id].xV = players[id].xV - 0.5 * players[id].speed
   end
   if love.keyboard.isDown("d") then
-    players[id].xV = players[id].xV + 0.5
+    players[id].xV = players[id].xV + 0.5 * players[id].speed
   end
   if love.keyboard.isDown("space") and not players[id].jump then
     players[id].zV = players[id].zV - 4
@@ -96,7 +96,7 @@ char.serverupdate = function(dt)
   for k, v in pairs(players) do
     server:sendToAll("pos", {index = k, pos = {x = v.x, y = v.y, z = v.z, xV = v.xV, yV = v.yV, zV = v.zV}})
     if k ~= id then
-      game.update_abilities(servergame.update_client_ability, k)
+      game.update_abilities(servergame.update_client_ability, k, dt)
     end
   end
 end
@@ -114,21 +114,24 @@ char.use_ability = function(player, index, target, num)
   end
 end
 
-char.update_ability = function(player, index, target, num)
-  if player.abilities[num].active and abilities[player.abilities[num].type].update_func then
+char.update_ability = function(player, index, target, num, dt)
+  if player.abilities[num].active then
     if player.energy >= abilities[player.abilities[num].type].energy then
-      abilities[player.abilities[num].type].update_func(player, index, target)
-      player.energy = player.energy - abilities[player.abilities[num].type].energy
-      return true
+      if abilities[player.abilities[num].type].update_func then
+        abilities[player.abilities[num].type].update_func(player, index, target, dt)
+      end
+      player.energy = player.energy - abilities[player.abilities[num].type].energy * dt*60
     else
       char.stop_ability(player, index, num)
     end
   end
-  return false
 end
 
 char.stop_ability = function(player, index, num)
   if player.abilities[num].active then
+    if abilities[player.abilities[num].type].stop_func then
+      abilities[player.abilities[num].type].stop_func(player, index)
+    end
     player.abilities[num].active = false
     player.abilities[num].delay = abilities[player.abilities[num].type].delay-- initiate cooldown
   end
@@ -136,7 +139,7 @@ end
 
 char.ability_check = function(player)
   for i, v in ipairs(player.abilities) do
-    if v.active and abilities[player.abilities[i].type].update_func then
+    if v.active then
       return true
     end
   end
@@ -154,7 +157,7 @@ char.death = function(player, killer)
 end
 
 char.new = function(name, loadout)
-  local item = {name = name, x = #grid[1][1]*tile_size*0.5, y = #grid[1]*tile_size*0.5, z = -24, l = 24, w = 24, h = 24, xV = 0, yV = 0, zV = 0, hp = hp_max, energy = energy_max, score = 0, jump = false, inv = 0}
+  local item = {name = name, x = #grid[1][1]*tile_size*0.5, y = #grid[1]*tile_size*0.5, z = -24, l = 24, w = 24, h = 24, xV = 0, yV = 0, zV = 0, speed = 1, hp = hp_max, energy = energy_max, score = 0, jump = false, inv = 0}
   item.weapon = {type = loadout.weapon, active = false}
   item.abilities = {}
   for i, v in ipairs(loadout.abilities) do

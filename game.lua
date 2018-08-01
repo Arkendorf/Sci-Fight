@@ -22,7 +22,7 @@ game.load = function()
 
   target = {x = 0, y = 0, z = 0}
 
-  ability_keys = {{"button", 1}, {"button", 2}, {"key", "q"}, {"key", "e"}, {"key", "f"}}
+  ability_keys = {{"button", 1}, {"button", 2}, {"key", "lshift"}, {"key", "lctrl"}, {"key", "lalt"}}
 end
 
 game.update = function(dt)
@@ -69,10 +69,10 @@ game.abilities = function(mode, button, func)
   end
 end
 
-game.update_abilities = function(func, k)
+game.update_abilities = function(func, k, dt)
   for i, v in ipairs(players[k].abilities) do
-    if v.active and abilities[players[k].abilities[i].type].update_func then
-      func(i, k)
+    if v.active then
+      func(i, k, dt)
     end
   end
 end
