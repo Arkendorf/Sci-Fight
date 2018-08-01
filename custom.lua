@@ -54,12 +54,12 @@ custom.draw = function()
     if current_slot == "weapon" then
       love.graphics.draw(weapon_img[v.num], v.x, v.y)
     elseif custom.ability_used(v.num) then
-      love.graphics.setColor(0.6, 0.6, 0.6)
+      love.graphics.setShader(shader.greyscale)
       love.graphics.draw(ability_img[v.num], v.x, v.y)
+      love.graphics.setShader()
     else
       love.graphics.draw(ability_img[v.num], v.x, v.y)
     end
-    love.graphics.setColor(1, 1, 1)
   end
 end
 

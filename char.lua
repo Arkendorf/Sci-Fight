@@ -106,6 +106,9 @@ char.use_ability = function(player, index, target, num)
       player.abilities[num].delay = abilities[player.abilities[num].type].delay
       player.energy = player.energy - abilities[player.abilities[num].type].energy
     end
+    if num < 3 then -- stop other weapon ability
+      char.stop_ability(player, index, num-(num*2-3))
+    end
   end
 end
 

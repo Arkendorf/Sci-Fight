@@ -16,6 +16,7 @@ game.load = function()
   bullet.load()
   clientgame.load()
   servergame.load()
+  hud.load()
 
   queue = {}
 

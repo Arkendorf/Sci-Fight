@@ -8,7 +8,6 @@ press_func = function(player, index, target)
   server:sendToAll("bullet", {info = bullets[k], k = k})
   return false
 end,
-update_func = nil,
 delay = 0.2,
 energy = 5,
 type = 2,
@@ -53,8 +52,7 @@ press_func = function(player, index, target)
   player.weapon.active = true
   return false
 end,
-update_func = nil,
-delay = 0.2,
+delay = 4,
 energy = 25,
 type = 1,
 desc = "Throw saber",
@@ -65,6 +63,9 @@ desc = "Throw saber",
 -- neutral abilities
 
 abilities[4] = { -- filler
+press_func = function() end,
+delay = 1,
+energy = 0,
 desc = "pls ignore",
 }
 

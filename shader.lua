@@ -49,4 +49,12 @@ shader.color = love.graphics.newShader[[
     }
   ]]
 
+shader.greyscale = love.graphics.newShader[[
+  vec4 effect( vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords ){
+    vec4 pixel = Texel(texture, texture_coords);
+    number avg = (pixel.r+pixel.g+pixel.b) / 3.0;
+    return vec4(avg, avg, avg, pixel.a);
+  }
+  ]]
+
 return shader
