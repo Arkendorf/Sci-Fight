@@ -6,6 +6,9 @@ energy_max = 100
 local energy_increase = 0.1
 hp_max = 100
 
+local tile_buffer = 8
+local death_inv = 4
+
 char.load = function()
 end
 
@@ -85,9 +88,13 @@ char.update = function(dt)
       end
     end
     if v.energy < energy_max and not char.ability_check(v) then
-      v.energy = v.energy + energy_increase*weapons[v.weapon.type].regen
+      v.energy = v.energy + energy_increase*weapons[v.weapon.type].energy
     elseif v.energy > energy_max then
       v.energy = energy_max
+    end
+
+    if v.hp <= 0 then -- death
+      char.death(v)
     end
   end
 end
@@ -95,6 +102,10 @@ end
 char.serverupdate = function(dt)
   for k, v in pairs(players) do
     server:sendToAll("pos", {index = k, pos = {x = v.x, y = v.y, z = v.z, xV = v.xV, yV = v.yV, zV = v.zV}})
+    if v.z > (#grid+tile_buffer)*tile_size then -- fall off reset
+      v.hp = 0
+      server:sendToAll("hp", {index = k, hp = 0})
+    end
     if k ~= id then
       game.update_abilities(servergame.update_client_ability, k, dt)
     end
@@ -103,13 +114,13 @@ end
 
 char.use_ability = function(player, index, target, num)
   if player.abilities[num].delay <= 0 and player.energy >= abilities[player.abilities[num].type].energy and not (num < 3 and player.weapon.active) then
-    player.abilities[num].active = abilities[player.abilities[num].type].press_func(player, index, target)
+    player.abilities[num].active = abilities[player.abilities[num].type].press_func(player, index, target, num)
     if not player.abilities[num].active then -- initiate cooldown if ability isn't channelled
       player.abilities[num].delay = abilities[player.abilities[num].type].delay
       player.energy = player.energy - abilities[player.abilities[num].type].energy
     end
     if num < 3 then -- stop other weapon ability
-      char.stop_ability(player, index, num-(num*2-3))
+      char.stop_ability(player, index, target, num-(num*2-3))
     end
   end
 end
@@ -118,19 +129,19 @@ char.update_ability = function(player, index, target, num, dt)
   if player.abilities[num].active then
     if player.energy >= abilities[player.abilities[num].type].energy then
       if abilities[player.abilities[num].type].update_func then
-        abilities[player.abilities[num].type].update_func(player, index, target, dt)
+        abilities[player.abilities[num].type].update_func(player, index, target, num)
       end
       player.energy = player.energy - abilities[player.abilities[num].type].energy * dt*60
     else
-      char.stop_ability(player, index, num)
+      char.stop_ability(player, index, target, num)
     end
   end
 end
 
-char.stop_ability = function(player, index, num)
+char.stop_ability = function(player, index, target, num)
   if player.abilities[num].active then
     if abilities[player.abilities[num].type].stop_func then
-      abilities[player.abilities[num].type].stop_func(player, index)
+      abilities[player.abilities[num].type].stop_func(player, index, target, num)
     end
     player.abilities[num].active = false
     player.abilities[num].delay = abilities[player.abilities[num].type].delay-- initiate cooldown
@@ -151,9 +162,10 @@ char.death = function(player, killer)
   player.x = #grid[1][1]*tile_size*0.5-player.l/2
   player.y = #grid[1]*tile_size*0.5-player.w/2
   player.z = -player.h
-  if killer.score then
+  if killer and killer.score then
     killer.score = killer.score + 1
   end
+  player.inv = death_inv
 end
 
 char.new = function(name, loadout)
@@ -161,14 +173,18 @@ char.new = function(name, loadout)
   item.weapon = {type = loadout.weapon, active = false}
   item.abilities = {}
   for i, v in ipairs(loadout.abilities) do
-    item.abilities[i] = {type = v, active = false, delay = 0}
+    item.abilities[i] = {type = v, active = false, delay = 0, info = nil}
   end
   return item
 end
 
 char.queue = function()
   for i, v in pairs(players) do
-    queue[#queue + 1] = {img = player_img, x = v.x, y = v.y, z = v.z, w = v.w, h = v.h, l = v.l, shadow = true}
+    if math.floor(math.sin(v.inv*14)+0.5) > 0 then
+      queue[#queue + 1] = {img = player_img, x = v.x, y = v.y, z = v.z, w = v.w, h = v.h, l = v.l, shadow = true, flash = true}
+    else
+      queue[#queue + 1] = {img = player_img, x = v.x, y = v.y, z = v.z, w = v.w, h = v.h, l = v.l, shadow = true}
+    end
   end
 end
 

@@ -13,15 +13,12 @@ bullet.load = function()
   bullet_info[2] = {ai = 2, speed = 4, r = 16, dmg = 25, persistant = true, img = 2, shadow = true}
   bullet_info[3] = {ai = 1, speed = 6, r = 0, dmg = 20, img = 1}
   bullet_info[4] = {ai = 3, speed = 3, r = 12, dmg = 0, persistant = true, img = 3, shadow = true, explosion = {dmg = 30, r = 64}}
-  bullet_info[5] = {ai = 4, speed = 2.2, r = 12, dmg = 0, persistant = true, img = 4, shadow = true, explosion = {dmg = 20, r = 32}}
+  bullet_info[5] = {ai = 4, speed = 2.2, r = 12, dmg = 0, img = 4, shadow = true, explosion = {dmg = 20, r = 32}}
+  bullet_info[6] = {ai = 5, speed = 6, r = 0, dmg = 10, img = 5, explosion = {dmg = 0, r = 24}}
 end
 
 bullet.update = function(dt)
   for k, v in pairs(bullets) do
-    -- collide with map
-    bullet.map_collide(k, v)
-    -- collide with borders
-    bullet.bound_collide(k, v)
     -- update pos
     if v.freeze <= 0 then
       v.x = v.x + v.xV * dt * 60
@@ -36,6 +33,10 @@ end
 bullet.serverupdate = function(dt)
   for k, v in pairs(bullets) do
     if v.freeze <= 0 then
+      -- collide with map
+      bullet.map_collide(k, v)
+      -- collide with borders
+      bullet.bound_collide(k, v)
       -- collide with players
       bullet.player_collide(k, v)
       -- update velocity
@@ -73,7 +74,10 @@ bullet.map_collide = function(k, v)
     if face then
       v.collide = face
       v.x, v.y, v.z = v.x+v.xV*frac, v.y+v.yV*frac, v.z+v.zV*frac
-      if bullet.destroy(k, v, face) then
+      if bullet_info[v.type].explosion then
+        bullet.explode(k, v)
+        break
+      elseif bullet.destroy(k, v, face) then
         break
       end
     end
@@ -84,15 +88,12 @@ bullet.player_collide = function(k, v) -- only server should do this
   local p1, p2 = bullet.get_points(v)
   for l, w in pairs(players) do
     if l ~= v.parent and w.inv <= 0 and collision.line_and_cube(p1, p2, w) then
-      if bullet_info[v.type].dmg > 0 then
+      if bullet_info[v.type].explosion then
+        bullet.explode(k, v)
+      elseif bullet_info[v.type].dmg > 0 then
         local num = w.hp - bullet_info[v.type].dmg*weapons[players[v.parent].weapon.type].dmg -- bullet damage * weapon modifier
         bullet.damage(w, num, v.parent)
         server:sendToAll("hit", {index = l, num = num, parent = v.parent})
-      end
-      if bullet_info[v.type].explosion then
-        bullet.explode(k, v)
-      else
-        bullet.destroy(k, v)
       end
       break
     end
@@ -109,9 +110,13 @@ end
 
 bullet.explode = function(k, v)
   local info = bullet_info[v.type].explosion
+  local dmg = info.dmg
+  if v.dmg then
+    dmg = v.dmg
+  end
   for l, w in pairs(players) do
     if l ~= v.parent and w.inv <= 0 and collision.sphere_and_cube(v, w, info.r) then
-      local num = w.hp - info.dmg*weapons[players[v.parent].weapon.type].dmg -- bullet damage * weapon modifier
+      local num = w.hp - dmg*weapons[players[v.parent].weapon.type].dmg -- bullet damage * weapon modifier
       bullet.damage(w, num, v.parent)
       server:sendToAll("hit", {index = l, num = num, parent = v.parent})
     end

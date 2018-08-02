@@ -87,9 +87,11 @@ bullet_ai[4] = function(k, v, dt)
     local zV = v.zV*0.9 + math.cos(math.atan2(math.sqrt(l_x*l_x+l_y*l_y), l_z))*speed*.1
     v.xV, v.yV, v.zV = xV, yV, zV
   end
+end
 
-  if v.collide then
-    bullet.explode(k, v)
+bullet_ai[5] = function(k, v, dt)
+  if not v.dmg then
+    v.dmg = v.info
   end
 end
 

@@ -25,8 +25,8 @@ local server_hooks = {
   end,
   stop_ability = function(data, client)
     local index = client:getIndex()
-    char.stop_ability(players[index], index, data)
-    server:sendToPeer(server:getPeerByIndex(index), "ability_info", {num = data, delay = players[index].abilities[data].delay, active = false})
+    char.stop_ability(players[index], index, data.target, data.num)
+    server:sendToPeer(server:getPeerByIndex(index), "ability_info", {num = data.num, delay = players[index].abilities[data.num].delay, active = false})
   end,
 }
 
@@ -105,7 +105,7 @@ servergame.update_client_ability = function(num, k, dt)
 end
 
 servergame.stop_ability = function(num)
-  char.stop_ability(players[id], id, num)
+  char.stop_ability(players[id], id, target, num)
 end
 
 servergame.start_end = function()

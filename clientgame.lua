@@ -110,7 +110,7 @@ clientgame.update_ability = function(num)
 end
 
 clientgame.stop_ability = function(num)
-  client:send("stop_ability", num)
+  client:send("stop_ability", {target = target, num = num})
 end
 
 clientgame.start_end = function()

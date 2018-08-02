@@ -1,7 +1,6 @@
 local abilities = {}
 
 -- blaster abilities
-
 abilities[1] = { -- blaster shot
 press_func = function(player, index, target)
   local k = bullet.new(players[index], target, index, 1)
@@ -42,6 +41,43 @@ energy = 15,
 type = 2,
 name = "Tri-Shot",
 desc = "Fire three high-damage lasers in an arc",
+}
+
+abilities[17] = { -- blaster shot
+press_func = function(player, index, target, num)
+  player.abilities[num].info = 0
+  return true
+end,
+update_func = function(player, index, target, num)
+  player.abilities[num].info = player.abilities[num].info + global_dt*10
+end,
+stop_func = function(player, index, target, num)
+  local k = bullet.new(players[index], target, index, 6, player.abilities[num].info)
+  server:sendToAll("bullet", {info = bullets[k], k = k})
+  return false
+end,
+delay = 2,
+energy = 0.2,
+type = 2,
+name = "Charged Shot",
+desc = "Fire a laser that becomes more powerful the longer it is held",
+}
+
+local roll_speed = 12
+abilities[4] = {
+press_func = function(player, index, target)
+  local dir = game.target_norm(player, target)
+  local length = math.sqrt(dir.x*dir.x + dir.y*dir.y);
+  player.xV = dir.x/length*roll_speed
+  player.yV = dir.y/length*roll_speed
+  server:sendToAll("v", {index = index, xV = player.xV, yV = player.yV})
+  return false
+end,
+delay = 1,
+energy = 5,
+type = 2,
+name = "Roll",
+desc = "Dodge towards target",
 }
 
 
@@ -114,15 +150,6 @@ desc = "Throw your saber towards the target",
 
 
 -- neutral abilities
-
-abilities[4] = { -- filler
-press_func = function() end,
-delay = 1,
-energy = 0,
-name = "placeholder",
-desc = "pls ignore",
-}
-
 abilities[8] = {
 press_func = function(player, index, target)
   local k = bullet.new(players[index], target, index, 4)
@@ -181,15 +208,15 @@ name = "Jetpack",
 desc = "Fly upwards",
 }
 
-local heal = function(player, index, target, dt)
+local heal = function(player, index, target, num)
   if player.hp < hp_max then
-    if dt then
-      player.hp = player.hp + 0.1*dt*60
-    else
-      player.hp = player.hp + 0.1
-    end
+    player.hp = player.hp + 0.1*global_dt*60
   else
     player.hp = hp_max
+    char.stop_ability(player, index, target, num)
+    if index ~= 0 then
+      server:sendToPeer(server:getPeerByIndex(index), "ability_info", {num = num, delay = player.abilities[num].delay, active = false})
+    end
   end
   server:sendToAll("hp", {index = index, hp = player.hp})
   return true

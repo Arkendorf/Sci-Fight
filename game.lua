@@ -88,6 +88,11 @@ game.draw_queue = function()
   for i, v in ipairs(queue) do
     love.graphics.setShader(shader.layer)
     shader.layer:send("coords", {0, 1+math.floor((v.y)/tile_size), 1+math.ceil((v.z+v.h)/tile_size)})
+    if v.flash then
+      shader.layer:send("flash", true)
+    else
+      shader.layer:send("flash", false)
+    end
     graphics.draw(v)
     love.graphics.setShader()
   end
