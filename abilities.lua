@@ -14,16 +14,7 @@ name = "Laser",
 desc = "Standard blaster attack",
 }
 
-abilities[6] = { -- rapid reload
-press_func = function() end,
-delay = 7,
-energy = -25,
-type = 2,
-name = "Reload",
-desc = "Rapidly reload and gain a burst of energy",
-}
-
-abilities[7] = { -- tri shot
+abilities[2] = { -- tri shot
 press_func = function(player, index, target)
   local dif = {x = target.x-(player.x+player.l/2), y = target.y-(player.y+player.w/2), z = target.z-(player.z+player.h/2)}
   local base_angle = math.atan2(dif.y, dif.x)-math.rad(20)
@@ -43,7 +34,7 @@ name = "Tri-Shot",
 desc = "Fire three high-damage lasers in an arc",
 }
 
-abilities[17] = { -- blaster shot
+abilities[3] = {
 press_func = function(player, index, target, num)
   player.abilities[num].info = 0
   return true
@@ -63,8 +54,31 @@ name = "Charged Shot",
 desc = "Fire a laser that becomes more powerful the longer it is held",
 }
 
-local roll_speed = 12
 abilities[4] = {
+press_func = function(player, index, target)
+  local k = bullet.new(players[index], target, index, 7)
+  server:sendToAll("bullet", {info = bullets[k], k = k})
+  return false
+end,
+delay = 8,
+energy = 20,
+type = 2,
+name = "Piercing Laser",
+desc = "Fire a laser that passes through floors and walls",
+}
+
+
+abilities[5] = { -- rapid reload
+press_func = function() end,
+delay = 7,
+energy = -25,
+type = 2,
+name = "Reload",
+desc = "Rapidly reload and gain a burst of energy",
+}
+
+local roll_speed = 12
+abilities[6] = {
 press_func = function(player, index, target)
   local dir = game.target_norm(player, target)
   local length = math.sqrt(dir.x*dir.x + dir.y*dir.y);
@@ -82,11 +96,12 @@ desc = "Dodge towards target",
 
 
 
+
 -- saber abilities
  -- swing saber
 local swing_range = 16
 local swing_radius = 8
-abilities[5] = {
+abilities[7] = {
 press_func = function(player, index, target)
   local dir = game.target_norm(player, target)
   local bubble = game.target_pos(player, dir, swing_range)
@@ -123,17 +138,17 @@ local deflect = function(player, index, target)
   end
   return true
 end
-abilities[2] = {
+abilities[8] = {
 press_func = deflect,
 update_func = deflect,
-delay = 4,
+delay = 5,
 energy = 0.3,
 type = 1,
 name = "Deflect",
 desc = "Deflect incoming projectiles in the direction of the target",
 }
 
-abilities[3] = { -- throw saber
+abilities[9] = { -- throw saber
 press_func = function(player, index, target)
   local k = bullet.new(players[index], target, index, 2, index)
   server:sendToAll("bullet", {info = bullets[k], k = k})
@@ -147,10 +162,29 @@ name = "Throw Saber",
 desc = "Throw your saber towards the target",
 }
 
+local spin_radius = 32
+abilities[10] = {
+press_func = function(player, index, target)
+  local bubble = {x = player.x+player.l/2, y = player.y+player.w/2, z = player.z+player.h/2}
+  for k, v in pairs(players) do
+    if k ~= index and collision.sphere_and_cube(bubble, v, spin_radius) then
+      local num = v.hp-weapons[player.weapon.type].dmg*10
+      bullet.damage(v, num, index)
+      server:sendToAll("hit", {index = k, num = num, parent = index})
+    end
+  end
+end,
+delay = 4,
+energy = 10,
+type = 1,
+name = "Spin",
+desc = "Spin saber damaging all adjacent enemies",
+}
+
 local lunge_speed = 12
 local lunge_range = 32
 local lunge_radius = 20
-abilities[18] = {
+abilities[11] = {
 press_func = function(player, index, target)
   local x, y = 0, 0
   if math.abs(player.xV) < 0.1 and math.abs(player.yV) < 0.1 then
@@ -183,144 +217,24 @@ name = "Lunge",
 desc = "Start a forward damaging lunge",
 }
 
-local spin_radius = 32
-abilities[19] = {
+abilities[12] = {
 press_func = function(player, index, target)
-  local bubble = {x = player.x+player.l/2, y = player.y+player.w/2, z = player.z+player.h/2}
-  for k, v in pairs(players) do
-    if k ~= index and collision.sphere_and_cube(bubble, v, spin_radius) then
-      local num = v.hp-weapons[player.weapon.type].dmg*10
-      bullet.damage(v, num, index)
-      server:sendToAll("hit", {index = k, num = num, parent = index})
-    end
-  end
+  player.inv = 1
+  return false
 end,
-delay = 4,
-energy = 10,
+delay = 5,
+energy = 20,
 type = 1,
-name = "Spin",
-desc = "Spin saber damaging all adjacent enemies",
+name = "Block",
+desc = "Become temporarily invincible",
 }
 
 
 
 -- neutral abilities
-abilities[8] = {
-press_func = function(player, index, target)
-  local k = bullet.new(players[index], target, index, 4)
-  server:sendToAll("bullet", {info = bullets[k], k = k})
-  return false
-end,
-delay = 6,
-energy = 10,
-name = "Grenade",
-desc = "Throw an explosive projectile",
-}
-
-abilities[9] = {
-press_func = function(player, index, target)
-  player.zV = -8
-  server:sendToAll("v", {index = index, zV = player.zV})
-  return false
-end,
-delay = 6,
-energy = 15,
-name = "Leap",
-desc = "Burst of vertical momentum",
-}
-
-abilities[10] = {
-press_func = function(player, index, target)
-  player.speed = 2
-  server:sendToAll("speed", {index = index, speed = player.speed})
-  return true
-end,
-stop_func = function(player, index)
-  player.speed = 1
-  server:sendToAll("speed", {index = index, speed = player.speed})
-end,
-delay = 2,
-energy = 0.3,
-name = "Speed",
-desc = "Increases movement speed",
-}
-
-local fly = function(player, index, target)
-  if player.zV > -5 then
-    player.zV = player.zV - 0.3
-  else
-    player.zV = -5
-  end
-  server:sendToAll("v", {index = index, zV = player.zV})
-  return true
-end
-abilities[11] = {
-press_func = fly,
-update_func = fly,
-delay = 0.2,
-energy = 0.4,
-name = "Jetpack",
-desc = "Fly upwards",
-}
-
-local heal = function(player, index, target, num)
-  if player.hp < hp_max then
-    player.hp = player.hp + 0.1*global_dt*60
-  else
-    player.hp = hp_max
-    char.stop_ability(player, index, target, num)
-    if index ~= 0 then
-      server:sendToPeer(server:getPeerByIndex(index), "ability_info", {num = num, delay = player.abilities[num].delay, active = false})
-    end
-  end
-  server:sendToAll("hp", {index = index, hp = player.hp})
-  return true
-end
-abilities[12] = {
-press_func = heal,
-update_func = heal,
-delay = 7,
-energy = 0.2,
-name = "Heal",
-desc = "Slowly heal over time",
-}
-
-abilities[13] = {
-press_func = function(player, index, target)
-  local k = bullet.new(players[index], target, index, 5)
-  server:sendToAll("bullet", {info = bullets[k], k = k})
-  return false
-end,
-delay = 6,
-energy = 20,
-name = "Homing missile",
-desc = "Fire a missile that locks on to enemies",
-}
-
-local freeze_range = 20
-local freeze_radius = 24
-abilities[14] = {
-press_func = function(player, index, target)
-  local dir = game.target_norm(player, target)
-  local bubble = game.target_pos(player, dir, freeze_range)
-  for k, v in pairs(bullets) do
-    local p1, p2 = bullet.get_points(v, 1)
-    if collision.line_and_sphere(p1, p2, bubble, freeze_radius) then
-      v.freeze = 2
-      server:sendToAll("bulletfreeze", {index = k, freeze = v.freeze})
-    end
-  end
-  return false
-end,
-delay = 5,
-energy = 15,
-name = "Freeze",
-desc = "Stop projectiles in target range in mid-air",
-}
-
 local push_range = 36
 local push_radius = 24
-abilities[15] = {
+abilities[13] = {
 press_func = function(player, index, target)
   local dir = game.target_norm(player, target)
   local bubble = game.target_pos(player, dir, push_range)
@@ -342,6 +256,103 @@ name = "Push",
 desc = "Shove other players backwards",
 }
 
+abilities[14] = {
+press_func = function(player, index, target)
+  player.zV = -8
+  server:sendToAll("v", {index = index, zV = player.zV})
+  return false
+end,
+delay = 6,
+energy = 15,
+name = "Leap",
+desc = "Burst of vertical momentum",
+}
+
+abilities[15] = {
+press_func = function(player, index, target)
+  player.speed = 2
+  server:sendToAll("speed", {index = index, speed = player.speed})
+  return true
+end,
+stop_func = function(player, index)
+  player.speed = 1
+  server:sendToAll("speed", {index = index, speed = player.speed})
+end,
+delay = 2,
+energy = 0.3,
+name = "Speed",
+desc = "Increases movement speed",
+}
+
+local freeze_range = 20
+local freeze_radius = 24
+abilities[16] = {
+press_func = function(player, index, target)
+  local dir = game.target_norm(player, target)
+  local bubble = game.target_pos(player, dir, freeze_range)
+  for k, v in pairs(bullets) do
+    local p1, p2 = bullet.get_points(v, 1)
+    if collision.line_and_sphere(p1, p2, bubble, freeze_radius) then
+      v.freeze = 2
+      server:sendToAll("bulletfreeze", {index = k, freeze = v.freeze})
+    end
+  end
+  return false
+end,
+delay = 5,
+energy = 15,
+name = "Freeze",
+desc = "Stop projectiles in target range in mid-air",
+}
+
+local heal = function(player, index, target, num)
+  if player.hp < hp_max then
+    player.hp = player.hp + 0.1*global_dt*60
+  else
+    player.hp = hp_max
+    char.stop_ability(player, index, target, num)
+    if index ~= 0 then
+      server:sendToPeer(server:getPeerByIndex(index), "ability_info", {num = num, delay = player.abilities[num].delay, active = false})
+    end
+  end
+  server:sendToAll("hp", {index = index, hp = player.hp})
+  return true
+end
+abilities[17] = {
+press_func = heal,
+update_func = heal,
+delay = 7,
+energy = 0.2,
+name = "Heal",
+desc = "Slowly heal over time",
+}
+
+abilities[18] = {
+press_func = function(player, index, target)
+  local k = bullet.new(players[index], target, index, 4)
+  server:sendToAll("bullet", {info = bullets[k], k = k})
+  return false
+end,
+delay = 6,
+energy = 10,
+name = "Grenade",
+desc = "Throw an explosive projectile",
+}
+
+abilities[19] = {
+press_func = function(player, index, target)
+  local k = bullet.new(players[index], target, index, 5)
+  server:sendToAll("bullet", {info = bullets[k], k = k})
+  return false
+end,
+delay = 6,
+energy = 20,
+name = "Homing missile",
+desc = "Fire a missile that locks on to enemies",
+}
+
+
+
 local flame_range = 18
 local flame_radius = 12
 local flame = function(player, index, target)
@@ -356,7 +367,7 @@ local flame = function(player, index, target)
   end
   return true
 end
-abilities[16] = {
+abilities[20] = {
 press_func = flame,
 update_func = flame,
 delay = 5,
@@ -365,5 +376,22 @@ name = "Flamethrower",
 desc = "Shoot out a jet of flame in the direction of the target",
 }
 
+local fly = function(player, index, target)
+  if player.zV > -5 then
+    player.zV = player.zV - 0.3
+  else
+    player.zV = -5
+  end
+  server:sendToAll("v", {index = index, zV = player.zV})
+  return true
+end
+abilities[21] = {
+press_func = fly,
+update_func = fly,
+delay = 0.2,
+energy = 0.4,
+name = "Jetpack",
+desc = "Fly upwards",
+}
 
 return abilities
