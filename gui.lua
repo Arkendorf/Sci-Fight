@@ -169,13 +169,8 @@ gui.get_pos = function(w)
 end
 
 gui.text_size = function(txt, limit)
-  local w = font:getWidth(txt)
-  if w <= limit then
-    return {w = w+4, h = font:getHeight()+4}
-  else
-    w, wrap = font:getWrap(txt, limit)
-    return {w = w+4, h = #wrap*font:getHeight()+4}
-  end
+  local w, wrap = font:getWrap(txt, limit)
+  return {w = w+4, h = #wrap*font:getHeight()+4}
 end
 
 return gui

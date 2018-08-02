@@ -11,7 +11,8 @@ end,
 delay = 0.2,
 energy = 5,
 type = 2,
-desc = "Fire laser",
+name = "Laser",
+desc = "Standard blaster attack",
 }
 
 abilities[6] = { -- rapid reload
@@ -19,6 +20,7 @@ press_func = function() end,
 delay = 7,
 energy = -25,
 type = 2,
+name = "Reload",
 desc = "Rapidly reload and gain a burst of energy",
 }
 
@@ -38,6 +40,7 @@ end,
 delay = 3,
 energy = 15,
 type = 2,
+name = "Tri-Shot",
 desc = "Fire three high-damage lasers in an arc",
 }
 
@@ -62,7 +65,8 @@ end,
 delay = 0.2,
 energy = 5,
 type = 1,
-desc = "Swing saber",
+name = "Swing Saber",
+desc = "Standard saber attack",
 }
 
 -- laser deflect
@@ -89,7 +93,8 @@ update_func = deflect,
 delay = 4,
 energy = 0.3,
 type = 1,
-desc = "Deflect incoming projectiles in the direction of the mouse cursor",
+name = "Deflect",
+desc = "Deflect incoming projectiles in the direction of the target",
 }
 
 abilities[3] = { -- throw saber
@@ -102,7 +107,8 @@ end,
 delay = 4,
 energy = 25,
 type = 1,
-desc = "Throw saber",
+name = "Throw Saber",
+desc = "Throw your saber towards the target",
 }
 
 
@@ -113,6 +119,7 @@ abilities[4] = { -- filler
 press_func = function() end,
 delay = 1,
 energy = 0,
+name = "placeholder",
 desc = "pls ignore",
 }
 
@@ -124,7 +131,8 @@ press_func = function(player, index, target)
 end,
 delay = 6,
 energy = 10,
-desc = "Throw grenade",
+name = "Grenade",
+desc = "Throw an explosive projectile",
 }
 
 abilities[9] = {
@@ -135,7 +143,8 @@ press_func = function(player, index, target)
 end,
 delay = 6,
 energy = 15,
-desc = "Super leap",
+name = "Leap",
+desc = "Burst of vertical momentum",
 }
 
 abilities[10] = {
@@ -150,7 +159,8 @@ stop_func = function(player, index)
 end,
 delay = 2,
 energy = 0.3,
-desc = "Super speed",
+name = "Speed",
+desc = "Increases movement speed",
 }
 
 local fly = function(player, index, target)
@@ -167,7 +177,8 @@ press_func = fly,
 update_func = fly,
 delay = 0.2,
 energy = 0.4,
-desc = "Jetpack",
+name = "Jetpack",
+desc = "Fly upwards",
 }
 
 local heal = function(player, index, target, dt)
@@ -188,7 +199,8 @@ press_func = heal,
 update_func = heal,
 delay = 7,
 energy = 0.2,
-desc = "Heal",
+name = "Heal",
+desc = "Slowly heal over time",
 }
 
 abilities[13] = {
@@ -199,30 +211,29 @@ press_func = function(player, index, target)
 end,
 delay = 6,
 energy = 20,
-desc = "Fire homing missile",
+name = "Homing missile",
+desc = "Fire a missile that locks on to enemies",
 }
 
 local freeze_range = 20
 local freeze_radius = 24
-local freeze = function(player, index, target)
+abilities[14] = {
+press_func = function(player, index, target)
   local dir = game.target_norm(player, target)
   local bubble = game.target_pos(player, dir, freeze_range)
   for k, v in pairs(bullets) do
+    local p1, p2 = bullet.get_points(v, 1)
     if collision.line_and_sphere(p1, p2, bubble, freeze_radius) then
-      v.freeze = true
-    else
-      v.freeze = false
+      v.freeze = 2
+      server:sendToAll("bulletfreeze", {index = k, freeze = v.freeze})
     end
-    server:sendToAll("bulletfreeze", {index = k, freeze = v.freeze})
   end
-  return true
-end
-abilities[14] = {
-press_func = freeze,
-update_func = freeze,
+  return false
+end,
 delay = 5,
-energy = 0.2,
-desc = "Freeze projectiles in target range",
+energy = 15,
+name = "Freeze",
+desc = "Stop projectiles in target range in mid-air",
 }
 
 local push_range = 36
@@ -245,7 +256,8 @@ press_func = function(player, index, target)
 end,
 delay = 6,
 energy = 15,
-desc = "Push other players backwards",
+name = "Push",
+desc = "Shove other players backwards",
 }
 
 local flame_range = 18
@@ -267,6 +279,7 @@ press_func = flame,
 update_func = flame,
 delay = 5,
 energy = 0.3,
+name = "Flamethrower",
 desc = "Shoot out a jet of flame in the direction of the target",
 }
 

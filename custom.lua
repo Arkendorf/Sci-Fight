@@ -76,11 +76,11 @@ custom.update_loadout_gui = function()
   local buttons = {}
   local infoboxes = {}
   buttons[1] = {x = pos.x+offsets.weapon.x, y = pos.y+offsets.weapon.y, w = 70, h = icon.h, txt = "Weapon", func = custom.set_current_slot, args = {"weapon"}, hide = true}
-  local txt = weapons[loadouts[current_loadout].weapon].desc
+  local txt = custom.weapon_info(loadouts[current_loadout].weapon)
   infoboxes[#infoboxes+1] = {x = pos.x+offsets.weapon.x, y = pos.y+offsets.weapon.y, w = 70, h = icon.h, box = gui.text_size(txt, 128), txt = txt}
   for i, v in ipairs(offsets.abilities) do
     buttons[i+1]  = {x = pos.x+v.x, y = pos.y+v.y, w = icon.w, h = icon.h, txt = tostring(i), func = custom.set_current_slot, args = {i}, hide = true}
-    txt = abilities[loadouts[current_loadout].abilities[i]].desc
+    txt = custom.ability_info(loadouts[current_loadout].abilities[i])
     infoboxes[#infoboxes+1] = {x = pos.x+v.x, y = pos.y+v.y, w = icon.w, h = icon.h, box = gui.text_size(txt, 128), txt = txt}
   end
   gui.add(3, buttons, {}, infoboxes)
@@ -94,11 +94,11 @@ custom.set_current_slot = function(type)
   for i, v in ipairs(icons) do
     if type == "weapon" then
       buttons[#buttons+1] = {x = v.x, y = v.y, w= v.w, h = v.h, txt = tostring(v.num), func = custom.change_weapon, args = {v.num}, hide = true}
-      local txt = weapons[v.num].desc
+      local txt = custom.weapon_info(v.num)
       infoboxes[#infoboxes+1] = {x = v.x, y = v.y, w= v.w, h = v.h, box = gui.text_size(txt, 128), txt = txt}
     else
       buttons[#buttons+1] = {x = v.x, y = v.y, w= v.w, h = v.h, txt = tostring(v.num), func = custom.change_ability, args = {v.num, type}, hide = true}
-      local txt =  abilities[v.num].desc
+      local txt = custom.ability_info(v.num)
       infoboxes[#infoboxes+1] = {x = v.x, y = v.y, w= v.w, h = v.h, box = gui.text_size(txt, 128), txt = txt}
     end
   end
@@ -176,6 +176,20 @@ end
 
 custom.get_loadout = function()
   return loadouts[current_loadout]
+end
+
+custom.ability_info = function(num)
+  local str = abilities[num].name.."\n"..abilities[num].desc.."\nCooldown: "..tostring(abilities[num].delay).."s\nEnergy: "
+  if abilities[num].update_func or abilities[num].stop_func then
+    str = str..tostring(abilities[num].energy*60).."/s"
+  else
+    str = str..tostring(abilities[num].energy)
+  end
+  return str
+end
+
+custom.weapon_info = function(num)
+  return weapons[num].desc.."\nDamage Modifier: x"..tostring(weapons[num].dmg).."\nEnergy Modifier: x"..tostring(weapons[num].energy)
 end
 
 return custom

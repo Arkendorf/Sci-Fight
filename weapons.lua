@@ -4,21 +4,21 @@ weapons[1] = { -- saber
   type = 1,
   desc = "Saber (Blue)",
   dmg = 1,
-  regen = 1,
+  energy = 1,
 }
 
 weapons[2] = { -- blaster
   type = 2,
   desc = "Blaster",
   dmg = 1,
-  regen = 1,
+  energy = 1,
 }
 
 weapons[3] = { -- blaster
   type = 1,
-  desc = "Saber (Red)\nDoes more damage than its counterpart, but has slower energy regen",
+  desc = "Saber (Red)",
   dmg = 1.2,
-  regen = 0.8,
+  energy = 0.8,
 }
 
 return weapons

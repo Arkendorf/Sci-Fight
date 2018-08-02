@@ -196,7 +196,7 @@ collision.line_and_tile = function(p1, p2, t)
 end
 
 collision.bullet_and_cube = function(k, v, c)
-  p1, p2 = bullet.get_points(v)
+  local p1, p2 = bullet.get_points(v)
   return collision.line_and_cube(p1, p2, c)
 end
 

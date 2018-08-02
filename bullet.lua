@@ -23,17 +23,19 @@ bullet.update = function(dt)
     -- collide with borders
     bullet.bound_collide(k, v)
     -- update pos
-    if not v.freeze then
+    if v.freeze <= 0 then
       v.x = v.x + v.xV * dt * 60
       v.y = v.y + v.yV * dt * 60
       v.z = v.z + v.zV * dt * 60
+    else
+      v.freeze = v.freeze - dt
     end
   end
 end
 
 bullet.serverupdate = function(dt)
   for k, v in pairs(bullets) do
-    if not v.freeze then
+    if v.freeze <= 0 then
       -- collide with players
       bullet.player_collide(k, v)
       -- update velocity
@@ -58,7 +60,10 @@ bullet.queue = function()
 end
 
 bullet.get_points = function(v, dt)
-  return {x = v.x, y = v.y, z = v.z}, {x = v.x+v.xV*global_dt*60, y = v.y+v.yV*global_dt*60, z = v.z+v.zV*global_dt*60}
+  if not dt then
+    dt = global_dt
+  end
+  return {x = v.x, y = v.y, z = v.z}, {x = v.x+v.xV*dt*60, y = v.y+v.yV*dt*60, z = v.z+v.zV*dt*60}
 end
 
 bullet.map_collide = function(k, v)
@@ -76,7 +81,7 @@ bullet.map_collide = function(k, v)
 end
 
 bullet.player_collide = function(k, v) -- only server should do this
-  p1, p2 = bullet.get_points(v)
+  local p1, p2 = bullet.get_points(v)
   for l, w in pairs(players) do
     if l ~= v.parent and w.inv <= 0 and collision.line_and_cube(p1, p2, w) then
       if bullet_info[v.type].dmg > 0 then
@@ -155,7 +160,7 @@ bullet.new = function(p1, p2, parent, type, extra)
   local zV = math.cos(math.atan2(math.sqrt(l_x*l_x+l_y*l_y), l_z))
   local info = bullet_info[type]
   local spot = #bullets+1
-  bullets[spot] = {x = x1, y = y1, z = z1, xV = xV*info.speed, yV = yV*info.speed, zV = zV*info.speed, angle = math.atan2(yV+zV, xV), parent = parent, type = type, info = extra, freeze = false}
+  bullets[spot] = {x = x1, y = y1, z = z1, xV = xV*info.speed, yV = yV*info.speed, zV = zV*info.speed, angle = math.atan2(yV+zV, xV), parent = parent, type = type, info = extra, freeze = 0}
   return spot
 end
 
