@@ -248,5 +248,27 @@ energy = 15,
 desc = "Push other players backwards",
 }
 
+local flame_range = 18
+local flame_radius = 12
+local flame = function(player, index, target)
+  local dir = game.target_norm(player, target)
+  local bubble = game.target_pos(player, dir, flame_range)
+  for k, v in pairs(players) do
+    if k ~= index and collision.sphere_and_cube(bubble, v, flame_radius) then
+      local num = v.hp - 0.2*weapons[player.weapon.type].dmg -- bullet damage * weapon modifier
+      bullet.damage(v, num, index)
+      server:sendToAll("hit", {index = k, num = num, parent = index})
+    end
+  end
+  return true
+end
+abilities[16] = {
+press_func = flame,
+update_func = flame,
+delay = 5,
+energy = 0.3,
+desc = "Shoot out a jet of flame in the direction of the target",
+}
+
 
 return abilities
