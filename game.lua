@@ -82,7 +82,7 @@ game.mouse_pos = function()
 end
 
 game.draw_queue = function()
-  table.sort(queue, function(a, b) return a.y < b.y end)
+  table.sort(queue, function(a, b) return a.y+a.w < b.y+b.w end)
   shader.layer:send("xray_color", {.2, .2, .3, 1})
 
   for i, v in ipairs(queue) do

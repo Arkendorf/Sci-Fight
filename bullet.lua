@@ -74,7 +74,7 @@ bullet.map_collide = function(k, v)
     if face then
       v.collide = face
       v.x, v.y, v.z = v.x+v.xV*frac, v.y+v.yV*frac, v.z+v.zV*frac
-      if bullet_info[v.type].explosion then
+      if bullet_info[v.type].explosion and not bullet_info[v.type].persistant then
         bullet.explode(k, v)
         break
       elseif bullet.destroy(k, v, face) then
