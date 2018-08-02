@@ -73,7 +73,7 @@ press_func = function(player, index, target)
   server:sendToAll("v", {index = index, xV = player.xV, yV = player.yV})
   return false
 end,
-delay = 1,
+delay = 1.5,
 energy = 5,
 type = 2,
 name = "Roll",
@@ -145,6 +145,61 @@ energy = 25,
 type = 1,
 name = "Throw Saber",
 desc = "Throw your saber towards the target",
+}
+
+local lunge_speed = 12
+local lunge_range = 32
+local lunge_radius = 20
+abilities[18] = {
+press_func = function(player, index, target)
+  local x, y = 0, 0
+  if math.abs(player.xV) < 0.1 and math.abs(player.yV) < 0.1 then
+    local dir = game.target_norm(player, target)
+    x = dir.x
+    y = dir.y
+  else
+    x = player.xV
+    y = player.yV
+  end
+  local length = math.sqrt(x*x + y*y);
+  player.xV = x/length*lunge_speed
+  player.yV = y/length*lunge_speed
+  server:sendToAll("v", {index = index, xV = player.xV, yV = player.yV})
+
+  local bubble = game.target_pos(player, {x = x, y = y, z = 0}, lunge_range)
+  for k, v in pairs(players) do
+    if k ~= index and collision.sphere_and_cube(bubble, v, lunge_radius) then
+      local num = v.hp-weapons[player.weapon.type].dmg*15
+      bullet.damage(v, num, index)
+      server:sendToAll("hit", {index = k, num = num, parent = index})
+    end
+  end
+  return false
+end,
+delay = 4,
+energy = 20,
+type = 1,
+name = "Lunge",
+desc = "Start a forward damaging lunge",
+}
+
+local spin_radius = 32
+abilities[19] = {
+press_func = function(player, index, target)
+  local bubble = {x = player.x+player.l/2, y = player.y+player.w/2, z = player.z+player.h/2}
+  for k, v in pairs(players) do
+    if k ~= index and collision.sphere_and_cube(bubble, v, spin_radius) then
+      local num = v.hp-weapons[player.weapon.type].dmg*10
+      bullet.damage(v, num, index)
+      server:sendToAll("hit", {index = k, num = num, parent = index})
+    end
+  end
+end,
+delay = 4,
+energy = 10,
+type = 1,
+name = "Spin",
+desc = "Spin saber damaging all adjacent enemies",
 }
 
 
