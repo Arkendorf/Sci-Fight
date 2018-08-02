@@ -23,26 +23,30 @@ bullet.update = function(dt)
     -- collide with borders
     bullet.bound_collide(k, v)
     -- update pos
-    v.x = v.x + v.xV * dt * 60
-    v.y = v.y + v.yV * dt * 60
-    v.z = v.z + v.zV * dt * 60
+    if not v.freeze then
+      v.x = v.x + v.xV * dt * 60
+      v.y = v.y + v.yV * dt * 60
+      v.z = v.z + v.zV * dt * 60
+    end
   end
 end
 
 bullet.serverupdate = function(dt)
   for k, v in pairs(bullets) do
-    -- collide with players
-    bullet.player_collide(k, v)
-    -- update velocity
-    bullet_ai[bullet_info[v.type].ai](k, v, dt)
-    -- send update info
-    if bullets[k] then
-      if not v.old or v.x ~= v.old.x or v.y ~= v.old.y or v.z ~= v.old.z or v.xV ~= v.old.xV or v.yV ~= v.old.yV or v.zV ~= v.old.yV or v.angle ~= v.old.angle then
-        server:sendToAll("bulletupdate", {index = k, pos = {x = v.x, y = v.y, z = v.z, xV = v.xV, yV = v.yV, zV = v.zV, angle = v.angle}})
-        v.old = {x = v.x, y = v.y, z = v.z, xV = v.xV, yV = v.yV, zV = v.zV, angle = v.angle}
+    if not v.freeze then
+      -- collide with players
+      bullet.player_collide(k, v)
+      -- update velocity
+      bullet_ai[bullet_info[v.type].ai](k, v, dt)
+      -- send update info
+      if bullets[k] then
+        if not v.old or v.x ~= v.old.x or v.y ~= v.old.y or v.z ~= v.old.z or v.xV ~= v.old.xV or v.yV ~= v.old.yV or v.zV ~= v.old.yV or v.angle ~= v.old.angle then
+          server:sendToAll("bulletupdate", {index = k, pos = {x = v.x, y = v.y, z = v.z, xV = v.xV, yV = v.yV, zV = v.zV, angle = v.angle}})
+          v.old = {x = v.x, y = v.y, z = v.z, xV = v.xV, yV = v.yV, zV = v.zV, angle = v.angle}
+        end
+      else -- delete bullet
+        server:sendToAll("bullet", {k = k, info = nil})
       end
-    else -- delete bullet
-      server:sendToAll("bullet", {k = k, info = nil})
     end
   end
 end
@@ -151,7 +155,7 @@ bullet.new = function(p1, p2, parent, type, extra)
   local zV = math.cos(math.atan2(math.sqrt(l_x*l_x+l_y*l_y), l_z))
   local info = bullet_info[type]
   local spot = #bullets+1
-  bullets[spot] = {x = x1, y = y1, z = z1, xV = xV*info.speed, yV = yV*info.speed, zV = zV*info.speed, angle = math.atan2(yV+zV, xV), parent = parent, type = type, info = extra}
+  bullets[spot] = {x = x1, y = y1, z = z1, xV = xV*info.speed, yV = yV*info.speed, zV = zV*info.speed, angle = math.atan2(yV+zV, xV), parent = parent, type = type, info = extra, freeze = false}
   return spot
 end
 

@@ -202,5 +202,51 @@ energy = 20,
 desc = "Fire homing missile",
 }
 
+local freeze_range = 20
+local freeze_radius = 24
+local freeze = function(player, index, target)
+  local dir = game.target_norm(player, target)
+  local bubble = game.target_pos(player, dir, freeze_range)
+  for k, v in pairs(bullets) do
+    if collision.line_and_sphere(p1, p2, bubble, freeze_radius) then
+      v.freeze = true
+    else
+      v.freeze = false
+    end
+    server:sendToAll("bulletfreeze", {index = k, freeze = v.freeze})
+  end
+  return true
+end
+abilities[14] = {
+press_func = freeze,
+update_func = freeze,
+delay = 5,
+energy = 0.2,
+desc = "Freeze projectiles in target range",
+}
+
+local push_range = 36
+local push_radius = 24
+abilities[15] = {
+press_func = function(player, index, target)
+  local dir = game.target_norm(player, target)
+  local bubble = game.target_pos(player, dir, push_range)
+  local speed = 15
+  for k, v in pairs(players) do
+    if k ~= index and collision.sphere_and_cube(bubble, v, push_radius) then
+      local x1, y1, z1 = v.x+v.l/2, v.y+v.w/2, v.z+v.h/2
+      local l_x, l_y, l_z = x1-bubble.x, y1-bubble.y, z1-bubble.z
+      v.xV = v.xV*0.1 + math.cos(math.atan2(math.sqrt(l_y*l_y+l_z*l_z), l_x))*speed
+      v.yV = v.yV*0.1 + math.cos(math.atan2(math.sqrt(l_z*l_z+l_x*l_x), l_y))*speed
+      v.zV = v.zV*0.1 + math.cos(math.atan2(math.sqrt(l_x*l_x+l_y*l_y), l_z))*speed
+      server:sendToAll("v", {index = k, xV = v.xV, yV = v.yV, zV = v.zV})
+    end
+  end
+end,
+delay = 6,
+energy = 15,
+desc = "Push other players backwards",
+}
+
 
 return abilities

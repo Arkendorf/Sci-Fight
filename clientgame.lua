@@ -34,6 +34,11 @@ local client_hooks = {
       bullets[data.index].angle = data.pos.angle
     end
   end,
+  bulletfreeze = function(data)
+    if bullets[data.index] then
+      bullets[data.index].freeze = data.freeze
+    end
+  end,
   ability_info = function(data)
     if data.num then
       players[id].abilities[data.num].delay = data.delay
@@ -53,6 +58,7 @@ local client_hooks = {
   hp = function(data)
     players[data.index].hp = data.hp
   end
+
 }
 
 clientgame.start = function(port)
