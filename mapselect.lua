@@ -12,7 +12,7 @@ mapselect.load = function()
     maps[i] = {name = string.sub(v, 1, -5), grid = love.filesystem.load("maps/"..v)()}
   end
 
-  option_pos = {x = (screen.w-256)/2, y = (screen.h-256)/2, w = 256, h = 256}
+  option_pos = {x = (screen.w-256)/2, y = (screen.h-256)/2+66, w = 256, h = 190}
 end
 
 mapselect.start = function(buttons)
@@ -33,6 +33,10 @@ mapselect.update = function(dt)
 end
 
 mapselect.draw = function(dt)
+  love.graphics.setColor(menu_color)
+  love.graphics.rectangle("fill", option_pos.x, option_pos.y-66, option_pos.w, 64)
+  love.graphics.setColor(1, 1, 1)
+  love.graphics.printf("Map Vote:\n"..maps[current].name, option_pos.x, option_pos.y-42, option_pos.w, "center")
   love.graphics.rectangle("fill", option_pos.x, option_pos.y, option_pos.w, option_pos.h)
   for i, v in ipairs(icons) do
     if current == i then

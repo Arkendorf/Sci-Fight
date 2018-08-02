@@ -66,5 +66,32 @@ bullet_ai[3] = function(k, v, dt)
   end
 end
 
+bullet_ai[4] = function(k, v, dt)
+  local target = {dist = math.huge}
+  for l, w in pairs(players) do
+    if l ~= v.parent then
+      local l_x, l_y, l_z = v.x-w.x, v.y-w.y, v.z-w.z
+      local dist = math.sqrt(l_x*l_x+l_y*l_y+l_z*l_z)
+      if dist < target.dist then
+        target = {dist = dist, num = l}
+      end
+    end
+  end
+  if target.num then
+    player = players[target.num]
+    local x1, y1, z1 = player.x+player.l/2, player.y+player.w/2, player.z+player.h/2
+    local l_x, l_y, l_z = x1-v.x, y1-v.y, z1-v.z
+    local speed = bullet_info[v.type].speed
+    local xV = v.xV*0.9 + math.cos(math.atan2(math.sqrt(l_y*l_y+l_z*l_z), l_x))*speed*.1
+    local yV = v.yV*0.9 + math.cos(math.atan2(math.sqrt(l_z*l_z+l_x*l_x), l_y))*speed*.1
+    local zV = v.zV*0.9 + math.cos(math.atan2(math.sqrt(l_x*l_x+l_y*l_y), l_z))*speed*.1
+    v.xV, v.yV, v.zV = xV, yV, zV
+  end
+
+  if v.collide then
+    bullet.explode(k, v)
+  end
+end
+
 
 return bullet_ai

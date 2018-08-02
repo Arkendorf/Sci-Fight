@@ -86,8 +86,8 @@ end
 abilities[2] = {
 press_func = deflect,
 update_func = deflect,
-delay = 1,
-energy = 0.2,
+delay = 4,
+energy = 0.3,
 type = 1,
 desc = "Deflect incoming projectiles in the direction of the mouse cursor",
 }
@@ -122,7 +122,7 @@ press_func = function(player, index, target)
   server:sendToAll("bullet", {info = bullets[k], k = k})
   return false
 end,
-delay = 10,
+delay = 6,
 energy = 10,
 desc = "Throw grenade",
 }
@@ -173,9 +173,9 @@ desc = "Jetpack",
 local heal = function(player, index, target, dt)
   if player.hp < hp_max then
     if dt then
-      player.hp = player.hp + 0.2*dt*60
+      player.hp = player.hp + 0.1*dt*60
     else
-      player.hp = player.hp + 0.2
+      player.hp = player.hp + 0.1
     end
   else
     player.hp = hp_max
@@ -186,9 +186,20 @@ end
 abilities[12] = {
 press_func = heal,
 update_func = heal,
-delay = 8,
-energy = 0.4,
+delay = 7,
+energy = 0.2,
 desc = "Heal",
+}
+
+abilities[13] = {
+press_func = function(player, index, target)
+  local k = bullet.new(players[index], target, index, 5)
+  server:sendToAll("bullet", {info = bullets[k], k = k})
+  return false
+end,
+delay = 6,
+energy = 20,
+desc = "Fire homing missile",
 }
 
 
