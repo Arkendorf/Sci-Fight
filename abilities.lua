@@ -361,8 +361,9 @@ local flame = function(player, index, target)
   for k, v in pairs(players) do
     if k ~= index and char.damageable(k, index) and collision.sphere_and_cube(bubble, v, flame_radius) then
       local num = v.hp - 0.2*weapons[player.weapon.type].dmg -- bullet damage * weapon modifier
-      bullet.damage(v, num, index)
-      server:sendToAll("hit", {index = k, num = num, parent = index})
+      v.killer = index
+      v.hp = num
+      server:sendToAll("hp", {index = k, hp = num})
     end
   end
   return true
@@ -370,8 +371,8 @@ end
 abilities[20] = {
 press_func = flame,
 update_func = flame,
-delay = 5,
-energy = 0.3,
+delay = 6,
+energy = 0.4,
 name = "Flamethrower",
 desc = "Shoot out a jet of flame in the direction of the target",
 }

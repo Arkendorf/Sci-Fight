@@ -157,20 +157,20 @@ char.ability_check = function(player)
   return false
 end
 
-char.death = function(player, killer)
+char.death = function(player)
   player.hp = hp_max
   player.x = #grid[1][1]*tile_size*0.5-player.l/2
   player.y = #grid[1]*tile_size*0.5-player.w/2
   player.z = -player.h
-  if killer and killer.score then
-    killer.score = killer.score + 1
+  if player.killer then
+    players[player.killer].score = players[player.killer].score + 1
   end
   player.inv = death_inv
 end
 
 char.new = function(name, loadout, team)
   local item = {name = name, x = #grid[1][1]*tile_size*0.5, y = #grid[1]*tile_size*0.5, z = -24, l = 24, w = 24, h = 24, xV = 0, yV = 0, zV = 0,
-                speed = 1, hp = hp_max, energy = energy_max, score = 0, jump = false, inv = 0, team = team}
+                speed = 1, hp = hp_max, energy = energy_max, score = 0, jump = false, inv = 0, team = team, killer = false}
   item.weapon = {type = loadout.weapon, active = false}
   item.abilities = {}
   for i, v in ipairs(loadout.abilities) do

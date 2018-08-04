@@ -106,8 +106,9 @@ end
 bullet.damage = function(player, num, parent)
   player.hp = num
   player.inv = inv_time
+  player.killer = parent
   if player.hp <= 0 then
-    char.death(player, players[parent])
+    char.death(player)
   end
 end
 
