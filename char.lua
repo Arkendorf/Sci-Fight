@@ -9,6 +9,15 @@ hp_max = 100
 local tile_buffer = 8
 local death_inv = 4
 
+local team_colors = {
+  {1, 0, 0},
+  {0, 0, 1},
+  {0, 1, 0},
+  {1, 1, 0},
+  {1, 0, 1},
+  {0, 1, 1},
+}
+
 char.load = function()
 end
 
@@ -35,7 +44,7 @@ char.input = function(dt)
   local m_x, m_y = game.mouse_pos()
   local current = {k = nil, dist = target_range}
   for k, v in pairs(players) do
-    if k ~= id then
+    if k ~= id and char.damageable(k, id) then
       local x = v.x+v.l/2
       local y = v.y+v.z+v.w
       if math.sqrt((m_x-x)*(m_x-x)+(m_y-y)*(m_y-y)) < current.dist then
@@ -169,7 +178,8 @@ char.death = function(player, killer)
 end
 
 char.new = function(name, loadout)
-  local item = {name = name, x = #grid[1][1]*tile_size*0.5, y = #grid[1]*tile_size*0.5, z = -24, l = 24, w = 24, h = 24, xV = 0, yV = 0, zV = 0, speed = 1, hp = hp_max, energy = energy_max, score = 0, jump = false, inv = 0}
+  local item = {name = name, x = #grid[1][1]*tile_size*0.5, y = #grid[1]*tile_size*0.5, z = -24, l = 24, w = 24, h = 24, xV = 0, yV = 0, zV = 0,
+                speed = 1, hp = hp_max, energy = energy_max, score = 0, jump = false, inv = 0, team = 0}
   item.weapon = {type = loadout.weapon, active = false}
   item.abilities = {}
   for i, v in ipairs(loadout.abilities) do
@@ -178,13 +188,21 @@ char.new = function(name, loadout)
   return item
 end
 
+char.damageable = function(k, l)
+  return (players[k].inv <= 0 and (players[k].team <= 0 or players[k].team ~= players[l].team))
+end
+
 char.queue = function()
   for i, v in pairs(players) do
+    local flash = false
     if math.floor(math.sin(v.inv*14)+0.5) > 0 then
-      queue[#queue + 1] = {img = player_img, x = v.x, y = v.y, z = v.z, w = v.w, h = v.h, l = v.l, shadow = true, flash = true}
-    else
-      queue[#queue + 1] = {img = player_img, x = v.x, y = v.y, z = v.z, w = v.w, h = v.h, l = v.l, shadow = true}
+      flash = true
     end
+    local border = false
+    if v.team > 0 then
+      border = team_colors[v.team]
+    end
+    queue[#queue + 1] = {img = player_img, x = v.x, y = v.y, z = v.z, w = v.w, h = v.h, l = v.l, shadow = true, flash = flash, border = border}
   end
 end
 

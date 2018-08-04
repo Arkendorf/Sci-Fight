@@ -216,4 +216,18 @@ graphics.zoom = function(bool, num, min, max, scalar)
   end
 end
 
+graphics.draw_border = function(v)
+  love.graphics.setShader(shader.layer)
+  shader.layer:send("xray_color", {0, 0, 0, 0})
+  shader.layer:send("flash", true)
+  love.graphics.setColor(v.border)
+  for i = -1, 1, 2 do
+    for j = -1, 1, 2 do
+      love.graphics.draw(v.img, math.floor(v.x+j), math.floor(v.y+v.z+i))
+    end
+  end
+  love.graphics.setColor(1, 1, 1)
+end
+
+
 return graphics

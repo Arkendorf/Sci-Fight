@@ -90,7 +90,7 @@ end
 bullet.player_collide = function(k, v) -- only server should do this
   local p1, p2 = bullet.get_points(v)
   for l, w in pairs(players) do
-    if l ~= v.parent and w.inv <= 0 and collision.line_and_cube(p1, p2, w) then
+    if l ~= v.parent and char.damageable(l, v.parent) and collision.line_and_cube(p1, p2, w) then
       if bullet_info[v.type].explosion then
         bullet.explode(k, v)
       elseif bullet_info[v.type].dmg > 0 then
@@ -118,7 +118,7 @@ bullet.explode = function(k, v)
     dmg = v.dmg
   end
   for l, w in pairs(players) do
-    if l ~= v.parent and w.inv <= 0 and collision.sphere_and_cube(v, w, info.r) then
+    if l ~= v.parent and char.damageable(l, v.parent) and collision.sphere_and_cube(v, w, info.r) then
       local num = w.hp - dmg*weapons[players[v.parent].weapon.type].dmg -- bullet damage * weapon modifier
       bullet.damage(w, num, v.parent)
       server:sendToAll("hit", {index = l, num = num, parent = v.parent})

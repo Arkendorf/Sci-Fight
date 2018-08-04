@@ -83,10 +83,13 @@ end
 
 game.draw_queue = function()
   table.sort(queue, function(a, b) return a.y+a.w < b.y+b.w end)
-  shader.layer:send("xray_color", {.2, .2, .3, 1})
 
   for i, v in ipairs(queue) do
+    if v.border then
+      graphics.draw_border(v)
+    end
     love.graphics.setShader(shader.layer)
+    shader.layer:send("xray_color", {.2, .2, .3, 1})
     shader.layer:send("coords", {0, 1+math.floor((v.y)/tile_size), 1+math.ceil((v.z+v.h)/tile_size)})
     if v.flash then
       shader.layer:send("flash", true)
