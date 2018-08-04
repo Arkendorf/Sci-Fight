@@ -1,8 +1,5 @@
 local servermenu = {}
 
-servermenu.load = function()
-end
-
 local server_hooks = {
   -- if a player connects
   playerinfo = function(data, client)
@@ -11,6 +8,9 @@ local server_hooks = {
       menu.new_player(index, data.name)
       server:sendToPeer(server:getPeerByIndex(index), "allinfo", {id = index, players = players})
       server:sendToAllBut(client, "newplayer", {info = players[index], index = index})
+      if menu.mode == 1 then
+        gui.add(4, servermenu.player_buttons())
+      end
     end
   end,
   -- if a player disconnects
@@ -35,6 +35,11 @@ local server_hooks = {
   end,
 }
 
+local team_select = false
+
+servermenu.load = function()
+end
+
 servermenu.start = function(port)
   server = sock.newServer("*", port, 12)
 
@@ -58,11 +63,25 @@ servermenu.update = function(dt)
     servermenu.all_ready()
   end
   menu.update()
+  if menu.mode == 1 and not gui.exists(4) then
+    gui.add(4, servermenu.player_buttons())
+  end
 end
 
 servermenu.draw = function()
   if menu.mode == 1 then
     menu.draw_list()
+    if team_select then
+      local x = (screen.w-256)/2
+      love.graphics.setColor(menu_color)
+      love.graphics.rectangle("fill", x, team_select, 256, 16)
+      love.graphics.setColor(1, 1, 1)
+      love.graphics.rectangle("line", x+4, team_select+4, 8, 8)
+      for i, v in ipairs(team_colors) do
+        love.graphics.setColor(v)
+        love.graphics.rectangle("fill", x+i*16+3, team_select+3, 10, 10)
+      end
+    end
   else
     menu.draw()
   end
@@ -101,10 +120,43 @@ servermenu.create_players = function(players)
     if v.left then
       new_players[k] = nil
     else
-      new_players[k] = char.new(v.name, v.loadout)
+      new_players[k] = char.new(v.name, v.loadout, v.team)
     end
   end
   return new_players
+end
+
+servermenu.player_buttons = function()
+  local buttons = {}
+  local i = 0
+  for k, v in pairs(players) do
+    local y = (screen.h-256)/2+i*16
+    buttons[#buttons+1] = {x = (screen.w-256)/2, y = y, w = 256, h = 16, txt = "Pick Team", func = servermenu.team_buttons, args = {k, y}, hide = true}
+    i = i + 1
+  end
+  return buttons
+end
+
+servermenu.team_buttons = function(k, y)
+  if y == team_select then
+    gui.remove(3)
+    team_select = false
+  else
+    local x = (screen.w-256)/2
+    local buttons = {{x = x+3, y = y+3, w = 10, h = 10, txt = "0", func = servermenu.swap_teams, args = {k, 0}, hide = true}}
+    for i, v in ipairs(team_colors) do
+      buttons[i+1] = {x = x+i*16+3, y = y+3, w = 10, h = 10, txt = tostring(i), func = servermenu.swap_teams, args = {k, i}, hide = true}
+    end
+    gui.add(3, buttons)
+    team_select = y
+  end
+end
+
+servermenu.swap_teams = function(k, num)
+  players[k].team = num
+  server:sendToAll("team", {index = k, team = num})
+  gui.remove(3)
+  team_select = false
 end
 
 servermenu.quit = function()

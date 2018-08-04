@@ -3,6 +3,15 @@ servermenu = require "servermenu"
 
 local menu = {}
 
+team_colors = {
+  {1, 0, 0},
+  {0, 0, 1},
+  {0, 1, 0},
+  {1, 1, 0},
+  {1, 0, 1},
+  {0, 1, 1},
+}
+
 menu.mode = 1
 menu.buttons = {}
 menu.player_gui = {}
@@ -26,7 +35,7 @@ menu.start_gui = function()
 end
 
 menu.new_player = function(i, name)
-  players[i] = {name = name, ready = false, x = -font:getWidth(name), y = i * 16, left = false}
+  players[i] = {name = name, ready = false, x = -font:getWidth(name), y = i * 16, left = false, team = 0}
 end
 
 menu.update_list = function(dt)
@@ -64,7 +73,11 @@ menu.draw_list = function()
   end
   local i = 0
   for k, v in pairs(players) do
+    if v.team > 0 then
+      love.graphics.setColor(team_colors[v.team])
+    end
     love.graphics.print(v.name, v.x, y+v.y+4)
+    love.graphics.setColor(1, 1, 1)
     if v.ready then
       love.graphics.print("Ready", x+254-font:getWidth("Ready"), y+i*16+4)
     end

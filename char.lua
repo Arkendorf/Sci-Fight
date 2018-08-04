@@ -9,15 +9,6 @@ hp_max = 100
 local tile_buffer = 8
 local death_inv = 4
 
-local team_colors = {
-  {1, 0, 0},
-  {0, 0, 1},
-  {0, 1, 0},
-  {1, 1, 0},
-  {1, 0, 1},
-  {0, 1, 1},
-}
-
 char.load = function()
 end
 
@@ -177,9 +168,9 @@ char.death = function(player, killer)
   player.inv = death_inv
 end
 
-char.new = function(name, loadout)
+char.new = function(name, loadout, team)
   local item = {name = name, x = #grid[1][1]*tile_size*0.5, y = #grid[1]*tile_size*0.5, z = -24, l = 24, w = 24, h = 24, xV = 0, yV = 0, zV = 0,
-                speed = 1, hp = hp_max, energy = energy_max, score = 0, jump = false, inv = 0, team = 0}
+                speed = 1, hp = hp_max, energy = energy_max, score = 0, jump = false, inv = 0, team = team}
   item.weapon = {type = loadout.weapon, active = false}
   item.abilities = {}
   for i, v in ipairs(loadout.abilities) do

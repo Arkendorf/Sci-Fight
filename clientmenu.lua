@@ -38,6 +38,10 @@ local client_hooks = {
   ready = function(data, client)
     players[data.index].ready = data.ready
   end,
+  -- team change
+  team = function(data, client)
+    players[data.index].team = data.team
+  end,
 }
 
 clientmenu.start = function(ip, port)
