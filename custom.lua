@@ -46,19 +46,19 @@ custom.draw = function()
   love.graphics.setColor(1, 1, 1)
   love.graphics.rectangle("fill", option_pos.x, option_pos.y, option_pos.w, option_pos.h)
 
-  love.graphics.draw(weapon_img[loadouts[current_loadout].weapon], loadout_pos.x+offsets.weapon.x, loadout_pos.y+offsets.weapon.y)
+  love.graphics.draw(weapon_icon[loadouts[current_loadout].weapon], loadout_pos.x+offsets.weapon.x, loadout_pos.y+offsets.weapon.y)
   for i, v in ipairs(offsets.abilities) do
-    love.graphics.draw(ability_img[loadouts[current_loadout].abilities[i]], loadout_pos.x+v.x, loadout_pos.y+v.y)
+    love.graphics.draw(ability_icon[loadouts[current_loadout].abilities[i]], loadout_pos.x+v.x, loadout_pos.y+v.y)
   end
   for i, v in ipairs(icons) do
     if current_slot == "weapon" then
-      love.graphics.draw(weapon_img[v.num], v.x, v.y)
+      love.graphics.draw(weapon_icon[v.num], v.x, v.y)
     elseif custom.ability_used(v.num) then
       love.graphics.setShader(shader.greyscale)
-      love.graphics.draw(ability_img[v.num], v.x, v.y)
+      love.graphics.draw(ability_icon[v.num], v.x, v.y)
       love.graphics.setShader()
     else
-      love.graphics.draw(ability_img[v.num], v.x, v.y)
+      love.graphics.draw(ability_icon[v.num], v.x, v.y)
     end
   end
 end

@@ -57,8 +57,10 @@ local client_hooks = {
   end,
   hp = function(data)
     players[data.index].hp = data.hp
-  end
-
+  end,
+  weaponanim = function(data)
+    char.weapon_anim(data.index, data.anim, data.speed)
+  end,
 }
 
 clientgame.start = function(port)
@@ -75,6 +77,7 @@ clientgame.update = function(dt)
   -- client pos
   char.input(dt)
   client:send("pos", {x = players[id].x, y = players[id].y, z = players[id].z, xV = players[id].xV, yV = players[id].yV, zV = players[id].zV})
+  client:send("target", players[id].target)
   --client's abilities
   game.update_abilities(clientgame.update_ability, id)
   -- game updating
@@ -102,15 +105,15 @@ clientgame.keyreleased = function(key)
 end
 
 clientgame.use_ability = function(num)
-  client:send("use_ability", {target = target, num = num})
+  client:send("use_ability", {target = players[id].target, num = num})
 end
 
 clientgame.update_ability = function(num)
-  client:send("update_ability", {target = target, num = num})
+  client:send("update_ability", {target = players[id].target, num = num})
 end
 
 clientgame.stop_ability = function(num)
-  client:send("stop_ability", {target = target, num = num})
+  client:send("stop_ability", {target = players[id].target, num = num})
 end
 
 clientgame.start_end = function()

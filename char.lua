@@ -43,9 +43,10 @@ char.input = function(dt)
       end
     end
   end
+  local target = players[id].target
   if current.k then
     local v = players[current.k]
-    target.dX, target.dY, target.dZ = v.x+v.l/2, v.y+v.w/2, v.z+v.h/2
+    players[id].target.dX, target.dY, target.dZ = v.x+v.l/2, v.y+v.w/2, v.z+v.h/2
   else
     local z = players[id].z+players[id].h/2
     target.dX, target.dY, target.dZ = m_x, m_y-z, z
@@ -91,6 +92,15 @@ char.update = function(dt)
       v.energy = v.energy + energy_increase*weapons[v.weapon.type].energy
     elseif v.energy > energy_max then
       v.energy = energy_max
+    end
+
+    -- animation
+    v.weapon.frame = v.weapon.frame + v.weapon.speed*dt
+    if v.weapon.frame > #weapon_quad[v.weapon.type][v.weapon.anim]+1 then
+      if v.weapon.anim ~= "base" then
+        v.weapon.anim = "base"
+      end
+      v.weapon.frame = 1
     end
 
     if v.hp <= 0 then -- death
@@ -170,8 +180,8 @@ end
 
 char.new = function(name, loadout, team)
   local item = {name = name, x = #grid[1][1]*tile_size*0.5, y = #grid[1]*tile_size*0.5, z = -24, l = 24, w = 24, h = 24, xV = 0, yV = 0, zV = 0,
-                speed = 1, hp = hp_max, energy = energy_max, score = 0, jump = false, inv = 0, team = team, killer = false}
-  item.weapon = {type = loadout.weapon, active = false}
+                speed = 1, hp = hp_max, energy = energy_max, score = 0, jump = false, inv = 0, team = team, killer = false, target = {x = 0, y = 0, z = 0}}
+  item.weapon = {type = loadout.weapon, active = false, anim = "base", frame = 1, speed = 0}
   item.abilities = {}
   for i, v in ipairs(loadout.abilities) do
     item.abilities[i] = {type = v, active = false, delay = 0, info = nil}
@@ -185,6 +195,7 @@ end
 
 char.queue = function()
   for i, v in pairs(players) do
+    -- char
     local flash = false
     if math.floor(math.sin(v.inv*14)+0.5) > 0 then
       flash = true
@@ -194,10 +205,23 @@ char.queue = function()
       border = team_colors[v.team]
     end
     queue[#queue + 1] = {img = player_img, x = v.x, y = v.y, z = v.z, w = v.w, h = v.h, l = v.l, shadow = true, flash = flash, border = border}
+
+    -- weapon
+    local dir = game.target_norm(v, v.target)
+    local pos = game.target_pos(v, dir, (v.l+v.w)/2)
+    local angle = math.atan2(dir.y+dir.z, dir.x)
+    local sy = 1
+    if pos.x < v.x then
+      sy = -1
+    end
+    queue[#queue + 1] = {img = weapon_img[v.weapon.type][v.weapon.anim], quad = weapon_quad[v.weapon.type][v.weapon.anim][math.floor(v.weapon.frame)], x = pos.x, y = pos.y, z = pos.z, angle = angle, w = 0, h = 0, l = 0, ox = 16, oy = 16, sx = 1, sy = sy}
   end
 end
 
-char.mousepressed = function(x, y, button)
+char.weapon_anim = function(k, anim, speed)
+  players[k].weapon.anim = anim
+  players[k].weapon.frame = 1
+  players[k].weapon.speed = speed
 end
 
 return char

@@ -112,6 +112,9 @@ press_func = function(player, index, target)
       server:sendToAll("hit", {index = k, num = num, parent = index})
     end
   end
+  -- weapon animation
+  char.weapon_anim(index, "swing", 12)
+  server:sendToAll("weaponanim", {index = index, anim = "swing", speed = 12})
 end,
 delay = 0.2,
 energy = 5,

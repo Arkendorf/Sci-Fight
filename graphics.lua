@@ -25,25 +25,46 @@ graphics.load = function()
 
   bullet_img = graphics.load_folder("art/bullets")
 
-  ability_img = graphics.load_folder("art/abilityicons")
-  weapon_img = graphics.load_folder("art/weaponicons")
-  map_img = graphics.load_folder("art/mapicons")
+  ability_icon = graphics.load_folder("art/abilityicons")
+  weapon_icon = graphics.load_folder("art/weaponicons")
+  map_icon = graphics.load_folder("art/mapicons")
 
+  weapon_img = {}
+  weapon_quad = {}
+  local files = love.filesystem.getDirectoryItems("art/weaponimgs")
+  for i, v in ipairs(files) do
+    local img, quad = graphics.load_folder("art/weaponimgs/"..v, 32, 32)
+    weapon_img[tonumber(v)] = img
+    weapon_quad[tonumber(v)] = quad
+  end
 end
 
-graphics.load_folder = function(str)
+graphics.load_folder = function(str, tw, th)
   local img = {}
   local quad = {}
   local files = love.filesystem.getDirectoryItems(str)
   for i, v in ipairs(files) do
-    local name = tonumber(string.sub(v, 1, -5))
-    if name then
-      img[name] = love.graphics.newImage(str.."/"..v)
-    else
-      img[#img+1] = love.graphics.newImage(str.."/"..v)
+    local name = string.sub(v, 1, -5)
+    if tonumber(name) then
+      name = tonumber(name)
+    end
+    img[name] = love.graphics.newImage(str.."/"..v)
+    if tx or th then
+      quad[name] = graphics.load_quad(img[name], tw, th)
     end
   end
-  return img
+  return img, quad
+end
+
+graphics.load_quad = function(img, tw, th)
+  local quad = {}
+  local iw, ih = img:getDimensions()
+  for h = 0, math.floor(ih/th)-1 do
+    for w = 0, math.floor(iw/tw)-1 do
+      quad[#quad+1] = love.graphics.newQuad(w*tw, h*th, tw, th, iw, ih)
+    end
+  end
+  return quad
 end
 
 graphics.load_tile_quad = function(t)
@@ -186,12 +207,16 @@ graphics.draw = function(v, color)
   if v.ox or v.oy then
     ox, oy = v.ox, v.oy
   end
+  local sx, sy = 1, 1
+  if v.sx or v.sy then
+    sx, sy = v.sx, v.sy
+  end
   if v.quad then
-    love.graphics.draw(v.img, v.quad, math.floor(v.x), math.floor(v.y+v.z), angle, 1, 1, ox, oy)
+    love.graphics.draw(v.img, v.quad, math.floor(v.x), math.floor(v.y+v.z), angle, sx, sy, ox, oy)
   elseif v.shape then
     love.graphics[v.shape]("fill", math.floor(v.x), math.floor(v.y+v.z), v.a, v.b)
   else
-    love.graphics.draw(v.img, math.floor(v.x), math.floor(v.y+v.z), angle, 1, 1, ox, oy)
+    love.graphics.draw(v.img, math.floor(v.x), math.floor(v.y+v.z), angle, sx, sy, ox, oy)
   end
   love.graphics.setShader()
   love.graphics.setColor(1, 1, 1)

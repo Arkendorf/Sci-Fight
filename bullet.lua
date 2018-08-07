@@ -14,7 +14,7 @@ bullet.load = function()
   bullet_info[3] = {ai = 1, speed = 6, r = 0, dmg = 20, img = 1}
   bullet_info[4] = {ai = 3, speed = 3, r = 12, dmg = 0, persistant = true, img = 3, shadow = true, explosion = {dmg = 30, r = 64}}
   bullet_info[5] = {ai = 4, speed = 2.2, r = 12, dmg = 0, img = 4, shadow = true, explosion = {dmg = 20, r = 32}}
-  bullet_info[6] = {ai = 5, speed = 6, r = 0, dmg = 10, img = 5, explosion = {dmg = 0, r = 24}}
+  bullet_info[6] = {ai = 5, speed = 6.3, r = 0, dmg = 10, img = 5, explosion = {dmg = 0, r = 24}}
   bullet_info[7] = {ai = 1, speed = 7, r = 0, dmg = 25, img = 6, pierce = true}
 end
 

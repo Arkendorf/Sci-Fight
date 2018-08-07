@@ -28,6 +28,11 @@ local server_hooks = {
     char.stop_ability(players[index], index, data.target, data.num)
     server:sendToPeer(server:getPeerByIndex(index), "ability_info", {num = data.num, delay = players[index].abilities[data.num].delay, active = false})
   end,
+  target = function(data, client)
+    local index = client:getIndex()
+    players[index].target = data
+    server:sendToAllBut(client, "target", {index = index, data = data})
+  end,
 }
 
 local win_score = 1
@@ -46,6 +51,7 @@ servergame.update = function(dt)
   -- server pos
   char.input(dt)
   server:sendToAll("pos", {index = id, pos = {x = players[id].x, y = players[id].y, z = players[id].z, xV = players[id].xV, yV = players[id].yV, zV = players[id].zV}})
+  server:sendToAll("target", {index = id, data = players[id].target})
   -- server's abilities
   game.update_abilities(servergame.update_ability, id, dt)
   -- game updating
@@ -87,11 +93,11 @@ servergame.keyreleased = function(key)
 end
 
 servergame.use_ability = function(num)
-  char.use_ability(players[id], id, target, num)
+  char.use_ability(players[id], id, players[id].target, num)
 end
 
 servergame.update_ability = function(num, k, dt)
-  char.update_ability(players[id], id, target, num, dt)
+  char.update_ability(players[id], id, players[id].target, num, dt)
 end
 
 servergame.update_client_ability = function(num, k, dt)
@@ -105,7 +111,7 @@ servergame.update_client_ability = function(num, k, dt)
 end
 
 servergame.stop_ability = function(num)
-  char.stop_ability(players[id], id, target, num)
+  char.stop_ability(players[id], id, players[id].target, num)
 end
 
 servergame.start_end = function()

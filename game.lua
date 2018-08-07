@@ -20,8 +20,6 @@ game.load = function()
 
   queue = {}
 
-  target = {x = 0, y = 0, z = 0}
-
   ability_keys = {{"button", 1}, {"button", 2}, {"key", "lshift"}, {"key", "lctrl"}, {"key", "lalt"}}
 end
 
@@ -51,7 +49,7 @@ game.draw = function()
   -- draw objects
   game.draw_queue()
   -- target
-  love.graphics.circle("line", target.x, target.y+target.z, 12, 24)
+  love.graphics.circle("line", players[id].target.x, players[id].target.y+players[id].target.z, 12, 24)
 
   love.graphics.pop()
   -- draw hud
