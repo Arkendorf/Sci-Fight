@@ -31,7 +31,7 @@ local server_hooks = {
   target = function(data, client)
     local index = client:getIndex()
     players[index].target = data
-    server:sendToAllBut(client, "target", {index = index, data = data})
+    server:sendToAllBut(client, "target", {index = index, target = data})
   end,
 }
 
@@ -51,7 +51,7 @@ servergame.update = function(dt)
   -- server pos
   char.input(dt)
   server:sendToAll("pos", {index = id, pos = {x = players[id].x, y = players[id].y, z = players[id].z, xV = players[id].xV, yV = players[id].yV, zV = players[id].zV}})
-  server:sendToAll("target", {index = id, data = players[id].target})
+  server:sendToAll("target", {index = id, target = players[id].target})
   -- server's abilities
   game.update_abilities(servergame.update_ability, id, dt)
   -- game updating

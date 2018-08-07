@@ -58,6 +58,9 @@ local client_hooks = {
   hp = function(data)
     players[data.index].hp = data.hp
   end,
+  target = function(data)
+    players[data.index].target = data.target
+  end,
   weaponanim = function(data)
     char.weapon_anim(data.index, data.anim, data.speed)
   end,

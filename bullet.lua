@@ -20,8 +20,14 @@ end
 
 bullet.update = function(dt)
   for k, v in pairs(bullets) do
-    -- update pos
     if v.freeze <= 0 then
+      -- collide with map
+      if not bullet_info[v.type].pierce then
+        bullet.map_collide(k, v)
+      end
+      -- collide with borders
+      bullet.bound_collide(k, v)
+      -- update_pos
       v.x = v.x + v.xV * dt * 60
       v.y = v.y + v.yV * dt * 60
       v.z = v.z + v.zV * dt * 60
@@ -29,9 +35,11 @@ bullet.update = function(dt)
       v.freeze = v.freeze - dt
     end
     -- animation
-    v.frame = v.frame+dt*bullet_info[v.type].anim_speed
-    if v.frame > #bullet_quad[bullet_info[v.type].img]+1 then
-      v.frame = 1
+    if bullet_info[v.type].anim_speed then
+      v.frame = v.frame+dt*bullet_info[v.type].anim_speed
+      if v.frame > #bullet_quad[bullet_info[v.type].img]+1 then
+        v.frame = 1
+      end
     end
   end
 end
@@ -39,16 +47,13 @@ end
 bullet.serverupdate = function(dt)
   for k, v in pairs(bullets) do
     if v.freeze <= 0 then
-      -- update velocity
-      bullet_ai[bullet_info[v.type].ai](k, v, dt)
-      -- collide with map
-      if not bullet_info[v.type].pierce then
-        bullet.map_collide(k, v)
+      if v.explode then
+        bullet.explode(k, v)
       end
-      -- collide with borders
-      bullet.bound_collide(k, v)
       -- collide with players
       bullet.player_collide(k, v)
+      -- update velocity
+      bullet_ai[bullet_info[v.type].ai](k, v, dt)
       -- send update info
       if bullets[k] then
         if not v.old or v.x ~= v.old.x or v.y ~= v.old.y or v.z ~= v.old.z or v.xV ~= v.old.xV or v.yV ~= v.old.yV or v.zV ~= v.old.yV or v.angle ~= v.old.angle then
@@ -82,8 +87,8 @@ bullet.map_collide = function(k, v)
     if face then
       v.collide = face
       v.x, v.y, v.z = v.x+v.xV*frac, v.y+v.yV*frac, v.z+v.zV*frac
-      if bullet_info[v.type].explosion and not bullet_info[v.type].persistant then
-        bullet.explode(k, v)
+      if bullet_info[v.type].explosion and not bullet_info[v.type].persistant and server then
+        v.explode = true
         break
       elseif bullet.destroy(k, v, face) then
         break

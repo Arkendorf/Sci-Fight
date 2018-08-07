@@ -82,6 +82,7 @@ bullet_ai[4] = function(k, v, dt)
     local yV = v.yV*0.9 + math.cos(math.atan2(math.sqrt(l_z*l_z+l_x*l_x), l_y))*speed*.1
     local zV = v.zV*0.9 + math.cos(math.atan2(math.sqrt(l_x*l_x+l_y*l_y), l_z))*speed*.1
     v.xV, v.yV, v.zV = xV, yV, zV
+    v.angle = math.atan2(yV+zV, xV)
   end
 end
 
