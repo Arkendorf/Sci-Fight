@@ -115,6 +115,7 @@ press_func = function(player, index, target)
   -- weapon animation
   char.weapon_anim(index, "swing", 12)
   server:sendToAll("weaponanim", {index = index, anim = "swing", speed = 12})
+  return false
 end,
 delay = 0.2,
 energy = 5,
@@ -156,6 +157,9 @@ press_func = function(player, index, target)
   local k = bullet.new(players[index], target, index, 2, index)
   server:sendToAll("bullet", {info = bullets[k], k = k})
   player.weapon.active = true
+  -- weapon animation
+  char.weapon_anim(index, "thrown", 0)
+  server:sendToAll("weaponanim", {index = index, anim = "thrown", speed = 0})
   return false
 end,
 delay = 4,

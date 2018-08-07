@@ -30,16 +30,12 @@ bullet_ai[2] = function(k, v, dt)
     v.xV, v.yV, v.zV = xV, yV, zV
   end
 
-  if not v.rangle then
-    v.rangle = v.angle
-  else
-    v.rangle = v.rangle + dt * 24 -- spin
-    v.angle = v.rangle
-  end
-
   if v.collide and collision.bullet_and_cube(k, v, player) then -- return saber
     player.weapon.active = false
     bullets[k] = nil
+    -- weapon animation
+    char.weapon_anim(v.info, "base", 0)
+    server:sendToAll("weaponanim", {index = v.info, anim = "base", speed = 0})
   end
 end
 

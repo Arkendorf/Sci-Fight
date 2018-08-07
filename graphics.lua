@@ -23,7 +23,9 @@ graphics.load = function()
   tile_img = graphics.load_folder("art/tiles")
   tile_quad = graphics.load_tile_quad(tile_size)
 
-  bullet_img = graphics.load_folder("art/bullets")
+  local img, quad = graphics.load_folder("art/bullets", 32, 32)
+  bullet_img = img
+  bullet_quad = quad
 
   ability_icon = graphics.load_folder("art/abilityicons")
   weapon_icon = graphics.load_folder("art/weaponicons")

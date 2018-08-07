@@ -10,7 +10,7 @@ bullet.load = function()
 
   bullet_info = {}
   bullet_info[1] = {ai = 1, speed = 6, r = 0, dmg = 10, img = 1}
-  bullet_info[2] = {ai = 2, speed = 4, r = 16, dmg = 25, persistant = true, img = 2, shadow = true}
+  bullet_info[2] = {ai = 2, speed = 4, r = 16, dmg = 25, persistant = true, img = 2, shadow = true, anim_speed = 30}
   bullet_info[3] = {ai = 1, speed = 6, r = 0, dmg = 20, img = 1}
   bullet_info[4] = {ai = 3, speed = 3, r = 12, dmg = 0, persistant = true, img = 3, shadow = true, explosion = {dmg = 30, r = 64}}
   bullet_info[5] = {ai = 4, speed = 2.2, r = 12, dmg = 0, img = 4, shadow = true, explosion = {dmg = 20, r = 32}}
@@ -28,12 +28,19 @@ bullet.update = function(dt)
     else
       v.freeze = v.freeze - dt
     end
+    -- animation
+    v.frame = v.frame+dt*bullet_info[v.type].anim_speed
+    if v.frame > #bullet_quad[bullet_info[v.type].img]+1 then
+      v.frame = 1
+    end
   end
 end
 
 bullet.serverupdate = function(dt)
   for k, v in pairs(bullets) do
     if v.freeze <= 0 then
+      -- update velocity
+      bullet_ai[bullet_info[v.type].ai](k, v, dt)
       -- collide with map
       if not bullet_info[v.type].pierce then
         bullet.map_collide(k, v)
@@ -42,8 +49,6 @@ bullet.serverupdate = function(dt)
       bullet.bound_collide(k, v)
       -- collide with players
       bullet.player_collide(k, v)
-      -- update velocity
-      bullet_ai[bullet_info[v.type].ai](k, v, dt)
       -- send update info
       if bullets[k] then
         if not v.old or v.x ~= v.old.x or v.y ~= v.old.y or v.z ~= v.old.z or v.xV ~= v.old.xV or v.yV ~= v.old.yV or v.zV ~= v.old.yV or v.angle ~= v.old.angle then
@@ -59,7 +64,7 @@ end
 
 bullet.queue = function()
   for k, v in pairs(bullets) do
-    queue[#queue + 1] = {img = bullet_img[bullet_info[v.type].img], x = v.x, y = v.y, z = v.z, h = 0, w = 0, l = 0, r = bullet_info[v.type].r/2, ox = 16, oy = 16, angle = v.angle, shadow = bullet_info[v.type].shadow}
+    queue[#queue + 1] = {img = bullet_img[bullet_info[v.type].img], quad = bullet_quad[bullet_info[v.type].img][math.floor(v.frame)], x = v.x, y = v.y, z = v.z, h = 0, w = 0, l = 0, r = bullet_info[v.type].r/2, ox = 16, oy = 16, angle = v.angle, shadow = bullet_info[v.type].shadow}
   end
 end
 
@@ -169,7 +174,7 @@ bullet.new = function(p1, p2, parent, type, extra)
   local zV = math.cos(math.atan2(math.sqrt(l_x*l_x+l_y*l_y), l_z))
   local info = bullet_info[type]
   local spot = #bullets+1
-  bullets[spot] = {x = x1, y = y1, z = z1, xV = xV*info.speed, yV = yV*info.speed, zV = zV*info.speed, angle = math.atan2(yV+zV, xV), parent = parent, type = type, info = extra, freeze = 0}
+  bullets[spot] = {x = x1, y = y1, z = z1, xV = xV*info.speed, yV = yV*info.speed, zV = zV*info.speed, angle = math.atan2(yV+zV, xV), parent = parent, type = type, info = extra, freeze = 0, frame = 1}
   return spot
 end
 
