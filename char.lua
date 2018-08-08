@@ -211,7 +211,7 @@ char.queue = function()
     local pos = game.target_pos(v, dir, (v.l+v.w)/2-8)
     local angle = math.atan2(dir.y+dir.z, dir.x)
     local sy = 1
-    if pos.x < v.x then
+    if pos.x < v.x+v.l/2 then
       sy = -1
     end
     queue[#queue + 1] = {img = weapon_img[v.weapon.type][v.weapon.anim], quad = weapon_quad[v.weapon.type][v.weapon.anim][math.floor(v.weapon.frame)], x = pos.x, y = pos.y, z = pos.z, angle = angle, w = 0, h = 0, l = 0, ox = 32, oy = 32, sx = 1, sy = sy}

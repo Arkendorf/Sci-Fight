@@ -5,6 +5,9 @@ abilities[1] = { -- blaster shot
 press_func = function(player, index, target)
   local k = bullet.new(players[index], target, index, 1)
   server:sendToAll("bullet", {info = bullets[k], k = k})
+  -- weapon animation
+  char.weapon_anim(index, "fire", 30)
+  server:sendToAll("weaponanim", {index = index, anim = "fire", speed = 30})
   return false
 end,
 delay = 0.2,
@@ -25,6 +28,9 @@ press_func = function(player, index, target)
     local k = bullet.new(players[index], dir, index, 3)
     server:sendToAll("bullet", {info = bullets[k], k = k})
   end
+  -- weapon animation
+  char.weapon_anim(index, "fire", 30)
+  server:sendToAll("weaponanim", {index = index, anim = "fire", speed = 30})
   return false
 end,
 delay = 3,
@@ -45,7 +51,9 @@ end,
 stop_func = function(player, index, target, num)
   local k = bullet.new(players[index], target, index, 6, player.abilities[num].info)
   server:sendToAll("bullet", {info = bullets[k], k = k})
-  return false
+  -- weapon animation
+  char.weapon_anim(index, "fire", 30)
+  server:sendToAll("weaponanim", {index = index, anim = "fire", speed = 30})
 end,
 delay = 2,
 energy = 0.2,
@@ -58,6 +66,9 @@ abilities[4] = {
 press_func = function(player, index, target)
   local k = bullet.new(players[index], target, index, 7)
   server:sendToAll("bullet", {info = bullets[k], k = k})
+  -- weapon animation
+  char.weapon_anim(index, "fire", 30)
+  server:sendToAll("weaponanim", {index = index, anim = "fire", speed = 30})
   return false
 end,
 delay = 8,
@@ -69,7 +80,11 @@ desc = "Fire a laser that passes through floors and walls",
 
 
 abilities[5] = { -- rapid reload
-press_func = function() end,
+press_func = function(player, index, target)
+  -- weapon animation
+  char.weapon_anim(index, "reload", 30)
+  server:sendToAll("weaponanim", {index = index, anim = "reload", speed = 30})
+end,
 delay = 7,
 energy = -25,
 type = 2,
