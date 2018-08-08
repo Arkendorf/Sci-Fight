@@ -40,10 +40,10 @@ mapselect.draw = function(dt)
   love.graphics.rectangle("fill", option_pos.x, option_pos.y, option_pos.w, option_pos.h)
   for i, v in ipairs(icons) do
     if current == i then
-      love.graphics.draw(map_icon[v.num], v.x, v.y)
+      love.graphics.draw(map_icon[maps[current].name], v.x, v.y)
     else
       love.graphics.setShader(shader.greyscale)
-      love.graphics.draw(map_icon[v.num], v.x, v.y)
+      love.graphics.draw(map_icon[maps[current].name], v.x, v.y)
       love.graphics.setShader()
     end
   end
