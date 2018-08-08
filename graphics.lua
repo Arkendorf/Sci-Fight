@@ -31,21 +31,21 @@ graphics.load = function()
   map_icon = graphics.load_folder("art/mapicons")
 
   weapon_img, weapon_quad, weapon_info = graphics.load_doublefolder("art/weaponimgs", 64, 64)
-  char_img, char_quad, char_info = graphics.load_doublefolder("art/charimgs", 24, 48)
+  char_img, char_quad, char_info = graphics.load_doublefolder("art/charimgs", 24, 48, graphics.load_face_quad)
 end
 
-graphics.load_doublefolder = function(str, tw, th)
+graphics.load_doublefolder = function(str, tw, th, quadfunc)
   local img = {}
   local quad = {}
   local info = {}
   local files = love.filesystem.getDirectoryItems(str)
   for i, v in ipairs(files) do
-    img[tonumber(v)], quad[tonumber(v)], info[tonumber(v)] = graphics.load_folder(str.."/"..v, tw, th)
+    img[tonumber(v)], quad[tonumber(v)], info[tonumber(v)] = graphics.load_folder(str.."/"..v, tw, th, quadfunc)
   end
   return img, quad, info
 end
 
-graphics.load_folder = function(str, tw, th)
+graphics.load_folder = function(str, tw, th, quadfunc)
   local img = {}
   local quad = {}
   local info = {}
@@ -58,7 +58,10 @@ graphics.load_folder = function(str, tw, th)
       end
       img[name] = love.graphics.newImage(str.."/"..v)
       if tx or th then
-        quad[name] = graphics.load_quad(img[name], tw, th)
+        if not quadfunc then
+          quadfunc = graphics.load_quad
+        end
+        quad[name] = quadfunc(img[name], tw, th)
       end
       local info_name = str.."/"..name.."_info.txt"
       if love.filesystem.getInfo(info_name) then
@@ -75,6 +78,18 @@ graphics.load_quad = function(img, tw, th)
   for h = 0, math.floor(ih/th)-1 do
     for w = 0, math.floor(iw/tw)-1 do
       quad[#quad+1] = love.graphics.newQuad(w*tw, h*th, tw, th, iw, ih)
+    end
+  end
+  return quad
+end
+
+graphics.load_face_quad = function(img, tw, th)
+  local quad = {}
+  local iw, ih = img:getDimensions()
+  for h = 0, 3 do
+    quad[h+1] = {}
+    for w = 0, math.floor(iw/tw)-1 do
+      quad[h+1][w+1] = love.graphics.newQuad(w*tw, h*th, tw, th, iw, ih)
     end
   end
   return quad
