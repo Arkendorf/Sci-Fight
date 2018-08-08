@@ -24,7 +24,6 @@ shader.layer = love.graphics.newShader[[
     extern vec3 coords;
     extern vec4 xray_color;
     extern vec2 offset;
-    extern bool flash;
     vec4 effect( vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords ){
       vec4 pixel = Texel(texture, texture_coords);
       if(pixel.a > 0){
@@ -34,13 +33,8 @@ shader.layer = love.graphics.newShader[[
           if((mask_pixel.z > 1.014-0.010*coords.z) && (mask_pixel.y < 1.014-0.010*coords.y)){
             return xray_color;
           }
+          return pixel*color;
         }
-      }
-      if (flash){
-        return color;
-      }
-      else{
-        return pixel*color;
       }
     }
   ]]

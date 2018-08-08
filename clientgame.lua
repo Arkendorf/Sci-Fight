@@ -75,8 +75,7 @@ clientgame.start = function(port)
     client:on(k, v)
   end
 
-  gui.clear()
-  bullets = {}
+  game.start()
 end
 
 clientgame.update = function(dt)

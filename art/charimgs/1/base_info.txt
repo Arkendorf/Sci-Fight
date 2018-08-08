@@ -1,0 +1,9 @@
+return {
+rightarmpos = {
+{x = 5, y = 17},
+},
+leftarmpos = {
+{x = 19, y = 17},
+},
+armcolor = {.4, .4, .4},
+}

@@ -43,8 +43,7 @@ servergame.start = function(port)
     server:on(k, v)
   end
 
-  gui.clear()
-  bullets = {}
+  game.start()
 end
 
 servergame.update = function(dt)

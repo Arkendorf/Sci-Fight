@@ -16,8 +16,7 @@ graphics.load = function()
   love.graphics.setFont(font)
 
   love.graphics.setLineWidth(1)
-
-  player_img = love.graphics.newImage("char.png")
+  love.graphics.setLineStyle("rough")
 
   -- load tile images
   tile_img = graphics.load_folder("art/tiles")
@@ -31,31 +30,43 @@ graphics.load = function()
   weapon_icon = graphics.load_folder("art/weaponicons")
   map_icon = graphics.load_folder("art/mapicons")
 
-  weapon_img = {}
-  weapon_quad = {}
-  local files = love.filesystem.getDirectoryItems("art/weaponimgs")
+  weapon_img, weapon_quad, weapon_info = graphics.load_doublefolder("art/weaponimgs", 64, 64)
+  char_img, char_quad, char_info = graphics.load_doublefolder("art/charimgs", 24, 48)
+end
+
+graphics.load_doublefolder = function(str, tw, th)
+  local img = {}
+  local quad = {}
+  local info = {}
+  local files = love.filesystem.getDirectoryItems(str)
   for i, v in ipairs(files) do
-    local img, quad = graphics.load_folder("art/weaponimgs/"..v, 64, 64)
-    weapon_img[tonumber(v)] = img
-    weapon_quad[tonumber(v)] = quad
+    img[tonumber(v)], quad[tonumber(v)], info[tonumber(v)] = graphics.load_folder(str.."/"..v, tw, th)
   end
+  return img, quad, info
 end
 
 graphics.load_folder = function(str, tw, th)
   local img = {}
   local quad = {}
+  local info = {}
   local files = love.filesystem.getDirectoryItems(str)
   for i, v in ipairs(files) do
-    local name = string.sub(v, 1, -5)
-    if tonumber(name) then
-      name = tonumber(name)
-    end
-    img[name] = love.graphics.newImage(str.."/"..v)
-    if tx or th then
-      quad[name] = graphics.load_quad(img[name], tw, th)
+    if string.sub(v, -4, -1) == ".png" then
+      local name = string.sub(v, 1, -5)
+      if tonumber(name) then
+        name = tonumber(name)
+      end
+      img[name] = love.graphics.newImage(str.."/"..v)
+      if tx or th then
+        quad[name] = graphics.load_quad(img[name], tw, th)
+      end
+      local info_name = str.."/"..name.."_info.txt"
+      if love.filesystem.getInfo(info_name) then
+        info[name] = love.filesystem.load(info_name)()
+      end
     end
   end
-  return img, quad
+  return img, quad, info
 end
 
 graphics.load_quad = function(img, tw, th)
@@ -244,16 +255,19 @@ graphics.zoom = function(bool, num, min, max, scalar)
 end
 
 graphics.draw_border = function(v)
-  love.graphics.setShader(shader.layer)
-  shader.layer:send("xray_color", {0, 0, 0, 0})
-  shader.layer:send("flash", true)
+  love.graphics.setShader(shader.color)
   love.graphics.setColor(v.border)
   for i = -1, 1, 2 do
     for j = -1, 1, 2 do
-      love.graphics.draw(v.img, math.floor(v.x+j), math.floor(v.y+v.z+i))
+      if v.quad then
+        love.graphics.draw(v.img, v.quad, math.floor(v.x+j), math.floor(v.y+i))
+      else
+        love.graphics.draw(v.img, math.floor(v.x+j), math.floor(v.y+i))
+      end
     end
   end
   love.graphics.setColor(1, 1, 1)
+  love.graphics.setShader()
 end
 
 

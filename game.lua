@@ -23,6 +23,14 @@ game.load = function()
   ability_keys = {{"button", 1}, {"button", 2}, {"key", "lshift"}, {"key", "lctrl"}, {"key", "lalt"}}
 end
 
+game.start = function()
+  gui.clear()
+  bullets = {}
+  for k, v in pairs(players) do
+    v.canvas = love.graphics.newCanvas(88, 88)
+  end
+end
+
 game.update = function(dt)
   -- normal updates
   char.update(dt)
@@ -83,17 +91,9 @@ game.draw_queue = function()
   table.sort(queue, function(a, b) return a.y+a.w < b.y+b.w end)
 
   for i, v in ipairs(queue) do
-    if v.border then
-      graphics.draw_border(v)
-    end
     love.graphics.setShader(shader.layer)
     shader.layer:send("xray_color", {.2, .2, .3, 1})
     shader.layer:send("coords", {0, 1+math.floor((v.y)/tile_size), 1+math.ceil((v.z+v.h)/tile_size)})
-    if v.flash then
-      shader.layer:send("flash", true)
-    else
-      shader.layer:send("flash", false)
-    end
     graphics.draw(v)
     love.graphics.setShader()
   end
@@ -175,10 +175,13 @@ game.draw_shadow_mask = function(x, y, z, tile)
   end
 end
 
-game.target_norm = function(p, t)
+game.target_norm = function(p, t, range)
+  if not range then
+    range = 1
+  end
   local x, y, z = t.x-p.x-p.l/2, t.y-p.y-p.w/2, t.z-p.z-p.h/2
   local denom = math.sqrt(x*x+y*y+z*z)
-  return {x = x/denom, y = y/denom, z = z/denom}
+  return {x = x/denom*range, y = y/denom*range, z = z/denom*range}
 end
 
 game.target_pos = function(p, t, range)

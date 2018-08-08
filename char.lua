@@ -195,27 +195,61 @@ end
 
 char.queue = function()
   for i, v in pairs(players) do
-    -- char
-    local flash = false
-    if math.floor(math.sin(v.inv*14)+0.5) > 0 then
-      flash = true
-    end
-    local border = false
-    if v.team > 0 then
-      border = team_colors[v.team]
-    end
-    queue[#queue + 1] = {img = player_img, x = v.x, y = v.y, z = v.z, w = v.w, h = v.h, l = v.l, shadow = true, flash = flash, border = border}
-
-    -- weapon
     local dir = game.target_norm(v, v.target)
-    local pos = game.target_pos(v, dir, (v.l+v.w)/2-8)
-    local angle = math.atan2(dir.y+dir.z, dir.x)
-    local sy = 1
-    if pos.x < v.x+v.l/2 then
-      sy = -1
+
+    love.graphics.setCanvas(v.canvas)
+    love.graphics.clear()
+    if dir.y < 0 then
+      char.draw_weapon(v)
+      char.draw_body(v)
+    else
+      char.draw_body(v)
+      char.draw_weapon(v)
     end
-    queue[#queue + 1] = {img = weapon_img[v.weapon.type][v.weapon.anim], quad = weapon_quad[v.weapon.type][v.weapon.anim][math.floor(v.weapon.frame)], x = pos.x, y = pos.y, z = pos.z, angle = angle, w = 0, h = 0, l = 0, ox = 32, oy = 32, sx = 1, sy = sy}
+    love.graphics.setCanvas()
+    
+    queue[#queue + 1] = {img = v.canvas, x = v.x, y = v.y, z = v.z, w = v.w, h = v.h, l = v.l, shadow = true, ox = 32, oy = 32}
   end
+end
+
+char.draw_body = function(v)
+  if v.team > 0 then
+    graphics.draw_border({img = char_img[1].base, quad = char_quad[1].base[1], x = 32, y = 32, border = team_colors[v.team]})
+  end
+  if math.floor(math.sin(v.inv*14)+0.5) > 0 then
+    love.graphics.setShader(shader.color)
+  end
+  love.graphics.draw(char_img[1].base, char_quad[1].base[1], 32, 32)
+  love.graphics.setShader()
+end
+
+char.draw_weapon = function(v)
+  -- weapon pos
+  local dir = game.target_norm(v, v.target, (v.l+v.w)/2-12)
+  local weapon_pos = {x = math.floor(dir.x)+44, y = math.floor(dir.y+dir.z)+48}
+  local angle = math.atan2(dir.y+dir.z, dir.x)
+  local sy = 1
+  if dir.x < 0 then
+    sy = -1
+  end
+
+  -- arms
+  local weapon_offset = {x = (weapon_info[v.weapon.type][v.weapon.anim].handlepos[math.floor(v.weapon.frame)].x-32)*sy, y = (weapon_info[v.weapon.type][v.weapon.anim].handlepos[math.floor(v.weapon.frame)].y-32)*sy}
+  local hand_pos = {x = weapon_pos.x+weapon_offset.x*math.cos(angle)-weapon_offset.y*math.sin(angle), y = weapon_pos.y+weapon_offset.x*math.sin(angle)+weapon_offset.y*math.cos(angle)}
+  local right_pos = {x = 32+char_info[1].base.rightarmpos[1].x, y = 32+char_info[1].base.rightarmpos[1].y}
+  local left_pos = {x = 32+char_info[1].base.leftarmpos[1].x, y = 32+char_info[1].base.leftarmpos[1].y}
+  love.graphics.setLineWidth(4)
+  love.graphics.setColor(0, 0, 0)
+  love.graphics.line(right_pos.x, right_pos.y, hand_pos.x, hand_pos.y)
+  love.graphics.line(left_pos.x, left_pos.y, hand_pos.x, hand_pos.y)
+  love.graphics.setLineWidth(2)
+  love.graphics.setColor(char_info[1].base.armcolor)
+  love.graphics.line(right_pos.x, right_pos.y, hand_pos.x, hand_pos.y)
+  love.graphics.line(left_pos.x, left_pos.y, hand_pos.x, hand_pos.y)
+  love.graphics.setColor(1, 1, 1)
+
+  -- weapon
+  love.graphics.draw(weapon_img[v.weapon.type][v.weapon.anim], weapon_quad[v.weapon.type][v.weapon.anim][math.floor(v.weapon.frame)], weapon_pos.x, weapon_pos.y, angle, 1, sy, 32, 32)
 end
 
 char.weapon_anim = function(k, anim, speed, reset)
