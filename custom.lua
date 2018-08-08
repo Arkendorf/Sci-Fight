@@ -114,7 +114,7 @@ custom.get_icon_pos = function(type)
       w = 70
       icons[#icons+1] = {x = option_pos.x+x*(w+icon.border)+icon.border+18, y = option_pos.y+y*(icon.h+icon.border)+icon.border, w = w, h = icon.h, num = i}
       x = x + 1
-      if x > 3 then
+      if x > 2 then
         x = 0
         y = y + 1
       end
