@@ -113,8 +113,8 @@ press_func = function(player, index, target)
     end
   end
   -- weapon animation
-  char.weapon_anim(index, "swing", 12)
-  server:sendToAll("weaponanim", {index = index, anim = "swing", speed = 12})
+  char.weapon_anim(index, "swing", 30)
+  server:sendToAll("weaponanim", {index = index, anim = "swing", speed = 30})
   return false
 end,
 delay = 0.2,
@@ -140,11 +140,26 @@ local deflect = function(player, index, target)
     end
     server:sendToAll("bulletupdate", {pos = {x = v.x, y = v.y, z = v.z, xV = v.xV, yV = v.yV, zV = v.zV, angle = v.angle}, index = k})
   end
-  return true
+  -- animation
+  if player.weapon.anim == "block" and player.weapon.frame > 3 then
+    char.weapon_anim(index, "block", 0)
+    player.weapon.frame = 3
+    server:sendToAll("weaponanim", {index = index, anim = "block", speed = 0, frame = 3})
+  end
 end
 abilities[8] = {
-press_func = deflect,
+press_func = function(player, index, target)
+  char.weapon_anim(index, "block", 30)
+  server:sendToAll("weaponanim", {index = index, anim = "block", speed = 30})
+  deflect(player, index, target)
+  return true
+end,
 update_func = deflect,
+stop_func = function(player, index, target)
+  char.weapon_anim(index, "block", 30)
+  player.weapon.frame = 3
+  server:sendToAll("weaponanim", {index = index, anim = "block", speed = 30, frame = 3})
+end,
 delay = 5,
 energy = 0.3,
 type = 1,
@@ -180,6 +195,10 @@ press_func = function(player, index, target)
       server:sendToAll("hit", {index = k, num = num, parent = index})
     end
   end
+  -- weapon animation
+  char.weapon_anim(index, "spin", 30)
+  server:sendToAll("weaponanim", {index = index, anim = "spin", speed = 30})
+  return false
 end,
 delay = 4,
 energy = 10,
@@ -227,6 +246,9 @@ desc = "Start a forward damaging lunge",
 abilities[12] = {
 press_func = function(player, index, target)
   player.inv = 1
+  -- weapon animation
+  char.weapon_anim(index, "block", 30)
+  server:sendToAll("weaponanim", {index = index, anim = "block", speed = 30})
   return false
 end,
 delay = 5,

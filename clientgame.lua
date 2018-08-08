@@ -63,6 +63,9 @@ local client_hooks = {
   end,
   weaponanim = function(data)
     char.weapon_anim(data.index, data.anim, data.speed)
+    if data.frame then
+      players[data.index].weapon.frame = data.frame
+    end
   end,
 }
 

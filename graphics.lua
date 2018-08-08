@@ -35,7 +35,7 @@ graphics.load = function()
   weapon_quad = {}
   local files = love.filesystem.getDirectoryItems("art/weaponimgs")
   for i, v in ipairs(files) do
-    local img, quad = graphics.load_folder("art/weaponimgs/"..v, 32, 32)
+    local img, quad = graphics.load_folder("art/weaponimgs/"..v, 64, 64)
     weapon_img[tonumber(v)] = img
     weapon_quad[tonumber(v)] = quad
   end

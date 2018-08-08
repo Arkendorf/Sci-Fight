@@ -208,17 +208,17 @@ char.queue = function()
 
     -- weapon
     local dir = game.target_norm(v, v.target)
-    local pos = game.target_pos(v, dir, (v.l+v.w)/2)
+    local pos = game.target_pos(v, dir, (v.l+v.w)/2-8)
     local angle = math.atan2(dir.y+dir.z, dir.x)
     local sy = 1
     if pos.x < v.x then
       sy = -1
     end
-    queue[#queue + 1] = {img = weapon_img[v.weapon.type][v.weapon.anim], quad = weapon_quad[v.weapon.type][v.weapon.anim][math.floor(v.weapon.frame)], x = pos.x, y = pos.y, z = pos.z, angle = angle, w = 0, h = 0, l = 0, ox = 16, oy = 16, sx = 1, sy = sy}
+    queue[#queue + 1] = {img = weapon_img[v.weapon.type][v.weapon.anim], quad = weapon_quad[v.weapon.type][v.weapon.anim][math.floor(v.weapon.frame)], x = pos.x, y = pos.y, z = pos.z, angle = angle, w = 0, h = 0, l = 0, ox = 32, oy = 32, sx = 1, sy = sy}
   end
 end
 
-char.weapon_anim = function(k, anim, speed)
+char.weapon_anim = function(k, anim, speed, reset)
   players[k].weapon.anim = anim
   players[k].weapon.frame = 1
   players[k].weapon.speed = speed
