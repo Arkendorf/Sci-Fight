@@ -222,12 +222,12 @@ char.draw_char = function(v)
   end
 
   -- face
-  local face = 2
-  if angle >= math.pi*.75 or angle <= -math.pi*.75 then
+  local face = 1
+  if math.abs(dir.x) > math.abs(dir.y) and dir.x > 0 then
+    face = 2
+  elseif math.abs(dir.x) > math.abs(dir.y) then
     face = 4
-  elseif angle >= math.pi*.25 then
-    face = 1
-  elseif angle <= -math.pi*.25 then
+  elseif dir.y < 0 then
     face = 3
   end
 
