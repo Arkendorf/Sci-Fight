@@ -207,9 +207,13 @@ char.queue = function()
   end
 end
 
+char.get_weapon_pos = function(v)
+  return game.target_norm(v, v.target, (v.l+v.w)/2-12)
+end
+
 char.draw_char = function(v)
   -- weapon pos
-  local dir = game.target_norm(v, v.target, (v.l+v.w)/2-12)
+  local dir = char.get_weapon_pos(v)
   local weapon_pos = {x = math.floor(dir.x)+44, y = math.floor(dir.y+dir.z)+48}
   local angle = math.atan2(dir.y+dir.z, dir.x)
   local sy = 1

@@ -175,7 +175,8 @@ bullet.reverse = function(v, face)
 end
 
 bullet.new = function(p1, p2, parent, type, extra)
-  local x1, y1, z1 = p1.x+p1.l/2, p1.y+p1.w/2, p1.z+p1.h/2
+  local weapon_pos = char.get_weapon_pos(players[parent])
+  local x1, y1, z1 = p1.x+p1.l/2+weapon_pos.x, p1.y+p1.w/2+weapon_pos.y, p1.z+p1.h/2+weapon_pos.z
   local l_x, l_y, l_z = p2.x-x1, p2.y-y1, p2.z-z1
   local xV = math.cos(math.atan2(math.sqrt(l_y*l_y+l_z*l_z), l_x))
   local yV = math.cos(math.atan2(math.sqrt(l_z*l_z+l_x*l_x), l_y))
