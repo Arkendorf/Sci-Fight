@@ -122,7 +122,7 @@ press_func = function(player, index, target)
   local bubble = game.target_pos(player, dir, swing_range)
   for k, v in pairs(players) do
     if k ~= index and char.damageable(k, index) and collision.sphere_and_cube(bubble, v, swing_radius) then
-      local num = v.hp-weapons[player.weapon.type].dmg*10
+      local num = v.hp-weapons[player.weapon.type].mod*10
       bullet.damage(v, num, index)
       server:sendToAll("hit", {index = k, num = num, parent = index})
     end
@@ -205,7 +205,7 @@ press_func = function(player, index, target)
   local bubble = {x = player.x+player.l/2, y = player.y+player.w/2, z = player.z+player.h/2}
   for k, v in pairs(players) do
     if k ~= index and char.damageable(k, index) and  collision.sphere_and_cube(bubble, v, spin_radius) then
-      local num = v.hp-weapons[player.weapon.type].dmg*10
+      local num = v.hp-weapons[player.weapon.type].mod*10
       bullet.damage(v, num, index)
       server:sendToAll("hit", {index = k, num = num, parent = index})
     end
@@ -244,7 +244,7 @@ press_func = function(player, index, target)
   local bubble = game.target_pos(player, {x = x, y = y, z = 0}, lunge_range)
   for k, v in pairs(players) do
     if k ~= index and char.damageable(k, index) and collision.sphere_and_cube(bubble, v, lunge_radius) then
-      local num = v.hp-weapons[player.weapon.type].dmg*15
+      local num = v.hp-weapons[player.weapon.type].mod*15
       bullet.damage(v, num, index)
       server:sendToAll("hit", {index = k, num = num, parent = index})
     end
@@ -404,7 +404,7 @@ local flame = function(player, index, target)
   local bubble = game.target_pos(player, dir, flame_range)
   for k, v in pairs(players) do
     if k ~= index and char.damageable(k, index) and collision.sphere_and_cube(bubble, v, flame_radius) then
-      local num = v.hp - 0.2*weapons[player.weapon.type].dmg -- bullet damage * weapon modifier
+      local num = v.hp - weapons[player.weapon.type].mod*0.2 -- bullet damage * weapon modifier
       v.killer = index
       v.hp = num
       server:sendToAll("hp", {index = k, hp = num})

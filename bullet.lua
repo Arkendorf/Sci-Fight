@@ -107,7 +107,7 @@ bullet.player_collide = function(k, v) -- only server should do this
       if bullet_info[v.type].explosion then
         bullet.explode(k, v)
       elseif bullet_info[v.type].dmg > 0 then
-        local num = w.hp - bullet_info[v.type].dmg*weapons[players[v.parent].weapon.type].dmg -- bullet damage * weapon modifier
+        local num = w.hp - bullet_info[v.type].dmg*weapons[players[v.parent].weapon.type].mod -- bullet damage * weapon modifier
         bullet.damage(w, num, v.parent)
         server:sendToAll("hit", {index = l, num = num, parent = v.parent})
       end
@@ -133,7 +133,7 @@ bullet.explode = function(k, v)
   end
   for l, w in pairs(players) do
     if l ~= v.parent and char.damageable(l, v.parent) and collision.sphere_and_cube(v, w, info.r) then
-      local num = w.hp - dmg*weapons[players[v.parent].weapon.type].dmg -- bullet damage * weapon modifier
+      local num = w.hp - dmg*weapons[players[v.parent].weapon.type].mod -- bullet damage * weapon modifier
       bullet.damage(w, num, v.parent)
       server:sendToAll("hit", {index = l, num = num, parent = v.parent})
     end

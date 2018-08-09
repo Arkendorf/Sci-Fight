@@ -189,7 +189,7 @@ custom.ability_info = function(num)
 end
 
 custom.weapon_info = function(num)
-  return weapons[num].desc.."\nDamage Modifier: x"..tostring(weapons[num].dmg).."\nEnergy Modifier: x"..tostring(weapons[num].energy)
+  return weapons[num].desc.."\nModifier: x"..tostring(weapons[num].mod)
 end
 
 return custom

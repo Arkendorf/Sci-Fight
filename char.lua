@@ -89,7 +89,7 @@ char.update = function(dt)
       end
     end
     if v.energy < energy_max and not char.ability_check(v) then
-      v.energy = v.energy + energy_increase*weapons[v.weapon.type].energy
+      v.energy = v.energy + energy_increase
     elseif v.energy > energy_max then
       v.energy = energy_max
     end
@@ -123,11 +123,12 @@ char.serverupdate = function(dt)
 end
 
 char.use_ability = function(player, index, target, num)
-  if player.abilities[num].delay <= 0 and player.energy >= abilities[player.abilities[num].type].energy and not (num < 3 and player.weapon.active) then
+  local cost = abilities[player.abilities[num].type].energy*weapons[player.weapon.type].mod
+  if player.abilities[num].delay <= 0 and player.energy >= cost and not (num < 3 and player.weapon.active) then
     player.abilities[num].active = abilities[player.abilities[num].type].press_func(player, index, target, num)
     if not player.abilities[num].active then -- initiate cooldown if ability isn't channelled
       player.abilities[num].delay = abilities[player.abilities[num].type].delay
-      player.energy = player.energy - abilities[player.abilities[num].type].energy
+      player.energy = player.energy - cost
     end
     if num < 3 then -- stop other weapon ability
       char.stop_ability(player, index, target, num-(num*2-3))
@@ -137,11 +138,12 @@ end
 
 char.update_ability = function(player, index, target, num, dt)
   if player.abilities[num].active then
-    if player.energy >= abilities[player.abilities[num].type].energy then
+    local cost = abilities[player.abilities[num].type].energy*weapons[player.weapon.type].mod*dt*60
+    if player.energy >= cost then
       if abilities[player.abilities[num].type].update_func then
         abilities[player.abilities[num].type].update_func(player, index, target, num)
       end
-      player.energy = player.energy - abilities[player.abilities[num].type].energy * dt*60
+      player.energy = player.energy - cost
     else
       char.stop_ability(player, index, target, num)
     end
