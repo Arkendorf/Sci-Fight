@@ -103,6 +103,16 @@ char.update = function(dt)
       v.weapon.frame = 1
     end
 
+    if math.abs(v.xV) > 0.1 or math.abs(v.yV) > 0.1 then
+      v.anim = "run"
+    else
+      v.anim = "base"
+    end
+    v.frame = v.frame + (math.abs(v.xV)+math.abs(v.yV))*6*dt
+    if v.frame > #char_quad[v.skin][v.anim][1]+1 then
+      v.frame = 1
+    end
+
     if v.hp <= 0 then -- death
       char.death(v)
     end
@@ -183,7 +193,7 @@ end
 char.new = function(name, loadout, team)
   local item = {name = name, x = #grid[1][1]*tile_size*0.5, y = #grid[1]*tile_size*0.5, z = -24, l = 24, w = 24, h = 24, xV = 0, yV = 0, zV = 0,
                 speed = 1, hp = hp_max, energy = energy_max, score = 0, jump = false, inv = 0, team = team, killer = false, target = {x = 0, y = 0, z = 0},
-                anim = "base", frame = 1, skin = 1}
+                anim = "run", frame = 1, skin = 1}
   item.weapon = {type = loadout.weapon, active = false, anim = "base", frame = 1, speed = 0}
   item.abilities = {}
   for i, v in ipairs(loadout.abilities) do
