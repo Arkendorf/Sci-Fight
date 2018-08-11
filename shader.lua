@@ -36,6 +36,9 @@ shader.layer = love.graphics.newShader[[
           return pixel*color;
         }
       }
+      else{
+        return vec4(0, 0, 0, 0);
+      }
     }
   ]]
 

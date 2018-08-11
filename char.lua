@@ -215,7 +215,7 @@ char.queue = function()
     char.draw_char(v)
     love.graphics.setCanvas()
 
-    queue[#queue + 1] = {img = v.canvas, x = v.x, y = v.y, z = v.z, w = v.w, h = v.h, l = v.l, shadow = true, ox = 32, oy = 32}
+    queue[#queue + 1] = {img = v.canvas, x = v.x, y = v.y, z = v.z, w = v.w, h = v.h, l = v.l, shadow = true, ox = 32, oy = 24}
   end
 end
 
@@ -226,7 +226,7 @@ end
 char.draw_char = function(v)
   -- weapon pos
   local dir = char.get_weapon_pos(v)
-  local weapon_pos = {x = math.floor(dir.x)+44, y = math.floor(dir.y+dir.z)+48}
+  local weapon_pos = {x = math.floor(dir.x)+44, y = math.floor(dir.y+dir.z)+44}
   local angle = math.atan2(dir.y+dir.z, dir.x)
   local sy = 1
   if dir.x < 0 then
@@ -246,8 +246,8 @@ char.draw_char = function(v)
   -- arm pos
   local weapon_offset = {x = (weapon_info[v.weapon.type][v.weapon.anim].handlepos[math.floor(v.weapon.frame)].x-32)*sy, y = (weapon_info[v.weapon.type][v.weapon.anim].handlepos[math.floor(v.weapon.frame)].y-32)*sy}
   local hand_pos = {x = weapon_pos.x+weapon_offset.x*math.cos(angle)-weapon_offset.y*math.sin(angle), y = weapon_pos.y+weapon_offset.x*math.sin(angle)+weapon_offset.y*math.cos(angle)}
-  local right_pos = {x = 32+char_info[v.skin][v.anim].armpos[face].right[math.floor(v.frame)].x, y = 32+char_info[v.skin][v.anim].armpos[face].right[math.floor(v.frame)].y}
-  local left_pos = {x = 32+char_info[v.skin][v.anim].armpos[face].left[math.floor(v.frame)].x, y = 32+char_info[v.skin][v.anim].armpos[face].left[math.floor(v.frame)].y}
+  local right_pos = {x = 32+char_info[v.skin][v.anim].armpos[face].right[math.floor(v.frame)].x, y = 24+char_info[v.skin][v.anim].armpos[face].right[math.floor(v.frame)].y}
+  local left_pos = {x = 32+char_info[v.skin][v.anim].armpos[face].left[math.floor(v.frame)].x, y = 24+char_info[v.skin][v.anim].armpos[face].left[math.floor(v.frame)].y}
 
   -- draw everything
   if face == 1 then
@@ -268,12 +268,12 @@ end
 
 char.draw_body = function(v, face)
   if v.team > 0 then
-    graphics.draw_border({img = char_img[v.skin][v.anim], quad = char_quad[v.skin][v.anim][face][math.floor(v.frame)], x = 32, y = 32, border = team_colors[v.team]})
+    graphics.draw_border({img = char_img[v.skin][v.anim], quad = char_quad[v.skin][v.anim][face][math.floor(v.frame)], x = 32, y = 24, border = team_colors[v.team]})
   end
   if math.floor(math.sin(v.inv*14)+0.5) > 0 then
     love.graphics.setShader(shader.color)
   end
-  love.graphics.draw(char_img[v.skin][v.anim], char_quad[v.skin][v.anim][face][math.floor(v.frame)], 32, 32)
+  love.graphics.draw(char_img[v.skin][v.anim], char_quad[v.skin][v.anim][face][math.floor(v.frame)], 32, 24)
   love.graphics.setShader()
 end
 
