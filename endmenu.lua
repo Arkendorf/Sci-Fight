@@ -56,8 +56,10 @@ endmenu.draw = function()
   end
   love.graphics.draw(endmenu_imgs.footer, (screen.w-256)/2, podium.y+32)
   love.graphics.draw(endmenu_imgs.header, (screen.w-256)/2, (screen.h-256)/2)
+  love.graphics.setColor(text_color)
   love.graphics.printf("Your Place: "..endmenu.num_string(player_place), (screen.w-256)/2+2, podium.y+44, 252, "center")
   love.graphics.printf(tostring(players[scores[1].k].name).." Wins!", (screen.w-256)/2+2, (screen.h-256)/2+28, 252, "center")
+  love.graphics.setColor(1, 1, 1)
 end
 
 endmenu.num_string = function(num)

@@ -28,7 +28,8 @@ mapselect.start = function(buttons)
   for i, v in ipairs(icons) do
     buttons[i] = {x = v.x, y = v.y, w= v.w, h = v.h, txt = tostring(v.num), func = mapselect.change_map, args = {v.num}, hide = true}
     local txt =  maps[v.num].name
-    infoboxes[i] = {x = v.x, y = v.y, w= v.w, h = v.h, box = gui.text_size(txt, 128), txt = txt}
+    local w, h = gui.text_size(txt, 128)
+    infoboxes[i] = {x = v.x, y = v.y, w= w, h = h, hit = {w = v.w, h = v.h}, txt = txt}
   end
   gui.add(2, buttons, {}, infoboxes)
 end
@@ -38,8 +39,10 @@ end
 
 mapselect.draw = function(dt)
   love.graphics.draw(mapselect_imgs.header, option_pos.x, option_pos.y-66)
-  love.graphics.printf("Map Vote:\n"..maps[current].name, option_pos.x, option_pos.y-42, option_pos.w, "center")
   love.graphics.draw(mapselect_imgs.option, option_pos.x, option_pos.y)
+  love.graphics.setColor(text_color)
+  love.graphics.printf("Map Vote:\n"..maps[current].name, option_pos.x, option_pos.y-42, option_pos.w, "center")
+  love.graphics.setColor(1, 1, 1)
   for i, v in ipairs(icons) do
     if current == i then
       love.graphics.draw(map_icon[maps[current].name], v.x, v.y)
@@ -56,7 +59,7 @@ mapselect.get_icon_pos = function()
   local y = 0
   local icons = {}
   for i, v in ipairs(maps) do
-    icons[i] = {x = option_pos.x+x*(icon.w+icon.border)+icon.border, y = option_pos.y+y*(icon.h+icon.border)+icon.border, w= icon.w, h = icon.h, num = i}
+    icons[i] = {x = option_pos.x+x*(icon.w+icon.border)+icon.border+4, y = option_pos.y+y*(icon.h+icon.border)+icon.border+5, w= icon.w, h = icon.h, num = i}
     x = x + 1
     if x > 2 then
       x = 0

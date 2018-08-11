@@ -1,11 +1,11 @@
 local custom = {}
 
 local button = {w = 64, h = 48, border = 2}
-local button2 = {w = 80, h = 32, border = 2}
+local button2 = {w = 80, h = 32, border = 8}
 local icon = {w = 32, h = 32, border = 2}
 local current_loadout = 1
 local current_slot = 0
-local offsets = {weapon = {x = 35, y = 5}, abilities = {{x = 35, y = 43}, {x = 73, y = 43}, {x = 111, y = 25}, {x = 149, y = 25}, {x = 187, y = 25}}}
+local offsets = {weapon = {x = 43, y = 7}, abilities = {{x = 43, y = 41}, {x = 77, y = 41}, {x = 111, y = 25}, {x = 145, y = 25}, {x = 179, y = 25}}}
 local loadout_pos = {}
 local option_pos = {}
 local icons = {}
@@ -34,8 +34,8 @@ custom.load = function()
   for i = 1, 3 do
     loadouts[i] = {weapon = 1, abilities = {7, 8, 13, 14, 15}}
   end
-  loadout_pos = {x = (screen.w-256)/2, y = (screen.h-256)/2+button2.h+button2.border, w = 256, h = 80}
-  option_pos = {x = loadout_pos.x, y = loadout_pos.y+loadout_pos.h+button2.border, w = loadout_pos.w, h = 256-loadout_pos.h-button2.h-button2.border*2}
+  loadout_pos = {x = (screen.w-256)/2, y = (screen.h-256)/2+button2.h+button.border, w = 256, h = 80}
+  option_pos = {x = loadout_pos.x, y = loadout_pos.y+loadout_pos.h+button.border, w = loadout_pos.w, h = 256-loadout_pos.h-button2.h-button.border*2}
 
   custom_imgs.loadout = gui.new_img(4, loadout_pos.w, loadout_pos.h)
   custom_imgs.option = gui.new_img(5, option_pos.w, option_pos.h)
@@ -78,13 +78,15 @@ custom.update_loadout_gui = function()
   local pos = loadout_pos
   local buttons = {}
   local infoboxes = {}
-  buttons[1] = {x = pos.x+offsets.weapon.x, y = pos.y+offsets.weapon.y, w = 70, h = icon.h, txt = "Weapon", func = custom.set_current_slot, args = {"weapon"}, hide = true}
+  buttons[1] = {x = pos.x+offsets.weapon.x, y = pos.y+offsets.weapon.y, w = icon.w*2+icon.border, h = icon.h, txt = "Weapon", func = custom.set_current_slot, args = {"weapon"}, hide = true}
   local txt = custom.weapon_info(loadouts[current_loadout].weapon)
-  infoboxes[#infoboxes+1] = {x = pos.x+offsets.weapon.x, y = pos.y+offsets.weapon.y, w = 70, h = icon.h, box = gui.text_size(txt, 128), txt = txt}
+  local w, h = gui.text_size(txt, 128)
+  infoboxes[#infoboxes+1] = {x = pos.x+offsets.weapon.x, y = pos.y+offsets.weapon.y, w = w, h = h, hit = {w = icon.w*2+icon.border, h = icon.h}, txt = txt}
   for i, v in ipairs(offsets.abilities) do
     buttons[i+1]  = {x = pos.x+v.x, y = pos.y+v.y, w = icon.w, h = icon.h, txt = tostring(i), func = custom.set_current_slot, args = {i}, hide = true}
     txt = custom.ability_info(loadouts[current_loadout].abilities[i])
-    infoboxes[#infoboxes+1] = {x = pos.x+v.x, y = pos.y+v.y, w = icon.w, h = icon.h, box = gui.text_size(txt, 128), txt = txt}
+    local w, h = gui.text_size(txt, 128)
+    infoboxes[#infoboxes+1] = {x = pos.x+v.x, y = pos.y+v.y, w = w, h = h, hit = {w = icon.w, h = icon.h}, txt = txt}
   end
   gui.add(3, buttons, {}, infoboxes)
 end
@@ -98,11 +100,13 @@ custom.set_current_slot = function(type)
     if type == "weapon" then
       buttons[#buttons+1] = {x = v.x, y = v.y, w= v.w, h = v.h, txt = tostring(v.num), func = custom.change_weapon, args = {v.num}, hide = true}
       local txt = custom.weapon_info(v.num)
-      infoboxes[#infoboxes+1] = {x = v.x, y = v.y, w= v.w, h = v.h, box = gui.text_size(txt, 128), txt = txt}
+      local w, h = gui.text_size(txt, 128)
+      infoboxes[#infoboxes+1] = {x = v.x, y = v.y, w = w, h = h, hit = {w = v.w, h = v.h}, txt = txt}
     else
       buttons[#buttons+1] = {x = v.x, y = v.y, w= v.w, h = v.h, txt = tostring(v.num), func = custom.change_ability, args = {v.num, type}, hide = true}
       local txt = custom.ability_info(v.num)
-      infoboxes[#infoboxes+1] = {x = v.x, y = v.y, w= v.w, h = v.h, box = gui.text_size(txt, 128), txt = txt}
+      local w, h = gui.text_size(txt, 128)
+      infoboxes[#infoboxes+1] = {x = v.x, y = v.y, w= w, h = h, hit = {w = v.w, h = v.h}, txt = txt}
     end
   end
   gui.add(4, buttons, {}, infoboxes)
@@ -114,8 +118,8 @@ custom.get_icon_pos = function(type)
   local icons = {}
   if type == "weapon" then
     for i, v in ipairs(weapons) do
-      w = 70
-      icons[#icons+1] = {x = option_pos.x+x*(w+icon.border)+icon.border+18, y = option_pos.y+y*(icon.h+icon.border)+icon.border, w = w, h = icon.h, num = i}
+      w = icon.w*2+icon.border
+      icons[#icons+1] = {x = option_pos.x+x*(w+icon.border)+icon.border+24, y = option_pos.y+y*(icon.h+icon.border)+icon.border+5, w = w, h = icon.h, num = i}
       x = x + 1
       if x > 2 then
         x = 0
@@ -125,7 +129,7 @@ custom.get_icon_pos = function(type)
   elseif type > 0 then
     for i, v in ipairs(abilities) do
       if (type > 2 and not v.type) or (type < 3 and v.type == weapons[loadouts[current_loadout].weapon].type) then
-        icons[#icons+1] = {x = option_pos.x+x*(icon.w+icon.border)+icon.border+8, y = option_pos.y+y*(icon.h+icon.border)+icon.border, w= icon.w, h = icon.h, num = i}
+        icons[#icons+1] = {x = option_pos.x+x*(icon.w+icon.border)+icon.border+8, y = option_pos.y+y*(icon.h+icon.border)+icon.border+5, w= icon.w, h = icon.h, num = i}
         x = x + 1
       end
       if x > 6 then

@@ -11,13 +11,14 @@ mainmenu.load = function()
 
   textbox.border = (button.h-textbox.h*2)/3
   prompts[1].y = sidebar.button_y(1, button_num)
-  prompts[1].textboxes = {{x = {t = prompts[1], i = "x", o = textbox.border}, y = prompts[1].y+(button.h-textbox.h)/2, w = prompts[1].w-textbox.border*2, h = textbox.h, t = prompts[1], i = "port", sample = "Port"}}
+  prompts[1].textboxes = {{x = {t = prompts[1], i = "x"}, y = prompts[1].y+(button.h-textbox.h)/2, w = prompts[1].w, h = textbox.h, t = prompts[1], i = "port", sample = "Port"}}
 
   prompts[2].y = sidebar.button_y(2, button_num)
-  prompts[2].textboxes = {{x = {t = prompts[2], i = "x", o = textbox.border}, y = prompts[2].y+textbox.border, w = prompts[2].w-textbox.border*2, h = textbox.h, t = prompts[2], i = "ip", sample = "I.P. Address"},
-                          {x = {t = prompts[2], i = "x", o = textbox.border}, y = prompts[2].y+textbox.border*2+textbox.h, w = prompts[2].w-textbox.border*2, h = textbox.h, t = prompts[2], i = "port", sample = "Port"}}
+  prompts[2].textboxes = {{x = {t = prompts[2], i = "x"}, y = prompts[2].y+textbox.border, w = prompts[2].w, h = textbox.h, t = prompts[2], i = "ip", sample = "I.P. Address"},
+                          {x = {t = prompts[2], i = "x"}, y = prompts[2].y+textbox.border*2+textbox.h, w = prompts[2].w, h = textbox.h, t = prompts[2], i = "port", sample = "Port"}}
 
   menu_color = {0.2, 0.4, 1}
+  text_color = {85/255, 81/255, 104/255}
 end
 
 mainmenu.start = function()

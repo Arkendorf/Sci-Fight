@@ -18,7 +18,7 @@ gui.update = function(dt)
         w.a = 0
       end
       local w_x, w_y = gui.get_pos(w)
-      if m_x >= screen.x+w_x*screen.scale and m_x <= screen.x+(w_x+w.w)*screen.scale and m_y >= screen.y+w_y*screen.scale and m_y <= screen.y+(w_y+w.h)*screen.scale then
+      if m_x >= screen.x+w_x*screen.scale and m_x <= screen.x+(w_x+w.hit.w)*screen.scale and m_y >= screen.y+w_y*screen.scale and m_y <= screen.y+(w_y+w.hit.h)*screen.scale then
         if w.a < 1 then
           w.a = w.a + dt * 4
         else
@@ -40,10 +40,7 @@ gui.draw = function()
     for j, w in ipairs(v.textboxes) do
       if not w.hide then
         local x, y = gui.get_pos(w)
-        love.graphics.setColor(menu_color)
-        love.graphics.setLineWidth(2)
-        love.graphics.rectangle("line", math.floor(x), math.floor(y), math.floor(w.w), math.floor(w.h))
-        love.graphics.setColor(1, 1, 1)
+        love.graphics.draw(gui_imgs[6][tostring(w.w).."x"..tostring(w.h)], math.floor(x), math.floor(y))
 
         local string = ""
         if gui.current_box and gui.current_box[1] == i and gui.current_box[2] == j then
@@ -56,7 +53,7 @@ gui.draw = function()
         else
           string = w.t[w.i]
         end
-        love.graphics.print(string, math.floor(x+2), math.floor(y+(w.h-font:getHeight())/2))
+        love.graphics.print(string, math.floor(x+5), math.floor(y+(w.h-font:getHeight())/2)+1)
       end
     end
 
@@ -77,10 +74,9 @@ gui.draw = function()
     for j, w in ipairs(v.infoboxes) do
       local m_x, m_y = love.mouse.getPosition()
       local x, y = m_x/screen.scale-screen.x+6, m_y/screen.scale-screen.y+6
-      love.graphics.setColor(menu_color[1], menu_color[2], menu_color[3], w.a)
-      love.graphics.rectangle("fill", math.floor(x), math.floor(y), math.floor(w.box.w), math.floor(w.box.h))
       love.graphics.setColor(1, 1, 1, w.a)
-      love.graphics.printf(w.txt, math.floor(x+2), math.floor(y+2), math.floor(w.box.w))
+      love.graphics.draw(gui_imgs[6][tostring(w.w).."x"..tostring(w.h)], math.floor(x), math.floor(y))
+      love.graphics.printf(w.txt, math.floor(x+5), math.floor(y+5), math.floor(w.w))
     end
   end
 end
@@ -96,12 +92,12 @@ gui.add = function(num, buttons, textboxes, infoboxes)
   local t = {}
   if textboxes then
     t = textboxes
-    gui.add_imgs(textboxes, 1)
+    gui.add_imgs(textboxes, 6)
   end
   local i = {}
   if infoboxes then
     i = infoboxes
-    gui.add_imgs(infoboxes, 1)
+    gui.add_imgs(infoboxes, 6)
   end
   gui.menus[num] = {buttons = b, textboxes = t, infoboxes = i}
 end
@@ -165,7 +161,7 @@ end
 gui.textinput = function(text)
   if gui.current_box then
     local box = gui.menus[gui.current_box[1]].textboxes[gui.current_box[2]]
-    if font:getWidth(box.t[box.i]..text) <= box.w-4 then
+    if font:getWidth(box.t[box.i]..text) <= box.w-10 then
       box.t[box.i] = box.t[box.i]..text
     end
   end
@@ -173,14 +169,14 @@ end
 
 gui.get_pos = function(w)
   local x, y = 0, 0
-  if type(w.x) == "number" then x = w.x else x = w.x.t[w.x.i]+w.x.o end
-  if type(w.y) == "number" then y = w.y else y = w.y.t[w.y.i]+w.y.o end
+  if type(w.x) == "number" then x = w.x else x = w.x.t[w.x.i] end
+  if type(w.y) == "number" then y = w.y else y = w.y.t[w.y.i] end
   return x, y
 end
 
 gui.text_size = function(txt, limit)
   local w, wrap = font:getWrap(txt, limit)
-  return {w = w+4, h = #wrap*font:getHeight()+4}
+  return w+10, #wrap*font:getHeight()+10
 end
 
 gui.add_imgs = function(list, mat)
@@ -194,14 +190,14 @@ gui.add_imgs = function(list, mat)
 end
 
 gui.new_img = function(mat, w, h)
-  local canvas = love.graphics.newCanvas(w, h)
+  local w = math.ceil(w/16)
+  local h = math.ceil(h/16)
+  local canvas = love.graphics.newCanvas(w*16, h*16)
   love.graphics.setCanvas(canvas)
   love.graphics.clear()
-  local w = math.floor(w/16)-1
-  local h = math.floor(h/16)-1
-  for x = 0, w do
-    for y = 0, h do
-      love.graphics.draw(mat_img[mat], mat_quad[gui.bitmask(x, y, w, h)], x*16, y*16)
+  for x = 0, w-1 do
+    for y = 0, h-1 do
+      love.graphics.draw(mat_img[mat], mat_quad[gui.bitmask(x, y, w-1, h-1)], x*16, y*16)
     end
   end
   love.graphics.setCanvas()
