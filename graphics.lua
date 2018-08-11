@@ -18,6 +18,9 @@ graphics.load = function()
   love.graphics.setLineWidth(1)
   love.graphics.setLineStyle("rough")
 
+  mat_img = graphics.load_folder("art/gui/materials")
+  mat_quad = graphics.load_quad(mat_img[1], 16, 16)
+
   -- load tile images
   tile_img = graphics.load_folder("art/tiles")
   tile_quad = graphics.load_tile_quad(tile_size)

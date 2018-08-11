@@ -52,7 +52,6 @@ local client_hooks = {
     bullet.damage(players[data.index], data.num, data.parent)
   end,
   gameover = function(data)
-    players = data
     wipe.start(clientgame.start_end)
   end,
   hp = function(data)

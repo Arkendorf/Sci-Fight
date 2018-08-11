@@ -1,6 +1,8 @@
 love.keyboard.setKeyRepeat(true)
 local gui = {}
 
+local gui_imgs = {}
+
 gui.load = function()
   gui.clear()
 end
@@ -61,8 +63,11 @@ gui.draw = function()
     for j, w in ipairs(v.buttons) do
       if not w.hide then
         local x, y = gui.get_pos(w)
-        love.graphics.setColor(menu_color)
-        love.graphics.rectangle("fill", math.floor(x), math.floor(y), math.floor(w.w), math.floor(w.h))
+        local mat = 1
+        if w.mat then
+          mat = w.mat.func(unpack(w.mat.args))
+        end
+        love.graphics.draw(gui_imgs[mat][tostring(w.w).."x"..tostring(w.h)], math.floor(x), math.floor(y))
 
         love.graphics.setColor(1, 1, 1)
         love.graphics.print(w.txt, math.floor(x+(w.w-font:getWidth(w.txt))/2), math.floor(y+(w.h-font:getHeight())/2))
@@ -84,14 +89,19 @@ gui.add = function(num, buttons, textboxes, infoboxes)
   local b = {}
   if buttons then
     b = buttons
+    gui.add_imgs(buttons, 1)
+    gui.add_imgs(buttons, 2)
+    gui.add_imgs(buttons, 3)
   end
   local t = {}
   if textboxes then
     t = textboxes
+    gui.add_imgs(textboxes, 1)
   end
   local i = {}
   if infoboxes then
     i = infoboxes
+    gui.add_imgs(infoboxes, 1)
   end
   gui.menus[num] = {buttons = b, textboxes = t, infoboxes = i}
 end
@@ -171,6 +181,48 @@ end
 gui.text_size = function(txt, limit)
   local w, wrap = font:getWrap(txt, limit)
   return {w = w+4, h = #wrap*font:getHeight()+4}
+end
+
+gui.add_imgs = function(list, mat)
+  for i, v in ipairs(list) do
+    if not gui_imgs[mat] then gui_imgs[mat] = {} end
+    local str = tostring(v.w).."x"..tostring(v.h)
+    if not gui_imgs[mat][str] then
+      gui_imgs[mat][str] = gui.new_img(mat, v.w, v.h)
+    end
+  end
+end
+
+gui.new_img = function(mat, w, h)
+  local canvas = love.graphics.newCanvas(w, h)
+  love.graphics.setCanvas(canvas)
+  love.graphics.clear()
+  local w = math.floor(w/16)-1
+  local h = math.floor(h/16)-1
+  for x = 0, w do
+    for y = 0, h do
+      love.graphics.draw(mat_img[mat], mat_quad[gui.bitmask(x, y, w, h)], x*16, y*16)
+    end
+  end
+  love.graphics.setCanvas()
+  return canvas
+end
+
+gui.bitmask = function(x, y, w, h)
+  local value = 1
+  if x > 0 then
+    value = value + 2
+  end
+  if x < w then
+    value = value + 4
+  end
+  if y > 0 then
+    value = value + 1
+  end
+  if y < h then
+    value = value + 8
+  end
+  return value
 end
 
 return gui

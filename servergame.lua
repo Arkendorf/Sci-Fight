@@ -64,7 +64,7 @@ servergame.update = function(dt)
 
   for k, v in pairs(players) do
     if v.score >= win_score then
-      server:sendToAll("gameover", players)
+      server:sendToAll("gameover")
       wipe.start(servergame.start_end)
       break
     end

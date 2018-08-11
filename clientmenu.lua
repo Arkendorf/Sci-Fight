@@ -54,9 +54,9 @@ clientmenu.start = function(ip, port)
     client:on(k, v)
   end
 
-  menu.buttons = sidebar.new({{txt = "Players", func = menu.swap_mode, args = {1}},
-                               {txt ="Loadout", func = menu.swap_mode, args = {2}},
-                               {txt ="Map", func = menu.swap_mode, args = {3}},
+  menu.buttons = sidebar.new({{txt = "Players", func = menu.swap_mode, args = {1}, mat = {func = menu.mat, args = {1}}},
+                               {txt ="Loadout", func = menu.swap_mode, args = {2}, mat = {func = menu.mat, args = {2}}},
+                               {txt ="Map", func = menu.swap_mode, args = {3}, mat = {func = menu.mat, args = {3}}},
                                {txt ="Leave", func = wipe.start, args = {clientmenu.leave}}})
   menu.player_gui = {{x = (screen.w-64)/2, y = (screen.h+256)/2-32, w = 64, h = 32, txt = "Ready", func = clientmenu.ready, args = {id}}}
   menu.start()

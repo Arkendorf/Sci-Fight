@@ -1,7 +1,7 @@
 local custom = {}
 
 local button = {w = 64, h = 48, border = 2}
-local button2 = {w = 84, h = 32, border = 2}
+local button2 = {w = 80, h = 32, border = 2}
 local icon = {w = 32, h = 32, border = 2}
 local current_loadout = 1
 local current_slot = 0
@@ -9,6 +9,8 @@ local offsets = {weapon = {x = 35, y = 5}, abilities = {{x = 35, y = 43}, {x = 7
 local loadout_pos = {}
 local option_pos = {}
 local icons = {}
+
+local custom_imgs = {}
 
 custom.start = function(buttons)
   gui.clear()
@@ -21,7 +23,7 @@ custom.start = function(buttons)
 
   local buttons = {}
   for i, v in ipairs(loadouts) do
-    buttons[i] = {x = (screen.w-(button2.w+button2.border)*#loadouts+button2.border)/2+(i-1)*(button2.w+button2.border), y = (screen.h-256)/2, w = button2.w, h = button2.h, txt = "Loadout "..tostring(i), func = custom.set_current_loadout, args = {i}}
+    buttons[i] = {x = (screen.w-(button2.w+button2.border)*#loadouts+button2.border)/2+(i-1)*(button2.w+button2.border), y = (screen.h-256)/2, w = button2.w, h = button2.h, txt = "Loadout "..tostring(i), func = custom.set_current_loadout, args = {i}, mat = {func = custom.mat, args = {i}}}
   end
   gui.add(2, buttons)
   custom.set_current_loadout(current_loadout)
@@ -34,6 +36,9 @@ custom.load = function()
   end
   loadout_pos = {x = (screen.w-256)/2, y = (screen.h-256)/2+button2.h+button2.border, w = 256, h = 80}
   option_pos = {x = loadout_pos.x, y = loadout_pos.y+loadout_pos.h+button2.border, w = loadout_pos.w, h = 256-loadout_pos.h-button2.h-button2.border*2}
+
+  custom_imgs.loadout = gui.new_img(4, loadout_pos.w, loadout_pos.h)
+  custom_imgs.option = gui.new_img(5, option_pos.w, option_pos.h)
 end
 
 custom.update = function(dt)
@@ -41,10 +46,8 @@ custom.update = function(dt)
 end
 
 custom.draw = function()
-  love.graphics.setColor(menu_color)
-  love.graphics.rectangle("fill", loadout_pos.x, loadout_pos.y, loadout_pos.w, loadout_pos.h)
-  love.graphics.setColor(1, 1, 1)
-  love.graphics.rectangle("fill", option_pos.x, option_pos.y, option_pos.w, option_pos.h)
+  love.graphics.draw(custom_imgs.loadout, loadout_pos.x, loadout_pos.y)
+  love.graphics.draw(custom_imgs.option, option_pos.x, option_pos.y)
 
   love.graphics.draw(weapon_icon[loadouts[current_loadout].weapon], loadout_pos.x+offsets.weapon.x, loadout_pos.y+offsets.weapon.y)
   for i, v in ipairs(offsets.abilities) do
@@ -190,6 +193,14 @@ end
 
 custom.weapon_info = function(num)
   return weapons[num].desc.."\nModifier: x"..tostring(weapons[num].mod)
+end
+
+custom.mat = function(num)
+  if current_loadout == num then
+    return 2
+  else
+    return 1
+  end
 end
 
 return custom

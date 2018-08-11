@@ -44,7 +44,7 @@ menu.update_list = function(dt)
   for k, v in pairs(players) do
     v.x = graphics.zoom(not v.left, v.x, -font:getWidth(v.name), (screen.w-256)/2+2, dt * 12)
     v.y = v.y + (i*16-v.y) * dt * 12
-    if v.left and v.x <= -font:getWidth(v.name) then
+    if v.left and v.x <= -font:getWidth(v.name)+1 then
       players[k] = nil
     end
     if not v.ready then
@@ -114,5 +114,16 @@ menu.mode_start[3] = function()
   menu.mode = 3
   mapselect.start(menu.buttons)
 end
+
+menu.mat = function(num)
+  if num == menu.mode then
+    return 2
+  elseif players[id] and players[id].ready then
+    return 3
+  else
+    return 1
+  end
+end
+
 
 return menu

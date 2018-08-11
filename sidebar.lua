@@ -9,7 +9,7 @@ end
 sidebar.new = function(t)
   local buttons = {}
   for i, v in ipairs(t) do
-    buttons[i] = {x = button.border, y = sidebar.button_y(i, #t), w = button.w, h = button.h, txt = v.txt, func = v.func, args = v.args}
+    buttons[i] = {x = button.border, y = sidebar.button_y(i, #t), w = button.w, h = button.h, txt = v.txt, func = v.func, args = v.args, mat = v.mat}
   end
   return buttons
 end

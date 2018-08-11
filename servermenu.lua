@@ -48,9 +48,9 @@ servermenu.start = function(port)
     server:on(k, v)
   end
 
-  menu.buttons = sidebar.new({{txt = "Players", func = menu.swap_mode, args = {1}},
-                               {txt ="Loadout", func = menu.swap_mode, args = {2}},
-                               {txt ="Map", func = menu.swap_mode, args = {3}},
+  menu.buttons = sidebar.new({{txt = "Players", func = menu.swap_mode, args = {1}, mat = {func = menu.mat, args = {1}}},
+                               {txt ="Loadout", func = menu.swap_mode, args = {2}, mat = {func = menu.mat, args = {2}}},
+                               {txt ="Map", func = menu.swap_mode, args = {3}, mat = {func = menu.mat, args = {3}}},
                                {txt ="Leave", func = wipe.start, args = {servermenu.leave}}})
   menu.player_gui = {{x = (screen.w-64)/2, y = (screen.h+256)/2-32, w = 64, h = 32, txt = "Ready", func = servermenu.ready, args = {id}}}
   menu.start()
@@ -130,25 +130,31 @@ servermenu.player_buttons = function()
   local buttons = {}
   local i = 0
   for k, v in pairs(players) do
-    local y = (screen.h-256)/2+i*16
-    buttons[#buttons+1] = {x = (screen.w-256)/2, y = y, w = 256, h = 16, txt = "Pick Team", func = servermenu.team_buttons, args = {k, y}, hide = true}
-    i = i + 1
+    if not v.left then
+      local y = (screen.h-256)/2+i*16
+      buttons[#buttons+1] = {x = (screen.w-256)/2, y = y, w = 256, h = 16, txt = "Pick Team", func = servermenu.team_buttons, args = {k, y}, hide = true}
+      i = i + 1
+    end
   end
   return buttons
 end
 
 servermenu.team_buttons = function(k, y)
-  if y == team_select then
-    gui.remove(3)
-    team_select = false
-  else
-    local x = (screen.w-256)/2
-    local buttons = {{x = x+3, y = y+3, w = 10, h = 10, txt = "0", func = servermenu.swap_teams, args = {k, 0}, hide = true}}
-    for i, v in ipairs(team_colors) do
-      buttons[i+1] = {x = x+i*16+3, y = y+3, w = 10, h = 10, txt = tostring(i), func = servermenu.swap_teams, args = {k, i}, hide = true}
+  if players[k] and not players[k].left then
+    if y == team_select then
+      gui.remove(3)
+      team_select = false
+    else
+      local x = (screen.w-256)/2
+      local buttons = {{x = x+3, y = y+3, w = 10, h = 10, txt = "0", func = servermenu.swap_teams, args = {k, 0}, hide = true}}
+      for i, v in ipairs(team_colors) do
+        buttons[i+1] = {x = x+i*16+3, y = y+3, w = 10, h = 10, txt = tostring(i), func = servermenu.swap_teams, args = {k, i}, hide = true}
+      end
+      gui.add(3, buttons)
+      team_select = y
     end
-    gui.add(3, buttons)
-    team_select = y
+  else
+    servermenu.player_buttons()
   end
 end
 

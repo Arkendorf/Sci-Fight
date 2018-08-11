@@ -4,6 +4,7 @@ local icon = {w = 82, h = 40, border = 2}
 local option_pos = {}
 local icons = {}
 local current = 1
+local mapselect_imgs = {}
 
 mapselect.load = function()
   local files = love.filesystem.getDirectoryItems("maps")
@@ -13,6 +14,9 @@ mapselect.load = function()
   end
 
   option_pos = {x = (screen.w-256)/2, y = (screen.h-256)/2+66, w = 256, h = 190}
+
+  mapselect_imgs.header = gui.new_img(4, option_pos.w, 64)
+  mapselect_imgs.option = gui.new_img(5, option_pos.w, option_pos.h)
 end
 
 mapselect.start = function(buttons)
@@ -33,11 +37,9 @@ mapselect.update = function(dt)
 end
 
 mapselect.draw = function(dt)
-  love.graphics.setColor(menu_color)
-  love.graphics.rectangle("fill", option_pos.x, option_pos.y-66, option_pos.w, 64)
-  love.graphics.setColor(1, 1, 1)
+  love.graphics.draw(mapselect_imgs.header, option_pos.x, option_pos.y-66)
   love.graphics.printf("Map Vote:\n"..maps[current].name, option_pos.x, option_pos.y-42, option_pos.w, "center")
-  love.graphics.rectangle("fill", option_pos.x, option_pos.y, option_pos.w, option_pos.h)
+  love.graphics.draw(mapselect_imgs.option, option_pos.x, option_pos.y)
   for i, v in ipairs(icons) do
     if current == i then
       love.graphics.draw(map_icon[maps[current].name], v.x, v.y)
