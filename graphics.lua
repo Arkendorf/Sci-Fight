@@ -163,7 +163,7 @@ graphics.bitmask_floor = function(x, y, z, w, h, tile)
 end
 
 graphics.match = function(x, y, z, tile)
-  return (grid[z][y][x] == tile and (z == 1 or grid[z-1][y][x] == 0))
+  return grid[z][y][x] == tile
 end
 
 graphics.draw_wall = function(x, y, z, tile)

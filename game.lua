@@ -128,8 +128,6 @@ end
 -- map functions
 game.draw_tiles = function(x, y, z, tile)
   if tile > 0 then
-    local bright = 1.01-z*0.01 -- slightly darken every layer for readability
-    love.graphics.setColor(bright, bright, bright)
     -- floor
     if not map.floor_block(x, y, z) then
       graphics.draw_floor(x, y, z, tile)
