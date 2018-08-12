@@ -9,6 +9,8 @@ graphics.load = function()
   screen.h = love.graphics.getHeight() / screen.scale
   screen.canvas = love.graphics.newCanvas(screen.w, screen.h)
 
+  -- love.graphics.setBackgroundColor(44/255,23/255, 99/255)
+
   font = love.graphics.newImageFont("font.png",
   " abcdefghijklmnopqrstuvwxyz" ..
   "ABCDEFGHIJKLMNOPQRSTUVWXYZ0" ..
@@ -24,6 +26,10 @@ graphics.load = function()
   -- load tile images
   tile_img = graphics.load_folder("art/tiles")
   tile_quad = graphics.load_tile_quad(tile_size)
+
+  -- tile shadows
+  tileshadow_img = love.graphics.newImage("art/tileshadow.png")
+  tileshadow_quad = graphics.load_quad(tileshadow_img, 32, 32)
 
   local img, quad = graphics.load_folder("art/bullets", 32, 32)
   bullet_img = img

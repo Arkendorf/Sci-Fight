@@ -181,10 +181,12 @@ end
 
 gui.add_imgs = function(list, mat)
   for i, v in ipairs(list) do
-    if not gui_imgs[mat] then gui_imgs[mat] = {} end
-    local str = tostring(v.w).."x"..tostring(v.h)
-    if not gui_imgs[mat][str] then
-      gui_imgs[mat][str] = gui.new_img(mat, v.w, v.h)
+    if not v.hide then
+      if not gui_imgs[mat] then gui_imgs[mat] = {} end
+      local str = tostring(v.w).."x"..tostring(v.h)
+      if not gui_imgs[mat][str] then
+        gui_imgs[mat][str] = gui.new_img(mat, v.w, v.h)
+      end
     end
   end
 end

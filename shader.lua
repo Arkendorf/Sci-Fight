@@ -33,12 +33,9 @@ shader.layer = love.graphics.newShader[[
           if((mask_pixel.z > 1.014-0.010*coords.z) && (mask_pixel.y < 1.014-0.010*coords.y)){
             return xray_color;
           }
-          return pixel*color;
         }
       }
-      else{
-        return vec4(0, 0, 0, 0);
-      }
+      return pixel*color;
     }
   ]]
 

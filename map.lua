@@ -57,6 +57,21 @@ map.iterate = function(func)
   end
 end
 
+map.column = function(x, y, z)
+  local new_ox = -1
+  local new_oy = -1
+  for new_z = 1, z do
+    new_x = x-(z-new_z+1)
+    new_y = y-(z-new_z+1)
+    if new_x >= 1 and new_x <= #grid[1][1] and new_y >= 1 and new_y <= #grid[1] then
+      if grid[new_z][new_y][new_x] > 0 then
+        return true
+      end
+    end
+  end
+  return false
+end
+
 map.set = function(num)
   grid = maps[num].grid
 
@@ -77,16 +92,14 @@ map.set = function(num)
   love.graphics.setShader()
   shader.layer:send("mask", layer_mask)
 
-  -- reset
-  love.graphics.setColor(1, 1, 1)
-  love.graphics.setCanvas()
-
-  shadow_canvas = love.graphics.newCanvas(x, y)
-
   map_canvas = love.graphics.newCanvas(x, y)
   love.graphics.setCanvas(map_canvas)
   love.graphics.clear()
   map.iterate(game.draw_tiles)
+  map.iterate(game.draw_tile_shadows) -- draw tile shadows
+
+  -- reset
+  love.graphics.setColor(1, 1, 1)
   love.graphics.setCanvas()
 end
 

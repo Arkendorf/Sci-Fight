@@ -35,8 +35,6 @@ local server_hooks = {
   end,
 }
 
-local team_select = false
-
 servermenu.load = function()
 end
 
@@ -71,16 +69,22 @@ end
 servermenu.draw = function()
   if menu.mode == 1 then
     menu.draw_list()
-    if team_select then
+    if menu.team_select then
+      local i = 0
+      for k, v in pairs(players) do
+        if k == menu.team_select then
+          break
+        end
+        i = i + 1
+      end
       local x = (screen.w-256)/2
-      love.graphics.setColor(menu_color)
-      love.graphics.rectangle("fill", x, team_select, 256, 16)
-      love.graphics.setColor(1, 1, 1)
-      love.graphics.rectangle("line", x+4, team_select+4, 8, 8)
+      local y = (screen.h-256)/2+i*16
+      love.graphics.rectangle("line", x+6, y+6, 7, 7)
       for i, v in ipairs(team_colors) do
         love.graphics.setColor(v)
-        love.graphics.rectangle("fill", x+i*16+3, team_select+3, 10, 10)
+        love.graphics.rectangle("fill", x+i*10+5, y+5, 8, 8)
       end
+      love.graphics.setColor(1, 1, 1)
     end
   else
     menu.draw()
@@ -132,26 +136,34 @@ servermenu.player_buttons = function()
   for k, v in pairs(players) do
     if not v.left then
       local y = (screen.h-256)/2+i*16
-      buttons[#buttons+1] = {x = (screen.w-256)/2, y = y, w = 256, h = 16, txt = "Pick Team", func = servermenu.team_buttons, args = {k, y}, hide = true}
+      buttons[#buttons+1] = {x = (screen.w-256)/2, y = y, w = 256, h = 16, txt = "Pick Team", func = servermenu.team_buttons, args = {k}, hide = true}
       i = i + 1
     end
   end
   return buttons
 end
 
-servermenu.team_buttons = function(k, y)
+servermenu.team_buttons = function(k)
   if players[k] and not players[k].left then
-    if y == team_select then
+    if k == menu.team_select then
       gui.remove(3)
-      team_select = false
+      menu.team_select = false
     else
+      local i = 0
+      for test_k, v in pairs(players) do        
+        if test_k == k then
+          break
+        end
+        i = i + 1
+      end
       local x = (screen.w-256)/2
-      local buttons = {{x = x+3, y = y+3, w = 10, h = 10, txt = "0", func = servermenu.swap_teams, args = {k, 0}, hide = true}}
+      local y = (screen.h-256)/2+i*16
+      local buttons = {{x = x+4, y = y+4, w = 0, h = 10, txt = "0", func = servermenu.swap_teams, args = {k, 0}, hide = true}}
       for i, v in ipairs(team_colors) do
-        buttons[i+1] = {x = x+i*16+3, y = y+3, w = 10, h = 10, txt = tostring(i), func = servermenu.swap_teams, args = {k, i}, hide = true}
+        buttons[i+1] = {x = x+i*10+4, y = y+4, w = 10, h = 10, txt = tostring(i), func = servermenu.swap_teams, args = {k, i}, hide = true}
       end
       gui.add(3, buttons)
-      team_select = y
+      menu.team_select = k
     end
   else
     servermenu.player_buttons()
@@ -162,7 +174,7 @@ servermenu.swap_teams = function(k, num)
   players[k].team = num
   server:sendToAll("team", {index = k, team = num})
   gui.remove(3)
-  team_select = false
+  menu.team_select = false
 end
 
 servermenu.quit = function()

@@ -15,10 +15,15 @@ team_colors = {
 menu.mode = 1
 menu.buttons = {}
 menu.player_gui = {}
+menu.team_select = false
+
+local menu_imgs = {}
 
 menu.load = function()
   clientmenu.load()
   servermenu.load()
+
+  menu_imgs.back = gui.new_img(5, 256, 192)
 end
 
 menu.start = function()
@@ -66,20 +71,18 @@ end
 menu.draw_list = function()
   local x = (screen.w-256)/2
   local y = (screen.h-256)/2
-  for i = 0, 11 do
-    love.graphics.setColor(menu_color)
-    love.graphics.rectangle("line", x, y+i*16, 256, 16)
-    love.graphics.setColor(1, 1, 1)
-  end
+  love.graphics.draw(menu_imgs.back, x, y)
   local i = 0
   for k, v in pairs(players) do
-    if v.team > 0 then
-      love.graphics.setColor(team_colors[v.team])
+    if menu.team_select ~= k then
+      if v.team > 0 then
+        love.graphics.setColor(team_colors[v.team])
+      end
+      love.graphics.print(v.name, v.x+5, y+v.y+5)
+      love.graphics.setColor(1, 1, 1)
     end
-    love.graphics.print(v.name, v.x, y+v.y+4)
-    love.graphics.setColor(1, 1, 1)
     if v.ready then
-      love.graphics.print("Ready", x+254-font:getWidth("Ready"), y+i*16+4)
+      love.graphics.print("Ready", x+251-font:getWidth("Ready"), y+i*16+5)
     end
     i = i + 1
   end

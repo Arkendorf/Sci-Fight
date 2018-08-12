@@ -58,6 +58,7 @@ game.draw = function()
   game.draw_queue()
   -- target
   love.graphics.circle("line", players[id].target.x, players[id].target.y+players[id].target.z, 12, 24)
+  -- love.graphics.draw(shadow_mask)
 
   love.graphics.pop()
   -- draw hud
@@ -108,7 +109,7 @@ game.shadow = function(v)
       r = v.r
     end
     shader.shadow:send("z", z_offset+1)
-    love.graphics.setColor(0.2, 0.2, 0.3, 1-diffuse)
+    love.graphics.setColor(0.2, 0.2, 0.3, 0.5-diffuse/2)
     love.graphics.circle("fill", math.ceil(v.x+v.l/2), math.ceil(v.y+v.w/2+z_offset*tile_size), r*(1+diffuse), 24)
   end
   love.graphics.setColor(1, 1, 1)
@@ -116,7 +117,6 @@ game.shadow = function(v)
 end
 
 game.draw_shadows = function()
-  map.iterate(game.draw_tile_shadows) -- draw tile shadows
   table.sort(queue, function(a, b) return a.z < b.z end)
   for i, v in ipairs(queue) do -- draw object shadows
     if v.shadow then
@@ -128,28 +128,35 @@ end
 -- map functions
 game.draw_tiles = function(x, y, z, tile)
   if tile > 0 then
-    if tiles[tile] == 3 then
-    else
-      -- floor
-      if not map.floor_block(x, y, z) then
-        graphics.draw_floor(x, y, z, tile)
-      end
+    local bright = 1.01-z*0.01 -- slightly darken every layer for readability
+    love.graphics.setColor(bright, bright, bright)
+    -- floor
+    if not map.floor_block(x, y, z) then
+      graphics.draw_floor(x, y, z, tile)
+    end
 
-      -- wall
-      if not map.wall_block(x , y, z) then
-        graphics.draw_wall(x, y, z, tile)
-      end
+    -- wall
+    if not map.wall_block(x , y, z) then
+      graphics.draw_wall(x, y, z, tile)
     end
   end
+  love.graphics.setColor(1, 1, 1)
 end
 
 game.draw_tile_shadows = function(x, y, z, tile)
   if tile > 0 then
-    local block, pos = map.vert_block(x, y, z)
-    if block and not map.floor_block(x, y, z) then
-      local diffuse = (z-pos-1)/3
-      love.graphics.setColor(0.2, 0.2, 0.3, 1-diffuse)
-      love.graphics.rectangle("fill", (x-1)*tile_size, (y+z-2)*tile_size, tile_size, tile_size)
+    if not map.floor_block(x, y, z) then
+      if z > 1 then
+        love.graphics.setColor(0.2, 0.2, 0.3, 0.5)
+        if map.column(x, y, z-1) or map.column(x+1, y+1, z-1) then
+          love.graphics.draw(tileshadow_img, tileshadow_quad[3], (x-1)*tile_size, (y+z-2)*tile_size)
+        elseif map.column(x+1, y, z-1) then
+          love.graphics.draw(tileshadow_img, tileshadow_quad[1], (x-1)*tile_size, (y+z-2)*tile_size)
+        elseif map.column(x, y+1, z-1) then
+          love.graphics.draw(tileshadow_img, tileshadow_quad[2], (x-1)*tile_size, (y+z-2)*tile_size)
+        end
+        love.graphics.setColor(1, 1, 1)
+      end
     end
   end
 end
@@ -169,7 +176,7 @@ end
 game.draw_shadow_mask = function(x, y, z, tile)
   if tile > 0 then
     love.graphics.setColor(1.01 - 0.01*z, 0, 0)
-    if not map.floor_block(x, y, z) and not map.vert_block(x, y, z) then
+    if not map.floor_block(x, y, z) then
       love.graphics.rectangle("fill", (x-1)*tile_size, (y+z-2)*tile_size, tile_size, tile_size)
     end
   end
