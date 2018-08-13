@@ -30,6 +30,7 @@ graphics.load = function()
   -- tile shadows
   tileshadow_img = love.graphics.newImage("art/tileshadow.png")
   tileshadow_quad = graphics.load_quad(tileshadow_img, 32, 32)
+  tileborder_img = love.graphics.newImage("art/tileborder.png")
 
   local img, quad = graphics.load_folder("art/bullets", 32, 32)
   bullet_img = img
@@ -41,6 +42,8 @@ graphics.load = function()
 
   weapon_img, weapon_quad, weapon_info = graphics.load_doublefolder("art/weaponimgs", 64, 64)
   char_img, char_quad, char_info = graphics.load_doublefolder("art/charimgs", 24, 48, graphics.load_face_quad)
+
+  shadow_color = {86/255, 81/255, 104/255}
 end
 
 graphics.load_doublefolder = function(str, tw, th, quadfunc)
@@ -122,79 +125,54 @@ graphics.draw_floor = function(x, y, z, tile)
   for w = 0, 1 do
     for h = 0, 1 do
       local corner = w+h*2+1
-      local type = graphics.bitmask_floor(x, y, z, w, h, tile)
-      love.graphics.draw(tile_img[tile], tile_quad[1][corner][type], (x-1+w/2)*tile_size, (y+z-2+h/2)*tile_size)
+      love.graphics.draw(tile_img[tile], tile_quad[1][corner][graphics.bitmask_tile(x, y, z, w, h, tile, graphics.floor_func)], (x-1+w/2)*tile_size, (y+z-2+h/2)*tile_size)
+      love.graphics.setColor(0.2, 0.2, 0.3, 0.5)
+      love.graphics.draw(tileborder_img, tile_quad[1][corner][graphics.bitmask_tile(x, y, z, w, h, tile, graphics.border_func)], (x-1+w/2)*tile_size, (y+z-2+h/2)*tile_size)
+      love.graphics.setColor(1, 1, 1)
     end
   end
-end
-
-graphics.bitmask_floor = function(x, y, z, w, h, tile)
-  -- determine value
-  local value = 3
-  local right = (w > 0 and x < #grid[1][1])
-  local left = (w < 1 and x > 1)
-  local down = (h > 0 and y < #grid[1])
-  local up = (h < 1 and y > 1)
-  local side_type = 4
-  -- direct sides
-  if (right and graphics.match(x+1, y, z, tile)) or (left and graphics.match(x-1, y, z, tile)) then
-    value = value + 2
-  else -- for resolving type conflict
-    side_type = 5
-  end
-  if (down and graphics.match(x, y+1, z, tile)) or (up and graphics.match(x, y-1, z, tile)) then
-    value = value + 2
-  end
-  -- diagonals
-  if (right and down and graphics.match(x+1, y+1, z, tile)) or (right and up and graphics.match(x+1, y-1, z, tile)) or (left and up and graphics.match(x-1, y-1, z, tile)) or (left and down and graphics.match(x-1, y+1, z, tile)) then
-    value = value + 1
-  end
-
-  -- translate value
-  if value < 5 then
-    return 2
-  elseif value < 7 then
-    return side_type
-  elseif value < 8 then
-    return 1
-  else
-    return 3
-  end
-end
-
-graphics.match = function(x, y, z, tile)
-  return grid[z][y][x] == tile
 end
 
 graphics.draw_wall = function(x, y, z, tile)
   for w = 0, 1 do
     for h = 0, 1 do
       local corner = w+h*2+1
-      local type = graphics.bitmask_wall(x, y, z, w, h, tile)
-      love.graphics.draw(tile_img[tile], tile_quad[2][corner][type], (x-1+w/2)*tile_size, (y+z-1+h/2)*tile_size)
+      love.graphics.draw(tile_img[tile], tile_quad[2][corner][graphics.bitmask_tile(x, y, z, w, h, tile, graphics.wall_func)], (x-1+w/2)*tile_size, (y+z-1+h/2)*tile_size)
     end
   end
 end
 
-graphics.bitmask_wall = function(x, y, z, w, h, tile)
+graphics.floor_func = function(x, y, z, ox, oy, tile)
+  return (map.in_bounds(x+ox, y+oy, z) and grid[z][y+oy][x+ox] == tile)
+end
+
+graphics.wall_func = function(x, y, z, ox, oy, tile)
+  return (map.in_bounds(x+ox, y, z+oy) and grid[z+oy][y][x+ox] == tile)
+end
+
+graphics.border_func = function(x, y, z, ox, oy, tile)
+  return (not map.in_bounds(x+ox, y+oy, z) or not map.floor_block(x+ox, y+oy, z))
+end
+
+graphics.bitmask_tile = function(x, y, z, w, h, tile, func)
   -- determine value
   local value = 3
-  local right = (w > 0 and x < #grid[1][1])
-  local left = (w < 1 and x > 1)
-  local down = (h > 0 and z < #grid)
-  local up = (h < 1 and z > 1)
+  local right = (w > 0)
+  local left = (w < 1)
+  local down = (h > 0)
+  local up = (h < 1)
   local side_type = 4
   -- direct sides
-  if (right and graphics.match_wall(x+1, y, z, tile)) or (left and graphics.match_wall(x-1, y, z, tile)) then
+  if (right and func(x, y, z, 1, 0, tile)) or (left and func(x, y, z, -1, 0, tile)) then
     value = value + 2
   else -- for resolving type conflict
     side_type = 5
   end
-  if (down and graphics.match_wall(x, y, z+1, tile)) or (up and graphics.match_wall(x, y, z-1, tile)) then
+  if (down and func(x, y, z, 0, 1, tile)) or (up and func(x, y, z, 0, -1, tile)) then
     value = value + 2
   end
   -- diagonals
-  if (right and down and graphics.match_wall(x+1, y, z+1, tile)) or (right and up and graphics.match_wall(x+1, y, z-1, tile)) or (left and up and graphics.match_wall(x-1, y, z-1, tile)) or (left and down and graphics.match_wall(x-1, y, z+1, tile)) then
+  if (right and down and func(x, y, z, 1, 1, tile)) or (right and up and func(x, y, z, 1, -1, tile)) or (left and up and func(x, y, z, -1, -1, tile)) or (left and down and func(x, y, z, -1, 1, tile)) then
     value = value + 1
   end
 
@@ -208,10 +186,6 @@ graphics.bitmask_wall = function(x, y, z, w, h, tile)
   else
     return 3
   end
-end
-
-graphics.match_wall = function(x, y, z, tile)
-  return (grid[z][y][x] == tile and (y == #grid[1] or grid[z][y+1][x] == 0))
 end
 
 graphics.spritesheet = function(img, tw, th)

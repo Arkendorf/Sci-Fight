@@ -72,6 +72,10 @@ map.column = function(x, y, z)
   return false
 end
 
+map.in_bounds = function(x, y, z)
+  return (x >= 1 and x <= #grid[1][1] and y >= 1 and y <= #grid[1] and z >= 1 and z <= #grid)
+end
+
 map.set = function(num)
   grid = maps[num].grid
 
