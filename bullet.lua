@@ -175,15 +175,15 @@ bullet.reverse = function(v, face)
 end
 
 bullet.new = function(p1, p2, parent, type, extra)
-  local weapon_pos = char.get_weapon_pos(players[parent])
-  local x1, y1, z1 = p1.x+p1.l/2+weapon_pos.x, p1.y+p1.w/2+weapon_pos.y, p1.z+p1.h/2+weapon_pos.z
+  local x1, y1, z1 = p1.x+p1.l/2, p1.y+p1.w/2, p1.z+p1.h/2
   local l_x, l_y, l_z = p2.x-x1, p2.y-y1, p2.z-z1
   local xV = math.cos(math.atan2(math.sqrt(l_y*l_y+l_z*l_z), l_x))
   local yV = math.cos(math.atan2(math.sqrt(l_z*l_z+l_x*l_x), l_y))
   local zV = math.cos(math.atan2(math.sqrt(l_x*l_x+l_y*l_y), l_z))
   local info = bullet_info[type]
   local spot = #bullets+1
-  bullets[spot] = {x = x1, y = y1, z = z1, xV = xV*info.speed, yV = yV*info.speed, zV = zV*info.speed, angle = math.atan2(yV+zV, xV), parent = parent, type = type, info = extra, freeze = 0, frame = 1}
+  local weapon_pos = char.get_weapon_pos(players[parent])
+  bullets[spot] = {x = x1+weapon_pos.x, y = y1+weapon_pos.y, z = z1+weapon_pos.z, xV = xV*info.speed, yV = yV*info.speed, zV = zV*info.speed, angle = math.atan2(yV+zV, xV), parent = parent, type = type, info = extra, freeze = 0, frame = 1}
   return spot
 end
 

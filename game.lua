@@ -110,7 +110,7 @@ game.shadow = function(v)
     end
     shader.shadow:send("z", z_offset+1)
     love.graphics.setColor(0.2, 0.2, 0.3, 0.5-diffuse/2)
-    love.graphics.circle("fill", math.ceil(v.x+v.l/2), math.ceil(v.y+v.w/2+z_offset*tile_size), r*(1+diffuse), 24)
+    love.graphics.circle("fill", math.floor(v.x+v.l/2), math.floor(v.y+v.w/2+z_offset*tile_size), r*(1+diffuse), 24)
   end
   love.graphics.setColor(1, 1, 1)
   love.graphics.setShader()

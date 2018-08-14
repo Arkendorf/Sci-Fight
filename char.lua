@@ -7,25 +7,33 @@ local energy_increase = 0.1
 hp_max = 100
 
 local tile_buffer = 8
-local death_inv = 4
+local death_inv = 1
 
 char.load = function()
 end
 
 char.input = function(dt)
   --input
+  local add = {x = 0, y = 0}
   if love.keyboard.isDown("w") then
-    players[id].yV = players[id].yV - .5 * players[id].speed
+    add.y = add.y - 1
   end
   if love.keyboard.isDown("s") then
-    players[id].yV = players[id].yV + 0.5 * players[id].speed
+    add.y = add.y + 1
   end
   if love.keyboard.isDown("a") then
-    players[id].xV = players[id].xV - 0.5 * players[id].speed
+    add.x = add.x - 1
   end
   if love.keyboard.isDown("d") then
-    players[id].xV = players[id].xV + 0.5 * players[id].speed
+    add.x = add.x + 1
   end
+  local norm = math.sqrt(add.x*add.x+add.y*add.y)
+  if norm > 0 then -- don't divide by zero!
+    local mag = .5 * players[id].speed
+    players[id].xV = players[id].xV + add.x/norm*mag
+    players[id].yV = players[id].yV + add.y/norm*mag
+  end
+
   if love.keyboard.isDown("space") and not players[id].jump then
     players[id].zV = players[id].zV - 4
     players[id].jump = true
