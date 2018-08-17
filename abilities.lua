@@ -82,7 +82,7 @@ desc = "Fire a laser that passes through floors and walls",
 abilities[5] = { -- rapid reload
 press_func = function(player, index, target)
   -- weapon animation
-  char.weapon_anim(index, "reload", 30)
+  char.weapon_anim(index, "reload", 38)
   server:sendToAll("weaponanim", {index = index, anim = "reload", speed = 30})
 end,
 delay = 7,

@@ -26,8 +26,26 @@ weapons[4] = { -- saber
 
 weapons[5] = { -- blaster
   type = 2,
-  desc = "Blaster",
+  desc = "Blaster Rifle",
   mod = 1,
+}
+
+weapons[6] = { -- blaster
+  type = 2,
+  desc = "Rough Pistol",
+  mod = 0.8,
+}
+
+weapons[7] = { -- blaster
+  type = 2,
+  desc = "Long-Range Blaster",
+  mod = 1.2,
+}
+
+weapons[8] = { -- blaster
+  type = 2,
+  desc = "Refined Pistol",
+  mod = 0.6,
 }
 
 
