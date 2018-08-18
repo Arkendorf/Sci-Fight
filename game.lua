@@ -6,6 +6,7 @@ shader = require "shader"
 clientgame = require "clientgame"
 servergame = require "servergame"
 bullet = require "bullet"
+particle = require "particle"
 hud = require "hud"
 
 local game = {}
@@ -14,6 +15,7 @@ game.load = function()
   map.load()
   char.load()
   bullet.load()
+  particle.load()
   clientgame.load()
   servergame.load()
   hud.load()
@@ -26,6 +28,7 @@ end
 game.start = function()
   gui.clear()
   bullets = {}
+  particles = {}
   for k, v in pairs(players) do
     v.canvas = love.graphics.newCanvas(88, 88)
   end
@@ -35,11 +38,13 @@ game.update = function(dt)
   -- normal updates
   char.update(dt)
   bullet.update(dt)
+  particle.update(dt)
   hud.update(dt)
   -- create drawing queue
   queue = {}
   char.queue()
   bullet.queue()
+  particle.queue()
   -- update masks (e.g. layer and shadow)
   map.update_masks()
 end
@@ -187,6 +192,12 @@ game.target_norm = function(p, t, range)
   local x, y, z = t.x-p.x-p.l/2, t.y-p.y-p.w/2, t.z-p.z-p.h/2
   local denom = math.sqrt(x*x+y*y+z*z)
   return {x = x/denom*range, y = y/denom*range, z = z/denom*range}
+end
+
+game.angle_norm = function(norm, angle)
+  local c_angle = math.atan2(norm.y+norm.z, norm.x)
+  local c_angle = c_angle + angle
+  return {x = math.cos(c_angle), y = math.sin(c_angle), z = norm.z}
 end
 
 game.target_pos = function(p, t, range)

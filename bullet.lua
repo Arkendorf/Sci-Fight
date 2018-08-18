@@ -9,16 +9,16 @@ bullet.load = function()
   bullets = {}
 
   bullet_info = {}
-  bullet_info.laser = {ai = 1, speed = 6, r = 0, dmg = 10, img = 1}
-  bullet_info.powerlaser = {ai = 1, speed = 6, r = 0, dmg = 20, img = 1}
-  bullet_info.charge = {ai = 5, speed = 6.3, r = 0, dmg = 10, img = 2, explosion = {dmg = 0, r = 24}}
-  bullet_info.pierce = {ai = 1, speed = 7, r = 0, dmg = 25, img = 3, pierce = true}
-  bullet_info.missile = {ai = 4, speed = 2.2, r = 12, dmg = 0, img = 4, shadow = true, explosion = {dmg = 20, r = 32}}
-  bullet_info.grenade = {ai = 3, speed = 3, r = 12, dmg = 0, persistant = true, img = 5, shadow = true, explosion = {dmg = 30, r = 64}}
-  bullet_info.saber1 = {ai = 2, speed = 4, r = 16, dmg = 25, persistant = true, img = 6, shadow = true, anim_speed = 30}
-  bullet_info.saber2 = {ai = 2, speed = 4, r = 16, dmg = 25, persistant = true, img = 7, shadow = true, anim_speed = 30}
-  bullet_info.saber3 = {ai = 2, speed = 4, r = 16, dmg = 25, persistant = true, img = 8, shadow = true, anim_speed = 30}
-  bullet_info.saber4 = {ai = 2, speed = 4, r = 16, dmg = 25, persistant = true, img = 9, shadow = true, anim_speed = 30}
+  bullet_info.laser = {ai = 1, speed = 6, r = 0, dmg = 10, img = "laser"}
+  bullet_info.powerlaser = {ai = 1, speed = 6, r = 0, dmg = 20, img = "laser"}
+  bullet_info.charge = {ai = 5, speed = 6.3, r = 0, dmg = 10, img = "charge", explosion = {dmg = 0, r = 24}}
+  bullet_info.pierce = {ai = 1, speed = 7, r = 0, dmg = 25, img = "pierce", pierce = true}
+  bullet_info.missile = {ai = 4, speed = 2.2, r = 12, dmg = 0, img = "missile", shadow = true, explosion = {dmg = 20, r = 32}}
+  bullet_info.grenade = {ai = 3, speed = 3, r = 12, dmg = 0, persistant = true, img = "grenade", shadow = true, explosion = {dmg = 30, r = 64}}
+  bullet_info.saber1 = {ai = 2, speed = 4, r = 16, dmg = 25, persistant = true, img = "saber1", shadow = true, anim_speed = 30}
+  bullet_info.saber2 = {ai = 2, speed = 4, r = 16, dmg = 25, persistant = true, img = "saber2", shadow = true, anim_speed = 30}
+  bullet_info.saber3 = {ai = 2, speed = 4, r = 16, dmg = 25, persistant = true, img = "saber3", shadow = true, anim_speed = 30}
+  bullet_info.saber4 = {ai = 2, speed = 4, r = 16, dmg = 25, persistant = true, img = "saber4", shadow = true, anim_speed = 30}
 end
 
 bullet.update = function(dt)
@@ -30,7 +30,7 @@ bullet.update = function(dt)
       end
       -- collide with borders
       bullet.bound_collide(k, v)
-      -- update_pos
+      -- update pos
       v.x = v.x + v.xV * dt * 60
       v.y = v.y + v.yV * dt * 60
       v.z = v.z + v.zV * dt * 60

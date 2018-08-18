@@ -95,6 +95,9 @@ char.update = function(dt)
       if w.delay > 0 then
         w.delay = w.delay - dt
       end
+      if w.active and abilities[w.type].particle_func then
+        abilities[w.type].particle_func(v, k, v.target)
+      end
     end
     if v.energy < energy_max and not char.ability_check(v) then
       v.energy = v.energy + energy_increase

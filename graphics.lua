@@ -32,9 +32,9 @@ graphics.load = function()
   tileshadow_quad = graphics.load_quad(tileshadow_img, 32, 32)
   tileborder_img = love.graphics.newImage("art/tileborder.png")
 
-  local img, quad = graphics.load_folder("art/bullets", 32, 32)
-  bullet_img = img
-  bullet_quad = quad
+  bullet_img, bullet_quad = graphics.load_folder("art/bullets", 32, 32)
+  particle_img, particle_quad = graphics.load_folder("art/particles", 32, 32)
+
 
   ability_icon = graphics.load_folder("art/abilityicons")
   weapon_icon = graphics.load_folder("art/weaponicons")

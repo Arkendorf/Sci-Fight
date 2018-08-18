@@ -365,6 +365,11 @@ end
 abilities[17] = {
 press_func = heal,
 update_func = heal,
+particle_func = function(player, index, target)
+  if math.random(0, 4) == 0 then
+    particle.new(player.x+player.l/2+math.random(-12, 12), player.y+player.w/2+math.random(-12, 12), player.z+player.h/2, 0, -1, 0, "radiant", player)
+  end
+end,
 delay = 7,
 energy = 0.2,
 name = "Heal",
@@ -415,6 +420,11 @@ end
 abilities[20] = {
 press_func = flame,
 update_func = flame,
+particle_func = function(player, index, target)
+  local dir = game.target_norm(player, target)
+  local dir = game.angle_norm(dir, math.rad(math.random(-20, 20)))
+  particle.new(player.x+player.l/2, player.y+player.w/2, player.z+player.h/2, dir.x*2, dir.y*2, dir.z*2, "fire", player)
+end,
 delay = 6,
 energy = 0.4,
 name = "Flamethrower",
@@ -433,6 +443,10 @@ end
 abilities[21] = {
 press_func = fly,
 update_func = fly,
+particle_func = function(player, index, target)
+  local dir = game.angle_norm({x = 0, y = 0, z = 1}, math.rad(math.random(-20, 20)))
+  particle.new(player.x+player.l/2, player.y+player.w/2, player.z+player.h/2, dir.x, dir.y, dir.z, "fire", player)
+end,
 delay = 0.2,
 energy = 0.4,
 name = "Jetpack",
