@@ -147,7 +147,7 @@ bullet.explode = function(k, v)
 end
 
 bullet.explode_particle = function(v, r)
-  for i = 1, math.floor(r/4) do
+  for i = 1, math.floor(r*r/128) do
     particle.new(v.x+math.random(-r, r), v.y+math.random(-r, r), v.z, 0, 0, 0, "explosion")
   end
 end
@@ -196,14 +196,14 @@ bullet.new = function(p1, p2, parent, type, extra)
   local weapon_pos = char.get_weapon_pos(players[parent])
   bullets[spot] = {x = x1+weapon_pos.x, y = y1+weapon_pos.y, z = z1+weapon_pos.z, xV = xV*info.speed, yV = yV*info.speed, zV = zV*info.speed, angle = math.atan2(yV+zV, xV), parent = parent, type = type, info = extra, freeze = 0, frame = 1}
   if info.flare then
-    particle.new(x1+weapon_pos.x+xV*8, y1+weapon_pos.y+yV*8, z1+weapon_pos.z+zV*8-6, 0, 0, 0, "flare", player, info.color)
+    particle.new(x1+weapon_pos.x+xV*8, y1+weapon_pos.y+yV*8, z1+weapon_pos.z+zV*8-6, 0, 0, 0, "flare", players[parent], info.color)
   end
   return spot
 end
 
 bullet.effect = function(v)
   for j = 1, 3 do -- effect
-    particle.new(v.x, v.y, v.z, math.random(-v.xV, 0), math.random(-v.yV, 0), math.random(-v.zV, 0), "spark", player, bullet_info[v.type].color)
+    particle.new(v.x, v.y, v.z, math.random(-v.xV, 0), math.random(-v.yV, 0), math.random(-v.zV, 0), "spark", {xV = 0, yV = 0, zV = 0}, bullet_info[v.type].color)
   end
 end
 
