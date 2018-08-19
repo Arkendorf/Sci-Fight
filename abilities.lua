@@ -452,7 +452,7 @@ press_func = fly,
 update_func = fly,
 particle_func = function(player, index, target)
   local dir = game.angle_norm({x = 0, y = 0, z = 1}, math.rad(math.random(-20, 20)))
-  particle.new(player.x+player.l/2, player.y+player.w/2, player.z+player.h/2, dir.x, dir.y, dir.z, "fire", player)
+  particle.new(player.x+player.l/2, player.y+player.w/2, player.z+player.h/2, dir.x, dir.y, dir.z, "jet", player)
 end,
 delay = 0.2,
 energy = 0.4,

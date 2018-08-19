@@ -5,6 +5,7 @@ particle.load = function()
 
   particle_info = {}
   particle_info.fire = {t = 0.4, slow = 1, speed = 24, img = "fire"}
+  particle_info.jet = {t = 0.4, slow = 1, speed = 24, img = "jet", angle = true}
   particle_info.radiant = {t = 0.6, slow = 1, speed = 24, img = "radiant"}
   particle_info.push = {t = 0.3, slow = 0.9, speed = 24, img = "push", angle = true}
   particle_info.dust = {t = 0.8, slow = 0.9, speed = 24, img = "dust"}

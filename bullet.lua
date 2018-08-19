@@ -13,7 +13,7 @@ bullet.load = function()
   bullet_info.powerlaser = {ai = 1, speed = 6, r = 0, dmg = 20, img = "laser", flare = true, color = {0, 1, 0}}
   bullet_info.charge = {ai = 5, speed = 6.3, r = 0, dmg = 10, img = "charge", explosion = {dmg = 0, r = 24}, flare = true, color = {0, 1, 1}}
   bullet_info.pierce = {ai = 1, speed = 7, r = 0, dmg = 25, img = "pierce", pierce = true, flare = true, color = {1, 0, 0}}
-  bullet_info.missile = {ai = 4, speed = 2.2, r = 12, dmg = 0, img = "missile", shadow = true, explosion = {dmg = 20, r = 32}}
+  bullet_info.missile = {ai = 4, speed = 2.2, r = 12, dmg = 0, img = "missile", shadow = true, explosion = {dmg = 20, r = 32}, particle = "jet"}
   bullet_info.grenade = {ai = 3, speed = 3, r = 12, dmg = 0, persistant = true, img = "grenade", shadow = true, explosion = {dmg = 30, r = 64}}
   bullet_info.saber1 = {ai = 2, speed = 4, r = 16, dmg = 25, persistant = true, img = "saber1", shadow = true, anim_speed = 30, color = weapons[1].color}
   bullet_info.saber2 = {ai = 2, speed = 4, r = 16, dmg = 25, persistant = true, img = "saber2", shadow = true, anim_speed = 30, color = weapons[2].color}
@@ -43,6 +43,10 @@ bullet.update = function(dt)
       if v.frame > #bullet_quad[bullet_info[v.type].img]+1 then
         v.frame = 1
       end
+    end
+
+    if bullet_info[v.type].particle then
+      particle.new(v.x, v.y, v.z, -v.xV+math.random()-.5, -v.yV+math.random()-.5, -v.zV+math.random()-.5, bullet_info[v.type].particle)
     end
   end
 end
