@@ -4,24 +4,28 @@ weapons[1] = { -- saber
   type = 1,
   desc = "Saber (Blue)",
   mod = 1,
+  color = {0, 1, 1},
 }
 
 weapons[2] = { -- saber
   type = 1,
   desc = "Saber (Green)",
   mod = 0.8,
+  color = {0, 1, 0},
 }
 
 weapons[3] = { -- saber
   type = 1,
   desc = "Saber (Purple)",
   mod = 1.2,
+  color = {.7, 0, 1},
 }
 
 weapons[4] = { -- saber
   type = 1,
   desc = "Saber (Red)",
   mod = 1.4,
+  color = {1, 0, 0},
 }
 
 weapons[5] = { -- blaster

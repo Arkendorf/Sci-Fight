@@ -50,7 +50,7 @@ servermenu.start = function(port)
                                {txt ="Loadout", func = menu.swap_mode, args = {2}, mat = {func = menu.mat, args = {2}}},
                                {txt ="Map", func = menu.swap_mode, args = {3}, mat = {func = menu.mat, args = {3}}},
                                {txt ="Leave", func = wipe.start, args = {servermenu.leave}}})
-  menu.player_gui = {{x = (screen.w-64)/2, y = (screen.h+256)/2-32, w = 64, h = 32, txt = "Ready", func = servermenu.ready, args = {id}}}
+  menu.player_gui = {{x = (screen.w-64)/2, y = (screen.h+256)/2-32, w = 64, h = 32, txt = "Ready", func = servermenu.ready, args = {id}, mat = {func = menu.readymat, args = {}}}}
   menu.start()
   menu.new_player(id, username[1])
 end
@@ -150,7 +150,7 @@ servermenu.team_buttons = function(k)
       menu.team_select = false
     else
       local i = 0
-      for test_k, v in pairs(players) do        
+      for test_k, v in pairs(players) do
         if test_k == k then
           break
         end

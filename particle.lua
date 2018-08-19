@@ -9,8 +9,8 @@ particle.load = function()
   particle_info.push = {t = 0.3, slow = 0.9, speed = 24, img = "push", angle = true}
   particle_info.dust = {t = 0.8, slow = 0.9, speed = 24, img = "dust"}
   particle_info.flare = {t = 0.2, slow = 1, speed = 12, img = "flare"}
-  particle_info.spark = {t = 0.3, slow = 1, speed = 0, img = "spark"}
-
+  particle_info.spark = {t = 0.2, slow = 1, speed = 0, img = "spark", angle = true}
+  particle_info.explosion = {t = 0.5, slow = 0.9, speed = 16, img = "explosion"}
 end
 
 particle.update = function(dt)

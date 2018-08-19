@@ -9,16 +9,16 @@ bullet.load = function()
   bullets = {}
 
   bullet_info = {}
-  bullet_info.laser = {ai = 1, speed = 6, r = 0, dmg = 10, img = "laser"}
-  bullet_info.powerlaser = {ai = 1, speed = 6, r = 0, dmg = 20, img = "laser"}
-  bullet_info.charge = {ai = 5, speed = 6.3, r = 0, dmg = 10, img = "charge", explosion = {dmg = 0, r = 24}}
-  bullet_info.pierce = {ai = 1, speed = 7, r = 0, dmg = 25, img = "pierce", pierce = true}
+  bullet_info.laser = {ai = 1, speed = 6, r = 0, dmg = 10, img = "laser", flare = true, color = {0, 1, 0}}
+  bullet_info.powerlaser = {ai = 1, speed = 6, r = 0, dmg = 20, img = "laser", flare = true, color = {0, 1, 0}}
+  bullet_info.charge = {ai = 5, speed = 6.3, r = 0, dmg = 10, img = "charge", explosion = {dmg = 0, r = 24}, flare = true, color = {0, 1, 1}}
+  bullet_info.pierce = {ai = 1, speed = 7, r = 0, dmg = 25, img = "pierce", pierce = true, flare = true, color = {1, 0, 0}}
   bullet_info.missile = {ai = 4, speed = 2.2, r = 12, dmg = 0, img = "missile", shadow = true, explosion = {dmg = 20, r = 32}}
   bullet_info.grenade = {ai = 3, speed = 3, r = 12, dmg = 0, persistant = true, img = "grenade", shadow = true, explosion = {dmg = 30, r = 64}}
-  bullet_info.saber1 = {ai = 2, speed = 4, r = 16, dmg = 25, persistant = true, img = "saber1", shadow = true, anim_speed = 30}
-  bullet_info.saber2 = {ai = 2, speed = 4, r = 16, dmg = 25, persistant = true, img = "saber2", shadow = true, anim_speed = 30}
-  bullet_info.saber3 = {ai = 2, speed = 4, r = 16, dmg = 25, persistant = true, img = "saber3", shadow = true, anim_speed = 30}
-  bullet_info.saber4 = {ai = 2, speed = 4, r = 16, dmg = 25, persistant = true, img = "saber4", shadow = true, anim_speed = 30}
+  bullet_info.saber1 = {ai = 2, speed = 4, r = 16, dmg = 25, persistant = true, img = "saber1", shadow = true, anim_speed = 30, color = weapons[1].color}
+  bullet_info.saber2 = {ai = 2, speed = 4, r = 16, dmg = 25, persistant = true, img = "saber2", shadow = true, anim_speed = 30, color = weapons[2].color}
+  bullet_info.saber3 = {ai = 2, speed = 4, r = 16, dmg = 25, persistant = true, img = "saber3", shadow = true, anim_speed = 30, color = weapons[3].color}
+  bullet_info.saber4 = {ai = 2, speed = 4, r = 16, dmg = 25, persistant = true, img = "saber4", shadow = true, anim_speed = 30, color = weapons[4].color}
 end
 
 bullet.update = function(dt)
@@ -90,6 +90,7 @@ bullet.map_collide = function(k, v)
     if face then
       v.collide = face
       v.x, v.y, v.z = v.x+v.xV*frac, v.y+v.yV*frac, v.z+v.zV*frac
+      bullet.effect(v)
       if bullet_info[v.type].explosion and not bullet_info[v.type].persistant and server then
         v.explode = true
         break
@@ -104,6 +105,7 @@ bullet.player_collide = function(k, v) -- only server should do this
   local p1, p2 = bullet.get_points(v)
   for l, w in pairs(players) do
     if l ~= v.parent and char.damageable(l, v.parent) and collision.line_and_cube(p1, p2, w) then
+      bullet.effect(v)
       if bullet_info[v.type].explosion then
         bullet.explode(k, v)
       elseif bullet_info[v.type].dmg > 0 then
@@ -111,6 +113,7 @@ bullet.player_collide = function(k, v) -- only server should do this
         bullet.damage(w, num, v.parent)
         server:sendToAll("hit", {index = l, num = num, parent = v.parent})
       end
+      bullet.destroy(k, v, {x = 0, y = 0, z = 0})
       break
     end
   end
@@ -138,7 +141,15 @@ bullet.explode = function(k, v)
       server:sendToAll("hit", {index = l, num = num, parent = v.parent})
     end
   end
+  bullet.explode_particle(v, info.r)
+  server:sendToAll("explosion", {pos = {x = v.x, y = v.y, z = v.z}, r = info.r})
   bullets[k] = nil
+end
+
+bullet.explode_particle = function(v, r)
+  for i = 1, math.floor(r/4) do
+    particle.new(v.x+math.random(-r, r), v.y+math.random(-r, r), v.z, 0, 0, 0, "explosion")
+  end
 end
 
 bullet.bound_collide = function(k, v)
@@ -184,8 +195,16 @@ bullet.new = function(p1, p2, parent, type, extra)
   local spot = #bullets+1
   local weapon_pos = char.get_weapon_pos(players[parent])
   bullets[spot] = {x = x1+weapon_pos.x, y = y1+weapon_pos.y, z = z1+weapon_pos.z, xV = xV*info.speed, yV = yV*info.speed, zV = zV*info.speed, angle = math.atan2(yV+zV, xV), parent = parent, type = type, info = extra, freeze = 0, frame = 1}
-  particle.new(x1+weapon_pos.x+xV*8, y1+weapon_pos.y+yV*8, z1+weapon_pos.z+zV*8-6, 0, 0, 0, "flare", player)
+  if info.flare then
+    particle.new(x1+weapon_pos.x+xV*8, y1+weapon_pos.y+yV*8, z1+weapon_pos.z+zV*8-6, 0, 0, 0, "flare", player, info.color)
+  end
   return spot
+end
+
+bullet.effect = function(v)
+  for j = 1, 3 do -- effect
+    particle.new(v.x, v.y, v.z, math.random(-v.xV, 0), math.random(-v.yV, 0), math.random(-v.zV, 0), "spark", player, bullet_info[v.type].color)
+  end
 end
 
 return bullet

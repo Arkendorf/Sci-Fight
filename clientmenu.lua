@@ -35,13 +35,16 @@ local client_hooks = {
     wipe.start(clientmenu.start_game, {data.map})
   end,
   -- if a player presses ready
-  ready = function(data, client)
+  ready = function(data)
     players[data.index].ready = data.ready
   end,
   -- team change
-  team = function(data, client)
+  team = function(data)
     players[data.index].team = data.team
   end,
+  explosion = function(data)
+    bullet.explode_particle(data.pos, data.r)
+  end
 }
 
 clientmenu.start = function(ip, port)
@@ -58,7 +61,7 @@ clientmenu.start = function(ip, port)
                                {txt ="Loadout", func = menu.swap_mode, args = {2}, mat = {func = menu.mat, args = {2}}},
                                {txt ="Map", func = menu.swap_mode, args = {3}, mat = {func = menu.mat, args = {3}}},
                                {txt ="Leave", func = wipe.start, args = {clientmenu.leave}}})
-  menu.player_gui = {{x = (screen.w-64)/2, y = (screen.h+256)/2-32, w = 64, h = 32, txt = "Ready", func = clientmenu.ready, args = {id}}}
+  menu.player_gui = {{x = (screen.w-64)/2, y = (screen.h+256)/2-32, w = 64, h = 32, txt = "Ready", func = clientmenu.ready, args = {id}, mat = {func = menu.readymat, args = {}}}}
   menu.start()
 end
 
