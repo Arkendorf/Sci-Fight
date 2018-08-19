@@ -85,8 +85,10 @@ clientmenu.leave = function()
 end
 
 clientmenu.ready = function()
-  players[id].ready = not players[id].ready
-  client:send("ready", {ready = players[id].ready, loadout = custom.get_loadout(), map = mapselect.get_map()})
+  if players[id] then
+    players[id].ready = not players[id].ready
+    client:send("ready", {ready = players[id].ready, loadout = custom.get_loadout(), map = mapselect.get_map()})
+  end
 end
 
 clientmenu.start_game = function(map_num)

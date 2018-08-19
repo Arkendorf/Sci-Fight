@@ -171,14 +171,16 @@ char.use_ability = function(player, index, target, num)
     if not player.abilities[num].active then -- initiate cooldown if ability isn't channelled
       player.abilities[num].delay = abilities[player.abilities[num].type].delay
       player.energy = player.energy - cost
+      if abilities[player.abilities[num].type].particle_func then
+        abilities[player.abilities[num].type].particle_func(player, index, target)
+      end
     end
     if num < 3 then -- stop other weapon ability
       char.stop_ability(player, index, target, num-(num*2-3))
     end
-    if abilities[player.abilities[num].type].particle_func then
-      abilities[player.abilities[num].type].particle_func(player, index, target)
-    end
+    return true
   end
+  return false
 end
 
 char.update_ability = function(player, index, target, num, dt)

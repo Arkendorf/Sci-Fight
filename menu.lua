@@ -129,7 +129,9 @@ menu.mat = function(num)
 end
 
 menu.readymat = function()
-  if players[id] and players[id].ready then
+  if not players[id] then
+    return 3
+  elseif players[id] and players[id].ready then
     return 2
   else
     return 1

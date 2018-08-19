@@ -90,7 +90,7 @@ bullet.map_collide = function(k, v)
     if face then
       v.collide = face
       v.x, v.y, v.z = v.x+v.xV*frac, v.y+v.yV*frac, v.z+v.zV*frac
-      bullet.effect(v)
+      bullet.spark(v, {x = v.xV, y = v.yV, z = v.zV}, bullet_info[v.type].color)
       if bullet_info[v.type].explosion and not bullet_info[v.type].persistant and server then
         v.explode = true
         break
@@ -105,13 +105,13 @@ bullet.player_collide = function(k, v) -- only server should do this
   local p1, p2 = bullet.get_points(v)
   for l, w in pairs(players) do
     if l ~= v.parent and char.damageable(l, v.parent) and collision.line_and_cube(p1, p2, w) then
-      bullet.effect(v)
       if bullet_info[v.type].explosion then
         bullet.explode(k, v)
       elseif bullet_info[v.type].dmg > 0 then
         local num = w.hp - bullet_info[v.type].dmg*weapons[players[v.parent].weapon.type].mod -- bullet damage * weapon modifier
-        bullet.damage(w, num, v.parent)
-        server:sendToAll("hit", {index = l, num = num, parent = v.parent})
+        local dir, color = {x = v.xV, y = v.yV, z = v.zV}, bullet_info[v.type].color
+        bullet.damage(w, num, v.parent, dir, color)
+        server:sendToAll("hit", {index = l, num = num, parent = v.parent, dir = dir, color = color})
       end
       bullet.destroy(k, v, {x = 0, y = 0, z = 0})
       break
@@ -119,7 +119,8 @@ bullet.player_collide = function(k, v) -- only server should do this
   end
 end
 
-bullet.damage = function(player, num, parent)
+bullet.damage = function(player, num, parent, dir, color)
+  bullet.spark(player, dir, color)
   player.hp = num
   player.inv = inv_time
   player.killer = parent
@@ -148,7 +149,10 @@ end
 
 bullet.explode_particle = function(v, r)
   for i = 1, math.floor(r*r/128) do
-    particle.new(v.x+math.random(-r, r), v.y+math.random(-r, r), v.z, 0, 0, 0, "explosion")
+    dir = {x = math.random()-.5, y = math.random()-.5, z = math.random()-.5}
+    local norm = math.sqrt(dir.x*dir.x+dir.y*dir.y+dir.z*dir.z)
+    local mag = r/12
+    particle.new(v.x, v.y, v.z, dir.x/norm*mag, dir.y/norm*mag, dir.z/norm*mag, "explosion")
   end
 end
 
@@ -201,9 +205,15 @@ bullet.new = function(p1, p2, parent, type, extra)
   return spot
 end
 
-bullet.effect = function(v)
-  for j = 1, 3 do -- effect
-    particle.new(v.x, v.y, v.z, math.random(-v.xV, 0), math.random(-v.yV, 0), math.random(-v.zV, 0), "spark", {xV = 0, yV = 0, zV = 0}, bullet_info[v.type].color)
+bullet.spark = function(v, dir, color)
+  local x, y, z = v.x, v.y, v.z
+  if v.l and v.w and v.h then
+    x, y, z = v.x+v.l/2, v.y+v.w/2, v.z+v.h/2
+  end
+  if dir then
+    for j = 1, 3 do -- effect
+      particle.new(x, y, z, math.random(-dir.x, 0)+(math.random()-.5)*2, math.random(-dir.y, 0)+(math.random()-.5)*2, math.random(-dir.z, 0)+(math.random()-.5)*2, "spark", {xV = 0, yV = 0, zV = 0}, color)
+    end
   end
 end
 

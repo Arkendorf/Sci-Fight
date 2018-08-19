@@ -12,9 +12,10 @@ local server_hooks = {
   end,
   use_ability = function(data, client)
     local index = client:getIndex()
-    char.use_ability(players[index], index, data.target, data.num)
-    local ability = players[index].abilities[data.num]
-    server:sendToAll("ability_start", {index = index, num = data.num, delay = ability.delay, active = ability.active, energy = players[index].energy})
+    if char.use_ability(players[index], index, data.target, data.num) then -- only send info if ability is used
+      local ability = players[index].abilities[data.num]
+      server:sendToAll("ability_start", {index = index, num = data.num, delay = ability.delay, active = ability.active, energy = players[index].energy})
+    end
   end,
   stop_ability = function(data, client)
     local index = client:getIndex()
@@ -85,9 +86,10 @@ servergame.keyreleased = function(key)
 end
 
 servergame.use_ability = function(num)
-  char.use_ability(players[id], id, players[id].target, num)
-  local ability = players[id].abilities[num]
-  server:sendToAll("ability_start", {index = id, num = num, delay = ability.delay, active = ability.active, energy = players[id].energy})
+  if char.use_ability(players[id], id, players[id].target, num) then
+    local ability = players[id].abilities[num]
+    server:sendToAll("ability_start", {index = id, num = num, delay = ability.delay, active = ability.active, energy = players[id].energy})
+  end
 end
 
 servergame.update_ability = function(num, k, dt)

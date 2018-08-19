@@ -31,6 +31,9 @@ local client_hooks = {
     bullets[data] = nil
   end,
   bulletupdate = function(data)
+    if data.spark then
+      bullet.spark(bullets[data.index], {x = bullets[data.index].xV, y = bullets[data.index].yV, z = bullets[data.index].zV}, bullet_info[bullets[data.index].type].color)
+    end
     if bullets[data.index] then
       bullets[data.index].x, bullets[data.index].y, bullets[data.index].z = data.pos.x, data.pos.y, data.pos.z
       bullets[data.index].xV, bullets[data.index].yV, bullets[data.index].zV = data.pos.xV, data.pos.yV, data.pos.zV
@@ -47,7 +50,7 @@ local client_hooks = {
     ability.active = data.active
     ability.delay = data.delay
     players[data.index].energy = data.energy
-    if abilities[ability.type].particle_func then
+    if not data.active and abilities[ability.type].particle_func then
       abilities[ability.type].particle_func(players[data.index], data.index, players[data.index].target)
     end
   end,
@@ -60,7 +63,7 @@ local client_hooks = {
     players[data.index].energy = data.energy
   end,
   hit = function(data)
-    bullet.damage(players[data.index], data.num, data.parent)
+    bullet.damage(players[data.index], data.num, data.parent, data.dir, data.color)
   end,
   gameover = function(data)
     wipe.start(clientgame.start_end)

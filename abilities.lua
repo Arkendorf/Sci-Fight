@@ -125,8 +125,8 @@ press_func = function(player, index, target)
   for k, v in pairs(players) do
     if k ~= index and char.damageable(k, index) and collision.sphere_and_cube(bubble, v, swing_radius) then
       local num = v.hp-weapons[player.weapon.type].mod*10
-      bullet.damage(v, num, index)
-      server:sendToAll("hit", {index = k, num = num, parent = index})
+      bullet.damage(v, num, index, dir, weapons[player.weapon.type].color)
+      server:sendToAll("hit", {index = k, num = num, parent = index, dir = dir, color = weapons[player.weapon.type].color})
     end
   end
   -- weapon animation
@@ -150,12 +150,13 @@ local deflect = function(player, index, target)
   for k, v in pairs(bullets) do
     local p1, p2 = bullet.get_points(v)
     if v.parent ~= index and collision.line_and_sphere(p1, p2, bubble, deflect_radius) then
+      bullet.spark(v, {x = v.xV, y = v.yV, z = v.zV}, bullet_info[v.type].color) -- effect
       local mag = math.sqrt(v.xV*v.xV+v.yV*v.yV+v.zV*v.zV)
       v.xV, v.yV, v.zV = dir.x*mag, dir.y*mag, dir.z*mag
       v.angle = math.atan2(dir.y+dir.z, dir.x)
       v.parent = index
+      server:sendToAll("bulletupdate", {pos = {x = v.x, y = v.y, z = v.z, xV = v.xV, yV = v.yV, zV = v.zV, angle = v.angle}, spark = true, index = k})
     end
-    server:sendToAll("bulletupdate", {pos = {x = v.x, y = v.y, z = v.z, xV = v.xV, yV = v.yV, zV = v.zV, angle = v.angle}, index = k})
   end
   -- animation
   if player.weapon.anim == "block" and player.weapon.frame > 3 then
@@ -208,8 +209,8 @@ press_func = function(player, index, target)
   for k, v in pairs(players) do
     if k ~= index and char.damageable(k, index) and  collision.sphere_and_cube(bubble, v, spin_radius) then
       local num = v.hp-weapons[player.weapon.type].mod*10
-      bullet.damage(v, num, index)
-      server:sendToAll("hit", {index = k, num = num, parent = index})
+      bullet.damage(v, num, index, dir, weapons[player.weapon.type].color)
+      server:sendToAll("hit", {index = k, num = num, parent = index, dir = dir, color = weapons[player.weapon.type].color})
     end
   end
   -- weapon animation
@@ -247,8 +248,8 @@ press_func = function(player, index, target)
   for k, v in pairs(players) do
     if k ~= index and char.damageable(k, index) and collision.sphere_and_cube(bubble, v, lunge_radius) then
       local num = v.hp-weapons[player.weapon.type].mod*15
-      bullet.damage(v, num, index)
-      server:sendToAll("hit", {index = k, num = num, parent = index})
+      bullet.damage(v, num, index, dir, weapons[player.weapon.type].color)
+      server:sendToAll("hit", {index = k, num = num, parent = index, dir = dir, color = weapons[player.weapon.type].color})
     end
   end
   return false
