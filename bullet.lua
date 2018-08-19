@@ -64,7 +64,7 @@ bullet.serverupdate = function(dt)
           v.old = {x = v.x, y = v.y, z = v.z, xV = v.xV, yV = v.yV, zV = v.zV, angle = v.angle}
         end
       else -- delete bullet
-        server:sendToAll("bullet", {k = k, info = nil})
+        server:sendToAll("bulletkill", k)
       end
     end
   end
@@ -184,6 +184,7 @@ bullet.new = function(p1, p2, parent, type, extra)
   local spot = #bullets+1
   local weapon_pos = char.get_weapon_pos(players[parent])
   bullets[spot] = {x = x1+weapon_pos.x, y = y1+weapon_pos.y, z = z1+weapon_pos.z, xV = xV*info.speed, yV = yV*info.speed, zV = zV*info.speed, angle = math.atan2(yV+zV, xV), parent = parent, type = type, info = extra, freeze = 0, frame = 1}
+  particle.new(x1+weapon_pos.x+xV*8, y1+weapon_pos.y+yV*8, z1+weapon_pos.z+zV*8-6, 0, 0, 0, "flare", player)
   return spot
 end
 

@@ -73,6 +73,19 @@ char.update = function(dt)
       v.zV = 10
     end
 
+    -- particles
+    local speed = math.sqrt(v.xV*v.xV+v.yV*v.yV)
+    local pos = {x = 1+math.floor((v.x+v.l/2)/tile_size), y = 1+math.floor((v.y+v.w/2)/tile_size), z = 1+math.floor((v.z+v.h+math.min(math.abs(v.zV), tile_size/2))/tile_size)}
+    if map.in_bounds(pos.x, pos.y, pos.z) and tiles[grid[pos.z][pos.y][pos.x]] > 0 then
+      if math.random(1, 16) < speed then
+        local vX, vY = math.random(-v.l/2, v.l/2), math.random(-v.w/2, v.w/2)
+        particle.new(v.x+v.l/2+vX, v.y+v.w/2+vY, v.z+v.h, vX/40, vY/40, 0, "dust")
+      end
+      if math.abs(v.zV) > 1 then
+        char.jump_particle(v)
+      end
+    end
+
     -- collision
     collision.grid(v)
 
@@ -143,6 +156,14 @@ char.serverupdate = function(dt)
   end
 end
 
+char.jump_particle = function(v)
+  local freq = math.ceil(math.abs(v.zV))
+  for i = 1, freq do
+    local vX, vY = math.random(-v.l/2, v.l/2), math.random(-v.w/2, v.w/2)
+    particle.new(v.x+v.l/2+vX, v.y+v.w/2+vY, v.z+v.h, vX*freq/40, vY*freq/40, 0, "dust")
+  end
+end
+
 char.use_ability = function(player, index, target, num)
   local cost = abilities[player.abilities[num].type].energy*weapons[player.weapon.type].mod
   if player.abilities[num].delay <= 0 and player.energy >= cost and not (num < 3 and player.weapon.active) then
@@ -153,6 +174,9 @@ char.use_ability = function(player, index, target, num)
     end
     if num < 3 then -- stop other weapon ability
       char.stop_ability(player, index, target, num-(num*2-3))
+    end
+    if abilities[player.abilities[num].type].particle_func then
+      abilities[player.abilities[num].type].particle_func(player, index, target)
     end
   end
 end

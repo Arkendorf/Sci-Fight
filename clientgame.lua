@@ -25,7 +25,10 @@ local client_hooks = {
     players[data.index].speed = data.speed
   end,
   bullet = function(data)
-    bullets[data.k] = data.info
+    bullet.new(players[data.index], data.target, data.index, data.type, data.extra)
+  end,
+  bulletkill = function(data)
+    bullets[data] = nil
   end,
   bulletupdate = function(data)
     if bullets[data.index] then
@@ -39,14 +42,22 @@ local client_hooks = {
       bullets[data.index].freeze = data.freeze
     end
   end,
-  ability_info = function(data)
-    if data.num then
-      players[data.index].abilities[data.num].delay = data.delay
-      players[data.index].abilities[data.num].active = data.active
+  ability_start = function(data)
+    local ability = players[data.index].abilities[data.num]
+    ability.active = data.active
+    ability.delay = data.delay
+    players[data.index].energy = data.energy
+    if abilities[ability.type].particle_func then
+      abilities[ability.type].particle_func(players[data.index], data.index, players[data.index].target)
     end
-    if data.energy then
-      players[data.index].energy = data.energy
-    end
+  end,
+  ability_end = function(data)
+    players[data.index].abilities[data.num].active = false
+    players[data.index].abilities[data.num].delay = data.delay
+    players[data.index].energy = data.energy
+  end,
+  energy = function(data)
+    players[data.index].energy = data.energy
   end,
   hit = function(data)
     bullet.damage(players[data.index], data.num, data.parent)

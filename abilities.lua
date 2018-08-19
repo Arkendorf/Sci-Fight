@@ -4,7 +4,7 @@ local abilities = {}
 abilities[1] = { -- blaster shot
 press_func = function(player, index, target)
   local k = bullet.new(players[index], target, index, "laser")
-  server:sendToAll("bullet", {info = bullets[k], k = k})
+  server:sendToAll("bullet", {target = target, index = index, type = "laser"})
   -- weapon animation
   char.weapon_anim(index, "fire", 30)
   server:sendToAll("weaponanim", {index = index, anim = "fire", speed = 30})
@@ -26,7 +26,7 @@ press_func = function(player, index, target)
     local angle = base_angle+math.rad(10)*i
     local dir = game.target_pos(player, {x = math.cos(angle), y = math.sin(angle), z = dif.z/mag})
     local k = bullet.new(players[index], dir, index, "powerlaser")
-    server:sendToAll("bullet", {info = bullets[k], k = k})
+    server:sendToAll("bullet", {target = dir, index = index, type = "powerlaser"})
   end
   -- weapon animation
   char.weapon_anim(index, "fire", 30)
@@ -50,7 +50,8 @@ update_func = function(player, index, target, num)
 end,
 stop_func = function(player, index, target, num)
   local k = bullet.new(players[index], target, index, "charge", player.abilities[num].info)
-  server:sendToAll("bullet", {info = bullets[k], k = k})
+  server:sendToAll("bullet", {target = target, index = index, type = "charge", extra = player.abilities[num].info})
+
   -- weapon animation
   char.weapon_anim(index, "fire", 30)
   server:sendToAll("weaponanim", {index = index, anim = "fire", speed = 30})
@@ -65,7 +66,8 @@ desc = "Fire a laser that becomes more powerful the longer it is held",
 abilities[4] = {
 press_func = function(player, index, target)
   local k = bullet.new(players[index], target, index, "pierce")
-  server:sendToAll("bullet", {info = bullets[k], k = k})
+  server:sendToAll("bullet", {target = target, index = index, type = "pierce"})
+
   -- weapon animation
   char.weapon_anim(index, "fire", 30)
   server:sendToAll("weaponanim", {index = index, anim = "fire", speed = 30})
@@ -185,7 +187,7 @@ desc = "Deflect incoming projectiles in the direction of the target",
 abilities[9] = { -- throw saber
 press_func = function(player, index, target)
   local k = bullet.new(players[index], target, index, "saber"..tostring(player.weapon.type), index)
-  server:sendToAll("bullet", {info = bullets[k], k = k})
+  server:sendToAll("bullet", {target = target, index = index, type = "saber"..tostring(player.weapon.type), extra = index})
   player.weapon.active = true
   -- weapon animation
   char.weapon_anim(index, "thrown", 0)
@@ -294,6 +296,10 @@ press_func = function(player, index, target)
     end
   end
 end,
+particle_func = function(player, index, target)
+  local dir = game.target_norm(player, target)
+  particle.new(player.x+player.l/2, player.y+player.w/2, player.z+player.h/2, dir.x*7, dir.y*7, dir.z*7, "push", player)
+end,
 delay = 6,
 energy = 15,
 name = "Push",
@@ -379,7 +385,7 @@ desc = "Slowly heal over time",
 abilities[18] = {
 press_func = function(player, index, target)
   local k = bullet.new(players[index], target, index, "grenade")
-  server:sendToAll("bullet", {info = bullets[k], k = k})
+  server:sendToAll("bullet", {target = target, index = index, type = "grenade"})
   return false
 end,
 delay = 6,
@@ -391,7 +397,7 @@ desc = "Throw an explosive projectile",
 abilities[19] = {
 press_func = function(player, index, target)
   local k = bullet.new(players[index], target, index, "missile")
-  server:sendToAll("bullet", {info = bullets[k], k = k})
+  server:sendToAll("bullet", {target = target, index = index, type = "missile"})
   return false
 end,
 delay = 6,
