@@ -24,8 +24,8 @@ end
 mainmenu.start = function()
   state = "mainmenu"
   gui.clear()
-  local buttons = sidebar.new({{txt = "Host", func = mainmenu.prompt, args = {1}},
-                               {txt ="Join", func = mainmenu.prompt, args = {2}},
+  local buttons = sidebar.new({{txt = "Host", func = mainmenu.prompt, args = {1}, mat = {func = mainmenu.mat, args = {1}}},
+                               {txt ="Join", func = mainmenu.prompt, args = {2}, mat = {func = mainmenu.mat, args = {2}}},
                                {txt ="Loadouts", func = wipe.start, args = {mainmenu.custom_start}},
                                {txt ="Quit", func = function() love.event.quit() end, args = {}}})
   gui.add(3, buttons, {{x = (screen.w-name_box.w)/2, y = screen.h-name_box.h*2-button.border, w = name_box.w, h = name_box.h, t = username, i = 1, sample = "Username"}})
@@ -81,6 +81,14 @@ end
 mainmenu.custom_start = function()
   state = "custom"
   custom.start()
+end
+
+mainmenu.mat = function(num)
+  if prompts[num].active then
+    return 2
+  else
+    return 1
+  end
 end
 
 return mainmenu

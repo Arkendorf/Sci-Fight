@@ -76,7 +76,7 @@ gui.draw = function()
       local x, y = m_x/screen.scale-screen.x+6, m_y/screen.scale-screen.y+6
       love.graphics.setColor(1, 1, 1, w.a)
       love.graphics.draw(gui_imgs[6][tostring(w.w).."x"..tostring(w.h)], math.floor(x), math.floor(y))
-      love.graphics.printf(w.txt, math.floor(x+5), math.floor(y+5), math.floor(w.w))
+      love.graphics.printf(w.txt, math.floor(x+5), math.floor(y+4), math.floor(w.w))
     end
   end
 end
@@ -176,7 +176,11 @@ end
 
 gui.text_size = function(txt, limit)
   local w, wrap = font:getWrap(txt, limit)
-  return w+10, #wrap*font:getHeight()+10
+  if #wrap > 1 then
+    return w+10, #wrap*font:getHeight()+8
+  else
+    return w+10, #wrap*font:getHeight()
+  end
 end
 
 gui.add_imgs = function(list, mat)

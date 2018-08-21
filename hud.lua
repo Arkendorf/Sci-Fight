@@ -32,6 +32,7 @@ hud.draw = function()
       love.graphics.rectangle("fill", x-icon.border, y-icon.border, icon.w+icon.border*2, icon.h+icon.border*2)
       love.graphics.setColor(1, 1, 1)
     end
+    custom.icon_background(x, y, 3, false)
     love.graphics.draw(ability_icon[v.type], x, y)
     love.graphics.setShader()
     if v.delay > 0 then

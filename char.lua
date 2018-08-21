@@ -9,6 +9,13 @@ hp_max = 100
 local tile_buffer = 8
 local death_inv = 1
 
+skin_name = {
+  "Trooper",
+  "Shadow Trooper",
+  "Bounty Hunter I",
+  "Bounty Hunter II",
+}
+
 char.load = function()
 end
 
@@ -230,7 +237,7 @@ end
 char.new = function(name, loadout, team)
   local item = {name = name, x = #grid[1][1]*tile_size*0.5, y = #grid[1]*tile_size*0.5, z = -24, l = 24, w = 24, h = 24, xV = 0, yV = 0, zV = 0,
                 speed = 1, hp = hp_max, energy = energy_max, score = 0, jump = false, inv = 0, team = team, killer = false, target = {x = 0, y = 0, z = 0},
-                anim = "run", frame = 1, skin = 1}
+                anim = "run", frame = 1, skin = 4}
   item.weapon = {type = loadout.weapon, active = false, anim = "base", frame = 1, speed = 0}
   item.abilities = {}
   for i, v in ipairs(loadout.abilities) do
@@ -240,7 +247,7 @@ char.new = function(name, loadout, team)
 end
 
 char.damageable = function(k, l)
-  return (players[k].inv <= 0 and (players[k].team <= 0 or players[k].team ~= players[l].team))
+  return (k ~= l and players[k].inv <= 0 and (players[k].team <= 0 or players[k].team ~= players[l].team))
 end
 
 char.queue = function()
@@ -291,12 +298,12 @@ char.draw_char = function(v)
     char.draw_body(v, face)
     love.graphics.draw(weapon_img[v.weapon.type][v.weapon.anim], weapon_quad[v.weapon.type][v.weapon.anim][math.floor(v.weapon.frame)], weapon_pos.x, weapon_pos.y, angle, 1, sy, 32, 32)
   end
-  char.draw_arm(left_pos, hand_pos)
+  char.draw_arm(left_pos, hand_pos, v.skin)
   if face == 2 or face == 4 then
     char.draw_body(v, face)
     love.graphics.draw(weapon_img[v.weapon.type][v.weapon.anim], weapon_quad[v.weapon.type][v.weapon.anim][math.floor(v.weapon.frame)], weapon_pos.x, weapon_pos.y, angle, 1, sy, 32, 32)
   end
-  char.draw_arm(right_pos, hand_pos)
+  char.draw_arm(right_pos, hand_pos, v.skin)
   if face == 3 then
     love.graphics.draw(weapon_img[v.weapon.type][v.weapon.anim], weapon_quad[v.weapon.type][v.weapon.anim][math.floor(v.weapon.frame)], weapon_pos.x, weapon_pos.y, angle, 1, sy, 32, 32)
     char.draw_body(v, face)
@@ -314,13 +321,17 @@ char.draw_body = function(v, face)
   love.graphics.setShader()
 end
 
-char.draw_arm = function(p1, p2)
+char.draw_arm = function(p1, p2, skin, disp)
   love.graphics.setLineWidth(4)
   love.graphics.setColor(0, 0, 0)
   love.graphics.line(p1.x, p1.y, p2.x, p2.y)
   love.graphics.setLineWidth(2)
-  love.graphics.setColor(char_info[1].base.armcolor)
-  love.graphics.line(p1.x, p1.y, p2.x, p2.y)
+  love.graphics.setColor(char_info[skin].base.armcolor)
+  if disp then
+    love.graphics.line(p1.x, p1.y, p2.x, p2.y-1)
+  else
+    love.graphics.line(p1.x, p1.y, p2.x, p2.y)
+  end
   love.graphics.setColor(1, 1, 1)
 end
 

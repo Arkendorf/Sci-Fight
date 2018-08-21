@@ -39,6 +39,8 @@ graphics.load = function()
   ability_icon = graphics.load_folder("art/abilityicons")
   weapon_icon = graphics.load_folder("art/weaponicons")
   map_icon = graphics.load_folder("art/mapicons")
+  icon_img = love.graphics.newImage("art/iconback.png")
+  icon_quad = graphics.load_quad(icon_img, 66, 66)
 
   weapon_img, weapon_quad, weapon_info = graphics.load_doublefolder("art/weaponimgs", 64, 64)
   char_img, char_quad, char_info = graphics.load_doublefolder("art/charimgs", 24, 48, graphics.load_face_quad)
