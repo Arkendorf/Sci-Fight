@@ -102,7 +102,7 @@ custom.update_loadout_gui = function()
   local infoboxes = {}
   -- skin
   buttons[#buttons+1] = {x = pos.x+offsets.skin.x, y = pos.y+offsets.skin.y, w = icon.w, h = icon.h*2+icon.border, txt = "Skin", func = custom.set_current_slot, args = {"skin"}, hide = true}
-  local txt = skin_name[loadouts[current_loadout].weapon]
+  local txt = skin_name[loadouts[current_loadout].skin]
   local w, h = gui.text_size(txt, 128)
   infoboxes[#infoboxes+1] = {x = pos.x+offsets.skin.x, y = pos.y+offsets.skin.y, w = w, h = h, hit = {w = icon.w, h = icon.h*2+icon.border}, txt = txt}
   -- weapon

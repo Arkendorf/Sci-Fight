@@ -77,7 +77,7 @@ map.in_bounds = function(x, y, z)
 end
 
 map.set = function(num)
-  grid = maps[num].grid
+  grid = maps[num]
 
   -- shader stuff
   local x, y = #grid[1][1]*tile_size, (#grid+#grid[1])*tile_size

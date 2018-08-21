@@ -6,16 +6,20 @@ local icons = {}
 local current = 1
 local mapselect_imgs = {}
 
+map_name = {
+  "Time Machine Interior"
+}
+
 mapselect.load = function()
   local files = love.filesystem.getDirectoryItems("maps")
   maps = {}
   for i, v in ipairs(files) do
-    maps[i] = {name = string.sub(v, 1, -5), grid = love.filesystem.load("maps/"..v)()}
+    maps[i] = love.filesystem.load("maps/"..v)()
   end
 
   option_pos = {x = (screen.w-256)/2, y = (screen.h-256)/2+66, w = 256, h = 190}
 
-  mapselect_imgs.header = gui.new_img(4, option_pos.w, 64)
+  mapselect_imgs.header = gui.new_img(1, option_pos.w, 64)
   mapselect_imgs.option = gui.new_img(5, option_pos.w, option_pos.h)
 end
 
@@ -27,7 +31,7 @@ mapselect.start = function(buttons)
   local infoboxes = {}
   for i, v in ipairs(icons) do
     buttons[i] = {x = v.x, y = v.y, w= v.w, h = v.h, txt = tostring(v.num), func = mapselect.change_map, args = {v.num}, hide = true}
-    local txt =  maps[v.num].name
+    local txt =  map_name[v.num]
     local w, h = gui.text_size(txt, 128)
     infoboxes[i] = {x = v.x, y = v.y, w= w, h = h, hit = {w = v.w, h = v.h}, txt = txt}
   end
@@ -40,17 +44,10 @@ end
 mapselect.draw = function(dt)
   love.graphics.draw(mapselect_imgs.header, option_pos.x, option_pos.y-66)
   love.graphics.draw(mapselect_imgs.option, option_pos.x, option_pos.y)
-  love.graphics.setColor(text_color)
-  love.graphics.printf("Map Vote:\n"..maps[current].name, option_pos.x, option_pos.y-42, option_pos.w, "center")
-  love.graphics.setColor(1, 1, 1)
+  love.graphics.printf("Map Vote:\n"..map_name[current], option_pos.x, option_pos.y-42, option_pos.w, "center")
   for i, v in ipairs(icons) do
-    if current == i then
-      love.graphics.draw(map_icon[maps[current].name], v.x, v.y)
-    else
-      love.graphics.setShader(shader.greyscale)
-      love.graphics.draw(map_icon[maps[current].name], v.x, v.y)
-      love.graphics.setShader()
-    end
+    custom.icon_background(v.x, v.y, 4, current == i)
+    love.graphics.draw(map_icon[current], v.x, v.y)
   end
 end
 
