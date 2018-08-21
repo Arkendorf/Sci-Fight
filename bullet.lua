@@ -140,7 +140,7 @@ bullet.explode = function(k, v)
     dmg = v.dmg
   end
   for l, w in pairs(players) do
-    if l ~= v.parent and char.damageable(l, v.parent) and collision.sphere_and_cube(v, w, info.r) then
+    if l ~= v.parent and char.damageable(l, v.parent) and collision.sphere_and_cube(v, w, info.r) and not collision.line_and_map(v, {x = w.x+w.l/2, y = w.y+w.w/2, z = w.z+w.h/2}) then
       local num = w.hp - dmg*weapons[players[v.parent].weapon.type].mod -- bullet damage * weapon modifier
       bullet.damage(w, num, v.parent)
       server:sendToAll("hit", {index = l, num = num, parent = v.parent})

@@ -9,7 +9,7 @@ particle.load = function()
   particle_info.radiant = {t = 0.5, slow = 1, speed = 10, img = "radiant"}
   particle_info.push = {t = 0.4, slow = 0.9, speed = 10, img = "push", angle = true}
   particle_info.dust = {t = 0.5, slow = 0.9, speed = 8, img = "dust"}
-  particle_info.flare = {t = 0.2, slow = 1, speed = 20, img = "flare", angle = true}
+  particle_info.flare = {t = 0.2, slow = 0, speed = 20, img = "flare", angle = true}
   particle_info.spark = {t = 0.2, slow = 1, speed = 20, img = "spark", angle = true}
   particle_info.explosion = {t = 0.5, slow = 0.9, speed = 14, img = "explosion"}
 end
