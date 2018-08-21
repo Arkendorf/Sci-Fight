@@ -3,7 +3,7 @@ local bullet_ai = require "bullet_ai"
 local bullet = {}
 
 local tile_buffer = 12
-local inv_time = 1
+local inv_time = 0.4
 
 bullet.load = function()
   bullets = {}
@@ -204,7 +204,7 @@ bullet.new = function(p1, p2, parent, type, extra)
   local weapon_pos = char.get_weapon_pos(players[parent])
   bullets[spot] = {x = x1+weapon_pos.x, y = y1+weapon_pos.y, z = z1+weapon_pos.z, xV = xV*info.speed, yV = yV*info.speed, zV = zV*info.speed, angle = math.atan2(yV+zV, xV), parent = parent, type = type, info = extra, freeze = 0, frame = 1}
   if info.flare then
-    particle.new(x1+weapon_pos.x+xV*8, y1+weapon_pos.y+yV*8, z1+weapon_pos.z+zV*8-6, 0, 0, 0, "flare", players[parent], info.color)
+    particle.new(x1+weapon_pos.x+xV*12, y1+weapon_pos.y+yV*12, z1+weapon_pos.z+zV*12-8, xV/100, yV/100, zV/100, "flare", players[parent], info.color)
   end
   return spot
 end

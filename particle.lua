@@ -4,14 +4,14 @@ particle.load = function()
   particles = {}
 
   particle_info = {}
-  particle_info.fire = {t = 0.4, slow = 1, speed = 24, img = "fire"}
-  particle_info.jet = {t = 0.4, slow = 1, speed = 24, img = "jet", angle = true}
-  particle_info.radiant = {t = 0.6, slow = 1, speed = 24, img = "radiant"}
-  particle_info.push = {t = 0.3, slow = 0.9, speed = 24, img = "push", angle = true}
-  particle_info.dust = {t = 0.8, slow = 0.9, speed = 24, img = "dust"}
-  particle_info.flare = {t = 0.2, slow = 1, speed = 12, img = "flare", angle = true}
-  particle_info.spark = {t = 0.2, slow = 1, speed = 0, img = "spark", angle = true}
-  particle_info.explosion = {t = 0.5, slow = 0.9, speed = 16, img = "explosion"}
+  particle_info.fire = {t = 0.5, slow = 1, speed = 10, img = "fire"}
+  particle_info.jet = {t = 0.4, slow = 1, speed = 10, img = "jet", angle = true}
+  particle_info.radiant = {t = 0.5, slow = 1, speed = 10, img = "radiant"}
+  particle_info.push = {t = 0.4, slow = 0.9, speed = 10, img = "push", angle = true}
+  particle_info.dust = {t = 0.5, slow = 0.9, speed = 8, img = "dust"}
+  particle_info.flare = {t = 0.2, slow = 1, speed = 20, img = "flare", angle = true}
+  particle_info.spark = {t = 0.2, slow = 1, speed = 20, img = "spark", angle = true}
+  particle_info.explosion = {t = 0.5, slow = 0.9, speed = 14, img = "explosion"}
 end
 
 particle.update = function(dt)
@@ -46,14 +46,14 @@ particle.queue = function()
 end
 
 particle.new = function(x, y, z, xV, yV, zV, type, player, color)
+  local angle = 0
+  if particle_info[type].angle then
+    angle = math.atan2(yV+zV, xV)
+  end
   if player then
     xV = xV + player.xV
     yV = yV + player.yV
     zV = zV + player.zV
-  end
-  local angle = 0
-  if particle_info[type].angle then
-    angle = math.atan2(yV+zV, xV)
   end
   local c = {1, 1, 1}
   if color then
