@@ -4,7 +4,11 @@ tile_size = 32
 
 map.load = function()
   -- maps must be within 100x100x100 for layering and shadows to work properly
-  tiles = {[0] = 0, 1, 1, 1, 1, 1, 1}
+  tiles = {[0] = 0, 1, 1, 1, 1, 1, 1, 1}
+
+  prop_info = {}
+  prop_info[1] = {w = 2, h = 2, img = 1}
+
   map.set(1)
 end
 
@@ -77,7 +81,8 @@ map.in_bounds = function(x, y, z)
 end
 
 map.set = function(num)
-  grid = maps[num]
+  grid = maps[num].grid
+  props = maps[num].props
 
   -- shader stuff
   local x, y = #grid[1][1]*tile_size, (#grid+#grid[1])*tile_size
@@ -93,6 +98,8 @@ map.set = function(num)
   -- draw layer mask
   love.graphics.setCanvas(layer_mask)
   map.iterate(game.draw_layer_mask)
+  game.draw_props("prop_layer_mask", layer_mask)
+
   love.graphics.setShader()
   shader.layer:send("mask", layer_mask)
 
@@ -101,6 +108,7 @@ map.set = function(num)
   love.graphics.clear()
   map.iterate(game.draw_tiles)
   map.iterate(game.draw_tile_shadows) -- draw tile shadows
+  game.draw_props("prop_layer", layer_mask)
 
   -- reset
   love.graphics.setColor(1, 1, 1)

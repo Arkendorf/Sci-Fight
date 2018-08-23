@@ -14,7 +14,8 @@ mapselect.load = function()
   local files = love.filesystem.getDirectoryItems("maps")
   maps = {}
   for i, v in ipairs(files) do
-    maps[i] = love.filesystem.load("maps/"..v)()
+    local grid, props = love.filesystem.load("maps/"..v)()
+    maps[i] = {grid = grid, props = props}
   end
 
   option_pos = {x = (screen.w-256)/2, y = (screen.h-256)/2+66, w = 256, h = 190}

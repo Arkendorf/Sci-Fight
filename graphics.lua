@@ -27,6 +27,9 @@ graphics.load = function()
   tile_img = graphics.load_folder("art/tiles")
   tile_quad = graphics.load_tile_quad(tile_size)
 
+  -- load props
+  prop_img = graphics.load_folder("art/props")
+
   -- tile shadows
   tileshadow_img = love.graphics.newImage("art/tileshadow.png")
   tileshadow_quad = graphics.load_quad(tileshadow_img, 32, 32)
