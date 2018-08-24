@@ -55,7 +55,7 @@ end
 collision.props = function(obj)
   for i, v in ipairs(props) do
     local cube = {x = (v.x-1)*tile_size, y = (v.y-1)*tile_size, z = (v.z-1)*tile_size, l = prop_info[v.type].l*tile_size, w = prop_info[v.type].w*tile_size, h = prop_info[v.type].h*tile_size}
-    if collision.cube_and_cube(obj, cube, 0, 0, obj.zV*global_dt*60) then
+    if collision.cube_and_moving_cube(obj, cube, 0, 0, obj.zV*global_dt*60) then
       if obj.zV > 0 then
         obj.z = (v.z-1)*tile_size - obj.h
         obj.jump = false
@@ -65,7 +65,7 @@ collision.props = function(obj)
       obj.zV = 0
     end
 
-    if collision.cube_and_cube(obj, cube, obj.xV*global_dt*60, 0, 0) then
+    if collision.cube_and_moving_cube(obj, cube, obj.xV*global_dt*60, 0, 0) then
       if obj.xV > 0 then
         obj.x = (v.x-1)*tile_size - obj.l
       elseif obj.zV < 0 then
@@ -74,7 +74,7 @@ collision.props = function(obj)
       obj.xV = 0
     end
 
-    if collision.cube_and_cube(obj, cube, 0, obj.yV*global_dt*60, 0) then
+    if collision.cube_and_moving_cube(obj, cube, 0, obj.yV*global_dt*60, 0) then
       if obj.yV > 0 then
         obj.y = (v.y-1)*tile_size - obj.w
       elseif obj.yV < 0 then
@@ -85,8 +85,12 @@ collision.props = function(obj)
   end
 end
 
-collision.cube_and_cube = function(a, b, xV, yV, zV)
+collision.cube_and_moving_cube = function(a, b, xV, yV, zV)
   return (a.x+a.l+xV > b.x and a.x+xV < b.x+b.l and a.y+a.w+yV > b.y and a.y+yV < b.y+b.w and a.z+a.h+zV > b.z and a.z+zV < b.z+b.h)
+end
+
+collision.cube_and_cube = function(a, b)
+  return (a.x+a.l > b.x and a.x < b.x+b.l and a.y+a.w > b.y and a.y < b.y+b.w and a.z+a.h > b.z and a.z < b.z+b.h)
 end
 
 collision.coord_to_tile = function(x, w, k)

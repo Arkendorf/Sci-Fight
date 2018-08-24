@@ -312,7 +312,7 @@ end
 
 char.draw_body = function(v, face)
   if v.team > 0 then
-    graphics.draw_border({img = char_img[v.skin][v.anim], quad = char_quad[v.skin][v.anim][face][math.floor(v.frame)], x = 32, y = 24, border = team_colors[v.team]})
+    graphics.draw_outline({img = char_img[v.skin][v.anim], quad = char_quad[v.skin][v.anim][face][math.floor(v.frame)], x = 32, y = 24, border = team_colors[v.team]})
   end
   if math.floor(math.sin(v.inv*14)+0.5) > 0 then
     love.graphics.setShader(shader.color)

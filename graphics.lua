@@ -131,9 +131,15 @@ graphics.draw_floor = function(x, y, z, tile)
     for h = 0, 1 do
       local corner = w+h*2+1
       love.graphics.draw(tile_img[tile], tile_quad[1][corner][graphics.bitmask_tile(x, y, z, w, h, tile, graphics.floor_func)], (x-1+w/2)*tile_size, (y+z-2+h/2)*tile_size)
-      love.graphics.setColor(0.2, 0.2, 0.3, 0.5)
+    end
+  end
+end
+
+graphics.draw_border = function(x, y, z, tile)
+  for w = 0, 1 do
+    for h = 0, 1 do
+      local corner = w+h*2+1
       love.graphics.draw(tileborder_img, tile_quad[1][corner][graphics.bitmask_tile(x, y, z, w, h, tile, graphics.border_func)], (x-1+w/2)*tile_size, (y+z-2+h/2)*tile_size)
-      love.graphics.setColor(1, 1, 1)
     end
   end
 end
@@ -257,7 +263,7 @@ graphics.zoom = function(bool, num, min, max, scalar)
   end
 end
 
-graphics.draw_border = function(v)
+graphics.draw_outline = function(v)
   love.graphics.setShader(shader.color)
   love.graphics.setColor(v.border)
   for i = -1, 1, 2 do

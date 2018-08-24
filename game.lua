@@ -145,11 +145,16 @@ game.draw_tiles = function(x, y, z, tile)
   love.graphics.setColor(1, 1, 1)
 end
 
+game.draw_borders = function(x, y, z, tile)
+  if tile > 0 and not map.floor_block(x, y, z) then
+    graphics.draw_border(x, y, z, tile)
+  end
+end
+
 game.draw_tile_shadows = function(x, y, z, tile)
   if tile > 0 then
     if not map.floor_block(x, y, z) then
       if z > 1 then
-        love.graphics.setColor(0.2, 0.2, 0.3, 0.5)
         if map.column(x, y, z-1) or map.column(x+1, y+1, z-1) then
           love.graphics.draw(tileshadow_img, tileshadow_quad[3], (x-1)*tile_size, (y+z-2)*tile_size)
         elseif map.column(x+1, y, z-1) then
@@ -157,7 +162,6 @@ game.draw_tile_shadows = function(x, y, z, tile)
         elseif map.column(x, y+1, z-1) then
           love.graphics.draw(tileshadow_img, tileshadow_quad[2], (x-1)*tile_size, (y+z-2)*tile_size)
         end
-        love.graphics.setColor(1, 1, 1)
       end
     end
   end
@@ -207,15 +211,35 @@ game.target_pos = function(p, t, range)
 end
 
 game.draw_props = function(shade, mask)
-  shader[shade]:send("mask", mask)
-  shader[shade]:send("mask_size", {mask:getWidth(), mask:getHeight()})
-  shader[shade]:send("tile_size", tile_size)
-  shader[shade]:send("offset", {0, 0})
+  if mask then
+    shader[shade]:send("mask", mask)
+    shader[shade]:send("mask_size", {mask:getWidth(), mask:getHeight()})
+    shader[shade]:send("tile_size", tile_size)
+    shader[shade]:send("offset", {0, 0})
+  end
   for i, v in ipairs(props) do
-    shader[shade]:send("w", prop_info[v.type].w)
-    shader[shade]:send("coords", {0, v.y+prop_info[v.type].h, v.z})
+    if mask then
+      shader[shade]:send("w", prop_info[v.type].w)
+      shader[shade]:send("coords", {0, v.y+prop_info[v.type].h, v.z})
+    end
     love.graphics.setShader(shader[shade])
     love.graphics.draw(prop_img[prop_info[v.type].img], (v.x-1)*tile_size, (v.y+v.z-2)*tile_size)
+    love.graphics.setShader()
+  end
+end
+
+game.draw_prop_border = function(x, y)
+  shader.prop_shadow:send("mask", layer_mask)
+  shader.prop_shadow:send("mask_size", {x, y})
+  shader.prop_shadow:send("offset", {0, 0})
+  for i, v in ipairs(props) do
+    shader.prop_shadow:send("coords", {0, v.y+prop_info[v.type].h, v.z})
+    love.graphics.setShader(shader.prop_shadow)
+    for i = -2, 2 do
+      for j = math.abs(i)-2, -math.abs(i)+2 do
+        love.graphics.draw(prop_img[prop_info[v.type].img], (v.x-1)*tile_size+j, (v.y+v.z-2)*tile_size+i)
+      end
+    end
     love.graphics.setShader()
   end
 end

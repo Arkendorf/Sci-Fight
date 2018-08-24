@@ -72,6 +72,12 @@ map.column = function(x, y, z)
         return true
       end
     end
+    for i, v in ipairs(props) do
+      local cube = {x = v.x, y = v.y, z = v.z, l = prop_info[v.type].l, w = prop_info[v.type].w, h = prop_info[v.type].h}
+      if collision.cube_and_cube(cube, {x = new_x, y = new_y, z = new_z, l = 1, w = 1, h = 1}) then
+        return true
+      end
+    end
   end
   return false
 end
@@ -87,33 +93,47 @@ map.set = function(num)
   -- shader stuff
   local x, y = #grid[1][1]*tile_size, (#grid+#grid[1])*tile_size
 
-  layer_mask = love.graphics.newCanvas(x, y)
+  layer_mask = love.graphics.newCanvas(x, y) -- create layer mask
   shader.layer:send("mask_size", {x, y})
   -- draw layer mask
   love.graphics.setCanvas(layer_mask)
-  map.iterate(game.draw_layer_mask)
-  game.draw_props("prop_layer_mask", layer_mask)
+  map.iterate(game.draw_layer_mask) -- draw tile layer mask
+  game.draw_props("prop_layer_mask", layer_mask) -- draw prop layer mask
   shader.layer:send("mask", layer_mask)
 
-  shadow_mask = love.graphics.newCanvas(x, y)
+  shadow_mask = love.graphics.newCanvas(x, y) -- create shadow mask
   shader.shadow:send("mask_size", {x, y})
   -- draw shadow mask
   love.graphics.setCanvas(shadow_mask)
-  map.iterate(game.draw_shadow_mask)
-  game.draw_props("prop_shadow_mask", layer_mask)
+  map.iterate(game.draw_shadow_mask) -- draw tile layer mask
+  game.draw_props("prop_shadow_mask", layer_mask) -- draw prop layer mask
   shader.shadow:send("mask", shadow_mask)
 
+  love.graphics.setColor(1, 1, 1) -- reset
   love.graphics.setShader()
 
-  map_canvas = love.graphics.newCanvas(x, y)
+  border_canvas = love.graphics.newCanvas(x, y) -- create canvas for borders (helps with perspective)
+  love.graphics.setCanvas(border_canvas)
+  love.graphics.clear()
+  game.draw_prop_border(x, y) -- draw borders due to props
+  love.graphics.setColor(0, 0, 0)
+  game.draw_props("color") -- block out actual prop from borders
+  love.graphics.setColor(1, 1, 1)
+  map.iterate(game.draw_borders) -- draw borders due to tiles
+
+  map_canvas = love.graphics.newCanvas(x, y) -- create canvas you actually see
   love.graphics.setCanvas(map_canvas)
   love.graphics.clear()
-  map.iterate(game.draw_tiles)
+  map.iterate(game.draw_tiles) -- draw tiles
+  love.graphics.setColor(0.2, 0.2, 0.3, 0.5)
   map.iterate(game.draw_tile_shadows) -- draw tile shadows
-  game.draw_props("prop_layer", layer_mask)
-
-  -- reset
   love.graphics.setColor(1, 1, 1)
+  game.draw_props("prop_layer", layer_mask) -- draw props
+  love.graphics.setShader(shader.border) -- only draw borders, ignore blocks
+  love.graphics.draw(border_canvas) -- draw borders
+  love.graphics.setShader()
+
+  love.graphics.setColor(1, 1, 1) -- reset
   love.graphics.setCanvas()
 end
 

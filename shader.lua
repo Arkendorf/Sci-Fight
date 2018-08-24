@@ -131,4 +131,36 @@ shader.prop_layer = love.graphics.newShader[[
     }
   ]]
 
+  shader.prop_shadow = love.graphics.newShader[[
+      extern Image mask;
+      extern vec2 mask_size;
+      extern vec3 coords;
+      extern vec2 offset;
+      extern number tile_size;
+      extern number w;
+      vec4 effect( vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords ){
+        vec4 pixel = Texel(texture, texture_coords);
+        if(pixel.a > 0){
+          vec2 adjusted_coords = vec2(screen_coords.x-offset.x, screen_coords.y-offset.y);
+          if(adjusted_coords.x >= 0.0 && adjusted_coords.x <= mask_size.x && adjusted_coords.y >= 0.0 && adjusted_coords.y <= mask_size.y){
+            vec4 mask_pixel = Texel(mask, vec2(adjusted_coords.x/mask_size.x, adjusted_coords.y/mask_size.y));
+            if((mask_pixel.b <= 1.014-0.010*coords.z)){
+              return color;
+            }
+          }
+        }
+        return vec4(0, 0, 0, 0);
+      }
+    ]]
+
+shader.border = love.graphics.newShader[[
+    vec4 effect( vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords ){
+      vec4 pixel = Texel(texture, texture_coords);
+      if(pixel.a > 0 && pixel.r > 0 && pixel.g > 0 && pixel.b > 0){
+        return vec4(.2, .2, .3, .5);
+      }
+      return vec4(0, 0, 0, 0);
+    }
+  ]]
+
 return shader
