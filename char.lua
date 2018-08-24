@@ -94,7 +94,7 @@ char.update = function(dt)
     end
 
     -- collision
-    collision.grid(v)
+    collision.map(v)
 
     -- movement and friction
     v.x = v.x + v.xV * dt * 60

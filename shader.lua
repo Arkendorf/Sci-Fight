@@ -49,36 +49,6 @@ shader.color = love.graphics.newShader[[
     }
   ]]
 
-  shader.prop_layer = love.graphics.newShader[[
-      extern Image mask;
-      extern vec2 mask_size;
-      extern vec3 coords;
-      extern vec2 offset;
-      extern number tile_size;
-      extern number w;
-      vec4 effect( vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords ){
-        vec4 pixel = Texel(texture, texture_coords);
-        if(pixel.a > 0){
-          vec2 adjusted_coords = vec2(screen_coords.x-offset.x, screen_coords.y-offset.y);
-          if(adjusted_coords.x >= 0.0 && adjusted_coords.x <= mask_size.x && adjusted_coords.y >= 0.0 && adjusted_coords.y <= mask_size.y){
-            vec4 mask_pixel = Texel(mask, vec2(adjusted_coords.x/mask_size.x, adjusted_coords.y/mask_size.y));
-            if(adjusted_coords.y/tile_size-coords.y<w){
-              if(mask_pixel.b > 1.014-0.010*coords.z){
-                return vec4(0, 0, 0, 0);
-              }
-            }
-            else{
-              if(mask_pixel.g < 1.014-0.010*(coords.y)){
-                return vec4(0, 0, 0, 0);
-              }
-            }
-          }
-        }
-        return pixel*color;
-      }
-    ]]
-
-
 shader.prop_layer_mask = love.graphics.newShader[[
     extern Image mask;
     extern vec2 mask_size;
@@ -105,6 +75,59 @@ shader.prop_layer_mask = love.graphics.newShader[[
         }
       }
       return vec4(0, 0, 0, 0);
+    }
+  ]]
+
+shader.prop_shadow_mask = love.graphics.newShader[[
+    extern Image mask;
+    extern vec2 mask_size;
+    extern vec3 coords;
+    extern vec2 offset;
+    extern number tile_size;
+    extern number w;
+    vec4 effect( vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords ){
+      vec4 pixel = Texel(texture, texture_coords);
+      if(pixel.a > 0){
+        vec2 adjusted_coords = vec2(screen_coords.x-offset.x, screen_coords.y-offset.y);
+        if(adjusted_coords.x >= 0.0 && adjusted_coords.x <= mask_size.x && adjusted_coords.y >= 0.0 && adjusted_coords.y <= mask_size.y){
+          vec4 mask_pixel = Texel(mask, vec2(adjusted_coords.x/mask_size.x, adjusted_coords.y/mask_size.y));
+          if(adjusted_coords.y/tile_size-coords.y<w){
+            if(mask_pixel.b > 1.014-0.010*coords.z){
+              return vec4(1.01-0.01*coords.z, 0, 0, 1);
+            }
+          }
+        }
+      }
+      return pixel*color;
+    }
+  ]]
+
+shader.prop_layer = love.graphics.newShader[[
+    extern Image mask;
+    extern vec2 mask_size;
+    extern vec3 coords;
+    extern vec2 offset;
+    extern number tile_size;
+    extern number w;
+    vec4 effect( vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords ){
+      vec4 pixel = Texel(texture, texture_coords);
+      if(pixel.a > 0){
+        vec2 adjusted_coords = vec2(screen_coords.x-offset.x, screen_coords.y-offset.y);
+        if(adjusted_coords.x >= 0.0 && adjusted_coords.x <= mask_size.x && adjusted_coords.y >= 0.0 && adjusted_coords.y <= mask_size.y){
+          vec4 mask_pixel = Texel(mask, vec2(adjusted_coords.x/mask_size.x, adjusted_coords.y/mask_size.y));
+          if(adjusted_coords.y/tile_size-coords.y<w){
+            if(mask_pixel.b > 1.014-0.010*coords.z){
+              return vec4(0, 0, 0, 0);
+            }
+          }
+          else{
+            if(mask_pixel.g < 1.014-0.010*(coords.y)){
+              return vec4(0, 0, 0, 0);
+            }
+          }
+        }
+      }
+      return pixel*color;
     }
   ]]
 

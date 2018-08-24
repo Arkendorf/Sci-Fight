@@ -215,7 +215,7 @@ game.draw_props = function(shade, mask)
     shader[shade]:send("w", prop_info[v.type].w)
     shader[shade]:send("coords", {0, v.y+prop_info[v.type].h, v.z})
     love.graphics.setShader(shader[shade])
-    love.graphics.draw(prop_img[prop_info[v.type].img], v.x*tile_size, (v.y+v.z-prop_info[v.type].h)*tile_size)
+    love.graphics.draw(prop_img[prop_info[v.type].img], (v.x-1)*tile_size, (v.y+v.z-2)*tile_size)
     love.graphics.setShader()
   end
 end

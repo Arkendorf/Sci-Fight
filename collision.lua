@@ -1,5 +1,10 @@
 local collision = {}
 
+collision.map = function(obj)
+  collision.grid(obj)
+  collision.props(obj)
+end
+
 collision.grid = function(obj)
   for i = 0, 1 do
     for j = 0, 1 do
@@ -45,6 +50,43 @@ collision.grid = function(obj)
       end
     end
   end
+end
+
+collision.props = function(obj)
+  for i, v in ipairs(props) do
+    local cube = {x = (v.x-1)*tile_size, y = (v.y-1)*tile_size, z = (v.z-1)*tile_size, l = prop_info[v.type].l*tile_size, w = prop_info[v.type].w*tile_size, h = prop_info[v.type].h*tile_size}
+    if collision.cube_and_cube(obj, cube, 0, 0, obj.zV*global_dt*60) then
+      if obj.zV > 0 then
+        obj.z = (v.z-1)*tile_size - obj.h
+        obj.jump = false
+      elseif obj.zV < 0 then
+        obj.z = (v.z+prop_info[v.type].h-1)*tile_size
+      end
+      obj.zV = 0
+    end
+
+    if collision.cube_and_cube(obj, cube, obj.xV*global_dt*60, 0, 0) then
+      if obj.xV > 0 then
+        obj.x = (v.x-1)*tile_size - obj.l
+      elseif obj.zV < 0 then
+        obj.x = (v.x+prop_info[v.type].l-1)*tile_size
+      end
+      obj.xV = 0
+    end
+
+    if collision.cube_and_cube(obj, cube, 0, obj.yV*global_dt*60, 0) then
+      if obj.yV > 0 then
+        obj.y = (v.y-1)*tile_size - obj.w
+      elseif obj.yV < 0 then
+        obj.y = (v.y+prop_info[v.type].w-1)*tile_size
+      end
+      obj.yV = 0
+    end
+  end
+end
+
+collision.cube_and_cube = function(a, b, xV, yV, zV)
+  return (a.x+a.l+xV > b.x and a.x+xV < b.x+b.l and a.y+a.w+yV > b.y and a.y+yV < b.y+b.w and a.z+a.h+zV > b.z and a.z+zV < b.z+b.h)
 end
 
 collision.coord_to_tile = function(x, w, k)
@@ -201,6 +243,25 @@ collision.bullet_and_cube = function(k, v, c)
 end
 
 collision.line_and_map = function(p1, p2)
+  local face, frac = collision.line_and_grid(p1, p2)
+  if face then
+    return face, frac
+  else
+    local face, frac = collision.line_and_props(p1, p2)
+    return face, frac
+  end
+end
+
+collision.line_and_props = function(p1, p2)
+  for i, v in ipairs(props) do
+    local cube = {x = (v.x-1)*tile_size, y = (v.y-1)*tile_size, z = (v.z-1)*tile_size, l = prop_info[v.type].l*tile_size, w = prop_info[v.type].w*tile_size, h = prop_info[v.type].h*tile_size}
+    if collision.line_and_cube(p1, p2, cube) then
+      return collision.find_prop_face(p1, p2, cube)
+    end
+  end
+end
+
+collision.line_and_grid = function(p1, p2)
   local x_min = 1+math.floor(math.min(p1.x, p2.x)/tile_size)
   local x_max = 1+math.floor(math.max(p1.x, p2.x)/tile_size)
   local y_min = 1+math.floor(math.min(p1.y, p2.y)/tile_size)
@@ -216,7 +277,7 @@ collision.line_and_map = function(p1, p2)
         if collision.in_bounds(x, y, z) and tiles[grid[z][y][x]] == 1 then
           local cube = {x = (x-1)*tile_size, y = (y-1)*tile_size, z = (z-1)*tile_size, l = tile_size, w = tile_size, h = tile_size}
           if collision.line_and_cube(p1, p2, cube) then
-            local new_face, new_frac = collision.find_face(p1, p2, cube)
+            local new_face, new_frac = collision.find_tile_face(p1, p2, cube)
             if new_face then
               for k, v in pairs(new_face) do
                 if v > 0 then
@@ -239,7 +300,7 @@ collision.line_and_map = function(p1, p2)
   end
 end
 
-collision.find_face = function(p1, p2, t)
+collision.find_tile_face = function(p1, p2, t)
   for i, v in ipairs(faces) do
     for j = 1, #corners - 1 do
       local corner1 = corners[j]
@@ -251,7 +312,7 @@ collision.find_face = function(p1, p2, t)
         if tiles[tile] == 0 then --no adjacent tile to edge
           local collide, frac = collision.line_intersect({x = p1[v.x], y = p1[v.y]}, {x = p2[v.x], y = p2[v.y]}, {x = t[v.x]+tile_size*corner1.x, y = t[v.y]+tile_size*corner1.y}, {x = t[v.x]+tile_size*corner2.x, y = t[v.y]+tile_size*corner2.y})
           if collide then
-            return {[v.x] = math.abs(x_offset), [v.y] = math.abs(y_offset)}, frac
+            return {[v.x] = math.abs(x_offset), [v.y] = math.abs(y_offset), [v.z] = 0}, frac
           end
         end
       end
@@ -266,6 +327,24 @@ collision.get_tile = function(coords)
   else
     return 0
   end
+end
+
+collision.find_prop_face = function(p1, p2, c)
+  for i, v in ipairs(faces) do
+    for j = 1, #corners - 1 do
+      local corner1 = corners[j]
+      local corner2 = corners[j+1]
+      local x_offset = corner2.y-corner1.y
+      local y_offset = corner1.x-corner2.x
+      if x_offset * (p2[v.x]-p1[v.x]) < 0 or y_offset * (p2[v.y]-p1[v.y]) < 0 then -- make sure edge is in LoS
+        local collide, frac = collision.line_intersect({x = p1[v.x], y = p1[v.y]}, {x = p2[v.x], y = p2[v.y]}, {x = c[v.x]+c[v.w]*corner1.x, y = c[v.y]+c[v.h]*corner1.y}, {x = c[v.x]+c[v.w]*corner2.x, y = c[v.y]+c[v.h]*corner2.y})
+        if collide then
+          return {[v.x] = math.abs(x_offset), [v.y] = math.abs(y_offset), [v.z] = 0}, frac
+        end
+      end
+    end
+  end
+  return false
 end
 
 return collision

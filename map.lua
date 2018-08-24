@@ -7,7 +7,7 @@ map.load = function()
   tiles = {[0] = 0, 1, 1, 1, 1, 1, 1, 1}
 
   prop_info = {}
-  prop_info[1] = {w = 2, h = 2, img = 1}
+  prop_info[1] = {l = 2, w = 2, h = 2, img = 1}
 
   map.set(1)
 end
@@ -86,12 +86,6 @@ map.set = function(num)
 
   -- shader stuff
   local x, y = #grid[1][1]*tile_size, (#grid+#grid[1])*tile_size
-  shadow_mask = love.graphics.newCanvas(x, y)
-  shader.shadow:send("mask_size", {x, y})
-  -- draw shadow mask
-  love.graphics.setCanvas(shadow_mask)
-  map.iterate(game.draw_shadow_mask)
-  shader.shadow:send("mask", shadow_mask)
 
   layer_mask = love.graphics.newCanvas(x, y)
   shader.layer:send("mask_size", {x, y})
@@ -99,9 +93,17 @@ map.set = function(num)
   love.graphics.setCanvas(layer_mask)
   map.iterate(game.draw_layer_mask)
   game.draw_props("prop_layer_mask", layer_mask)
+  shader.layer:send("mask", layer_mask)
+
+  shadow_mask = love.graphics.newCanvas(x, y)
+  shader.shadow:send("mask_size", {x, y})
+  -- draw shadow mask
+  love.graphics.setCanvas(shadow_mask)
+  map.iterate(game.draw_shadow_mask)
+  game.draw_props("prop_shadow_mask", layer_mask)
+  shader.shadow:send("mask", shadow_mask)
 
   love.graphics.setShader()
-  shader.layer:send("mask", layer_mask)
 
   map_canvas = love.graphics.newCanvas(x, y)
   love.graphics.setCanvas(map_canvas)
