@@ -220,7 +220,7 @@ game.draw_props = function(shade, mask, asd)
   for i, v in ipairs(props) do
     if mask then
       shader[shade]:send("w", prop_info[v.type].w)
-      shader[shade]:send("coords", {0, v.y+prop_info[v.type].w, v.z})
+      shader[shade]:send("coords", {v.x, v.y, v.z})
     end
     love.graphics.setShader(shader[shade])
     love.graphics.draw(prop_img[prop_info[v.type].img], (v.x-1)*tile_size, (v.y+v.z-2)*tile_size)
@@ -233,7 +233,7 @@ game.draw_prop_border = function(x, y)
   shader.prop_shadow:send("mask_size", {x, y})
   shader.prop_shadow:send("offset", {0, 0})
   for i, v in ipairs(props) do
-    shader.prop_shadow:send("coords", {0, v.y+prop_info[v.type].h, v.z})
+    shader.prop_shadow:send("coords", {v.x, v.y, v.z})
     love.graphics.setShader(shader.prop_shadow)
     for i = -2, 2 do
       for j = math.abs(i)-2, -math.abs(i)+2 do

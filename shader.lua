@@ -62,9 +62,9 @@ shader.prop_layer_mask = love.graphics.newShader[[
         vec2 adjusted_coords = vec2(screen_coords.x-offset.x, screen_coords.y-offset.y);
         if(adjusted_coords.x >= 0.0 && adjusted_coords.x <= mask_size.x && adjusted_coords.y >= 0.0 && adjusted_coords.y <= mask_size.y){
           vec4 mask_pixel = Texel(mask, vec2(adjusted_coords.x/mask_size.x, adjusted_coords.y/mask_size.y));
-          if(adjusted_coords.y/tile_size-coords.y<w){
+          if(adjusted_coords.y/tile_size-coords.y-coords.z+2<w){
             if(mask_pixel.b < 1.014-0.010*coords.z){
-              return vec4(0, 1.01 - 0.01*adjusted_coords.y/tile_size, 1.01 - 0.01*coords.z, 1);
+              return vec4(0, 1.01 - 0.01*(adjusted_coords.y/tile_size-w), 1.01 - 0.01*coords.z, 1);
             }
           }
           else{
@@ -91,7 +91,7 @@ shader.prop_shadow_mask = love.graphics.newShader[[
         vec2 adjusted_coords = vec2(screen_coords.x-offset.x, screen_coords.y-offset.y);
         if(adjusted_coords.x >= 0.0 && adjusted_coords.x <= mask_size.x && adjusted_coords.y >= 0.0 && adjusted_coords.y <= mask_size.y){
           vec4 mask_pixel = Texel(mask, vec2(adjusted_coords.x/mask_size.x, adjusted_coords.y/mask_size.y));
-          if(adjusted_coords.y/tile_size-coords.y<w){
+          if(adjusted_coords.y/tile_size-coords.y-coords.z+2<w){
             if(mask_pixel.b < 1.014-0.010*coords.z){
               return vec4(1.01-0.01*coords.z, 0, 0, 1);
             }
@@ -115,14 +115,14 @@ shader.prop_layer = love.graphics.newShader[[
         vec2 adjusted_coords = vec2(screen_coords.x-offset.x, screen_coords.y-offset.y);
         if(adjusted_coords.x >= 0.0 && adjusted_coords.x <= mask_size.x && adjusted_coords.y >= 0.0 && adjusted_coords.y <= mask_size.y){
           vec4 mask_pixel = Texel(mask, vec2(adjusted_coords.x/mask_size.x, adjusted_coords.y/mask_size.y));
-          if(adjusted_coords.y/tile_size-coords.y<w){
+          if(adjusted_coords.y/tile_size-coords.y-coords.z+2<w){
             if(mask_pixel.b > 1.014-0.010*coords.z){
               return vec4(0, 0, 0, 0);
             }
           }
           else{
-            if(mask_pixel.g < 1.014-0.010*(coords.y)){
-              return vec4(0, 0, 0, 1);
+            if(mask_pixel.g < 1.014-0.010*(coords.y+w)){
+              return vec4(0, 0, 0, 0);
             }
           }
         }
