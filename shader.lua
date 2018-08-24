@@ -122,7 +122,7 @@ shader.prop_layer = love.graphics.newShader[[
           }
           else{
             if(mask_pixel.g < 1.014-0.010*(coords.y)){
-              return vec4(0, 0, 0, 0);
+              return vec4(0, 0, 0, 1);
             }
           }
         }

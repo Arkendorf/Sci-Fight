@@ -7,7 +7,7 @@ map.load = function()
   tiles = {[0] = 0, 1, 1, 1, 1, 1, 1, 1}
 
   prop_info = {}
-  prop_info[1] = {l = 2, w = 2, h = 2, img = "test"}
+  prop_info[1] = {l = 4, w = 4, h = 1, img = "console"}
 
   map.set(1)
 end

@@ -210,7 +210,7 @@ game.target_pos = function(p, t, range)
   return {x = p.x+p.l/2+t.x*range, y= p.y+p.w/2+t.y*range, z = p.z+p.h/2+t.z*range}
 end
 
-game.draw_props = function(shade, mask)
+game.draw_props = function(shade, mask, asd)
   if mask then
     shader[shade]:send("mask", mask)
     shader[shade]:send("mask_size", {mask:getWidth(), mask:getHeight()})
@@ -220,7 +220,7 @@ game.draw_props = function(shade, mask)
   for i, v in ipairs(props) do
     if mask then
       shader[shade]:send("w", prop_info[v.type].w)
-      shader[shade]:send("coords", {0, v.y+prop_info[v.type].h, v.z})
+      shader[shade]:send("coords", {0, v.y+prop_info[v.type].w, v.z})
     end
     love.graphics.setShader(shader[shade])
     love.graphics.draw(prop_img[prop_info[v.type].img], (v.x-1)*tile_size, (v.y+v.z-2)*tile_size)
