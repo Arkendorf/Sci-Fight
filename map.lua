@@ -11,6 +11,7 @@ map.load = function()
   prop_info.runetop = {l = 4, w = 4, h = 1, img = "runetop", shadow = true}
   prop_info.timerods = {l = 2, w = 2, h = 3, img = "timerods", shadow = true}
   prop_info.railingright = {l = 1, w = 1, h = 1, img = "railingright"}
+  prop_info.railingleft = {l = 1, w = 1, h = 1, img = "railingleft"}
 
   map.set(1)
 end
@@ -100,6 +101,7 @@ map.set = function(num)
   shader.layer:send("mask_size", {x, y})
   -- draw layer mask
   love.graphics.setCanvas(layer_mask)
+  love.graphics.clear()
   map.iterate(game.draw_layer_mask) -- draw tile layer mask
   game.draw_props("prop_layer_mask", layer_mask) -- draw prop layer mask
   shader.layer:send("mask", layer_mask)
@@ -108,6 +110,7 @@ map.set = function(num)
   shader.shadow:send("mask_size", {x, y})
   -- draw shadow mask
   love.graphics.setCanvas(shadow_mask)
+  love.graphics.clear()
   map.iterate(game.draw_shadow_mask) -- draw tile layer mask
   game.draw_props("prop_shadow_mask", layer_mask, true) -- draw prop layer mask
   shader.shadow:send("mask", shadow_mask)

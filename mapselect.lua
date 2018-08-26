@@ -1,6 +1,6 @@
 local mapselect = {}
 
-local icon = {w = 82, h = 40, border = 2}
+local icon = {w = 82, h = 56, border = 2}
 local option_pos = {}
 local icons = {}
 local current = 1
@@ -18,7 +18,7 @@ mapselect.load = function()
     maps[i] = {grid = grid, props = props}
   end
 
-  option_pos = {x = (screen.w-256)/2, y = (screen.h-256)/2+66, w = 256, h = 190}
+  option_pos = {x = (screen.w-256)/2, y = (screen.h-256)/2+66, w = 256, h = 192}
 
   mapselect_imgs.header = gui.new_img(1, option_pos.w, 64)
   mapselect_imgs.option = gui.new_img(5, option_pos.w, option_pos.h)

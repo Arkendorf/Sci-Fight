@@ -199,16 +199,6 @@ graphics.bitmask_tile = function(x, y, z, w, h, tile, func)
   end
 end
 
-graphics.spritesheet = function(img, tw, th)
-  local quads = {}
-  for y = 0, math.ceil(img:getHeight()/th)-1 do
-    for x = 0, math.ceil(img:getWidth()/tw)-1 do
-      quads[#quads+1] = love.graphics.newQuad(x*tw, y * th, tw, th, img:getDimensions())
-    end
-  end
-  return quads
-end
-
 graphics.draw = function(v, color)
   if color then
     love.graphics.setColor(color)
