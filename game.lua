@@ -45,8 +45,6 @@ game.update = function(dt)
   char.queue()
   bullet.queue()
   particle.queue()
-  -- update masks (e.g. layer and shadow)
-  map.update_masks()
 end
 
 game.draw = function()
@@ -63,6 +61,9 @@ game.draw = function()
   game.draw_queue()
   -- target
   love.graphics.circle("line", players[id].target.x, players[id].target.y+players[id].target.z, 12, 24)
+  if love.keyboard.isDown("f") then
+    love.graphics.draw(layer_mask)
+  end
 
   love.graphics.pop()
   -- draw hud
@@ -146,20 +147,25 @@ game.draw_tiles = function(x, y, z, tile)
 end
 
 game.draw_borders = function(x, y, z, tile)
+  shader.layer:send("coords", {x, y, z})
+  love.graphics.setShader(shader.layer)
   if tile > 0 and not map.floor_block(x, y, z) then
     graphics.draw_border(x, y, z, tile)
   end
+  love.graphics.setShader()
 end
 
 game.draw_tile_shadows = function(x, y, z, tile)
   if tile > 0 then
     if not map.floor_block(x, y, z) then
       if z > 1 then
-        if map.column(x, y, z-1) or map.column(x+1, y+1, z-1) then
+        local x_axis = map.column(x+1, y, z-1)
+        local y_axis = map.column(x, y+1, z-1)
+        if map.column(x, y, z-1) or map.column(x+1, y+1, z-1) or (x_axis and y_axis) then
           love.graphics.draw(tileshadow_img, tileshadow_quad[3], (x-1)*tile_size, (y+z-2)*tile_size)
-        elseif map.column(x+1, y, z-1) then
+        elseif x_axis then
           love.graphics.draw(tileshadow_img, tileshadow_quad[1], (x-1)*tile_size, (y+z-2)*tile_size)
-        elseif map.column(x, y+1, z-1) then
+        elseif y_axis then
           love.graphics.draw(tileshadow_img, tileshadow_quad[2], (x-1)*tile_size, (y+z-2)*tile_size)
         end
       end
@@ -233,14 +239,16 @@ game.draw_prop_border = function(x, y)
   shader.prop_shadow:send("mask_size", {x, y})
   shader.prop_shadow:send("offset", {0, 0})
   for i, v in ipairs(props) do
-    shader.prop_shadow:send("coords", {v.x, v.y, v.z})
-    love.graphics.setShader(shader.prop_shadow)
-    for i = -2, 2 do
-      for j = math.abs(i)-2, -math.abs(i)+2 do
-        love.graphics.draw(prop_img[prop_info[v.type].img], (v.x-1)*tile_size+j, (v.y+v.z-2)*tile_size+i)
+    if prop_info[v.type].shadow then
+      shader.prop_shadow:send("coords", {v.x, v.y, v.z})
+      -- love.graphics.setShader(shader.prop_shadow)
+      for i = -2, 2 do
+        for j = math.abs(i)-2, -math.abs(i)+2 do
+          love.graphics.draw(prop_img[prop_info[v.type].img], (v.x-1)*tile_size+j, (v.y+v.z-2)*tile_size+i)
+        end
       end
+      love.graphics.setShader()
     end
-    love.graphics.setShader()
   end
 end
 

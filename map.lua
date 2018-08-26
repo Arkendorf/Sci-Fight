@@ -7,13 +7,12 @@ map.load = function()
   tiles = {[0] = 0, 1, 1, 1, 1, 1, 1, 1}
 
   prop_info = {}
-  prop_info[1] = {l = 4, w = 4, h = 1, img = "console"}
-  prop_info[2] = {l = 2, w = 2, h = 2, img = "test"}
+  prop_info.console = {l = 4, w = 4, h = 1, img = "console", shadow = true}
+  prop_info.runetop = {l = 4, w = 4, h = 1, img = "runetop", shadow = true}
+  prop_info.timerods = {l = 2, w = 2, h = 3, img = "timerods", shadow = true}
+  prop_info.railingright = {l = 1, w = 1, h = 1, img = "railingright"}
 
   map.set(1)
-end
-
-map.update_masks = function()
 end
 
 map.draw = function()
@@ -74,9 +73,11 @@ map.column = function(x, y, z)
       end
     end
     for i, v in ipairs(props) do
-      local cube = {x = v.x, y = v.y, z = v.z, l = prop_info[v.type].l, w = prop_info[v.type].w, h = prop_info[v.type].h}
-      if collision.cube_and_cube(cube, {x = new_x, y = new_y, z = new_z, l = 1, w = 1, h = 1}) then
-        return true
+      if prop_info[v.type].shadow then
+        local cube = {x = v.x, y = v.y, z = v.z, l = prop_info[v.type].l, w = prop_info[v.type].w, h = prop_info[v.type].h}
+        if collision.cube_and_cube(cube, {x = new_x, y = new_y, z = new_z, l = 1, w = 1, h = 1}) then
+          return true
+        end
       end
     end
   end
@@ -90,6 +91,7 @@ end
 map.set = function(num)
   grid = maps[num].grid
   props = maps[num].props
+  table.sort(props, function(a, b) return a.z > b.z end)
 
   -- shader stuff
   local x, y = #grid[1][1]*tile_size, (#grid+#grid[1])*tile_size
@@ -120,6 +122,8 @@ map.set = function(num)
   love.graphics.setColor(0, 0, 0)
   game.draw_props("color") -- block out actual prop from borders
   love.graphics.setColor(1, 1, 1)
+  shader.layer:send("xray_color", {0, 0, 0, 0})
+  shader.layer:send("offset", {0, 0})
   map.iterate(game.draw_borders) -- draw borders due to tiles
 
   map_canvas = love.graphics.newCanvas(x, y) -- create canvas you actually see
