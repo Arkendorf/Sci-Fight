@@ -109,7 +109,7 @@ map.set = function(num)
   -- draw shadow mask
   love.graphics.setCanvas(shadow_mask)
   map.iterate(game.draw_shadow_mask) -- draw tile layer mask
-  game.draw_props("prop_shadow_mask", layer_mask) -- draw prop layer mask
+  game.draw_props("prop_shadow_mask", layer_mask, true) -- draw prop layer mask
   shader.shadow:send("mask", shadow_mask)
 
   love.graphics.setColor(1, 1, 1) -- reset

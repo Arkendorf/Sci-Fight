@@ -61,9 +61,6 @@ game.draw = function()
   game.draw_queue()
   -- target
   love.graphics.circle("line", players[id].target.x, players[id].target.y+players[id].target.z, 12, 24)
-  if love.keyboard.isDown("f") then
-    love.graphics.draw(layer_mask)
-  end
 
   love.graphics.pop()
   -- draw hud
@@ -216,7 +213,7 @@ game.target_pos = function(p, t, range)
   return {x = p.x+p.l/2+t.x*range, y= p.y+p.w/2+t.y*range, z = p.z+p.h/2+t.z*range}
 end
 
-game.draw_props = function(shade, mask, asd)
+game.draw_props = function(shade, mask, shadow)
   if mask then
     shader[shade]:send("mask", mask)
     shader[shade]:send("mask_size", {mask:getWidth(), mask:getHeight()})
@@ -224,13 +221,15 @@ game.draw_props = function(shade, mask, asd)
     shader[shade]:send("offset", {0, 0})
   end
   for i, v in ipairs(props) do
-    if mask then
-      shader[shade]:send("w", prop_info[v.type].w)
-      shader[shade]:send("coords", {v.x, v.y, v.z})
+    if not shadow or prop_info[v.type].shadow then
+      if mask then
+        shader[shade]:send("w", prop_info[v.type].w)
+        shader[shade]:send("coords", {v.x, v.y, v.z})
+      end
+      love.graphics.setShader(shader[shade])
+      love.graphics.draw(prop_img[prop_info[v.type].img], (v.x-1)*tile_size, (v.y+v.z-2)*tile_size)
+      love.graphics.setShader()
     end
-    love.graphics.setShader(shader[shade])
-    love.graphics.draw(prop_img[prop_info[v.type].img], (v.x-1)*tile_size, (v.y+v.z-2)*tile_size)
-    love.graphics.setShader()
   end
 end
 
