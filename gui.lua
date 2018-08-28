@@ -34,14 +34,23 @@ gui.update = function(dt)
     gui.current_item.flash = gui.current_item.flash + dt
   elseif gui.current_item and gui.current_item.type == 2 then
     local scroll = gui.menus[gui.current_item[1]].scrolls[gui.current_item[2]]
-    local pos = (m_y/screen.scale-screen.x)-scroll.y-gui.current_item.offset
-    if pos < 0 then
-       pos = 0
+
+    scroll.pos = (m_y/screen.scale-screen.x)-scroll.y-gui.current_item.offset
+    if scroll.pos < 0 then
+       scroll.pos = 0
     end
-    if pos > scroll.h-scroll.grab.h then
-      pos = scroll.h-scroll.grab.h
+    if scroll.pos > scroll.h-scroll.grab_h then
+      scroll.pos = scroll.h-scroll.grab_h
     end
-    if type(scroll.pos) == "number" then scroll.pos = pos else scroll.pos.t[scroll.pos.i] = pos end
+    local value = scroll.pos*scroll.range/(scroll.h-scroll.grab_h)*scroll.scale
+    if scroll.range == 0 then
+      value = 0
+    end
+    if type(scroll.value) == "number" then
+      scroll.value = value
+    else
+      scroll.value.t[scroll.value.i] = value
+    end
     if not love.mouse.isDown(1) then
       gui.current_item  = nil
     end
@@ -84,19 +93,17 @@ gui.draw = function()
       end
     end
 
+    for j, w in ipairs(v.scrolls) do
+      love.graphics.setColor(1, 1, 1)
+      love.graphics.rectangle("fill", w.x, w.y+w.pos, w.grab_w, w.grab_h)
+    end
+
     for j, w in ipairs(v.infoboxes) do
       local m_x, m_y = love.mouse.getPosition()
       local x, y = m_x/screen.scale-screen.x+6, m_y/screen.scale-screen.y+6
       love.graphics.setColor(1, 1, 1, w.a)
       love.graphics.draw(gui_imgs[6][tostring(w.w).."x"..tostring(w.h)], math.floor(x), math.floor(y))
       love.graphics.printf(w.txt, math.floor(x+5), math.floor(y+4), math.floor(w.w))
-    end
-
-    for j, w in ipairs(v.scrolls) do
-      local pos = nil
-      if type(w.pos) == "number" then pos = w.pos else pos = w.pos.t[w.pos.i] end
-      love.graphics.setColor(1, 1, 1)
-      love.graphics.rectangle("fill", w.x, w.y+pos, w.grab.w, w.grab.h)
     end
   end
 end
@@ -122,6 +129,7 @@ gui.add = function(num, buttons, textboxes, infoboxes, scrolls)
   local s = {}
   if scrolls then
     s = scrolls
+    gui.scroll_setup(scrolls)
   end
   gui.menus[num] = {buttons = b, textboxes = t, infoboxes = i, scrolls = s}
 end
@@ -173,10 +181,8 @@ gui.mousepressed = function(x, y, button)
 
       for j, w in ipairs(v.scrolls) do
         local w_x, w_y = gui.get_pos(w)
-        local pos = nil
-        if type(w.pos) == "number" then pos = w.pos else pos = w.pos.t[w.pos.i] end
-        if x >= screen.x+w_x*screen.scale and x <= screen.x+(w_x+w.grab.w)*screen.scale and y >= screen.y+(w_y+pos)*screen.scale and y <= screen.y+(w_y+w.grab.h+pos)*screen.scale then
-          gui.current_item = {type = 2, i, j, offset = (y/screen.scale-screen.y)-w_y-pos}
+        if x >= screen.x+w_x*screen.scale and x <= screen.x+(w_x+w.grab_w)*screen.scale and y >= screen.y+(w_y+w.pos)*screen.scale and y <= screen.y+(w_y+w.grab_h+w.pos)*screen.scale then
+          gui.current_item = {type = 2, i, j, offset = (y/screen.scale-screen.y)-w_y-w.pos}
           box_clicked = true
         end
       end
@@ -218,7 +224,7 @@ gui.get_pos = function(w)
   else
     y = w.y.t[w.y.i]
     if w.y.o then
-      x = x + w.y.o
+      y = y + w.y.o
     end
   end
   return x, y
@@ -275,6 +281,25 @@ gui.bitmask = function(x, y, w, h)
     value = value + 8
   end
   return value
+end
+
+gui.scroll_setup = function(scrolls)
+  for i, v in ipairs(scrolls) do
+    if not v.scale then
+      v.scale = 1
+    end
+    v.range = math.abs(v.max-v.min)
+    v.grab_h = v.h/(v.range+1)
+    if v.range == 0 then
+      v.pos = 0
+    else
+      if type(v.value) == "number" then
+        v.pos = v.value/v.range*(v.h-v.grab_h)
+      else
+        v.pos = v.value.t[v.value.i]/v.range*(v.h-v.grab_h)
+      end
+    end
+  end
 end
 
 return gui

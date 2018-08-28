@@ -1,13 +1,16 @@
 local mapselect = {}
 
-local icon = {w = 82, h = 56, border = 2}
+local icon = {w = 76, h = 56, border = 2}
 local option_pos = {}
 local icons = {}
 local current = 1
+local option_scroll = {0}
 local mapselect_imgs = {}
 
 map_name = {
-  "Time Machine Interior"
+  "Time Machine Interior",
+  "Time Machine Interior",
+  "Time Machine Interior",
 }
 
 mapselect.load = function()
@@ -36,7 +39,8 @@ mapselect.start = function(buttons)
     local w, h = gui.text_size(txt, 128)
     infoboxes[i] = {x = v.x, y = v.y, w= w, h = h, hit = {w = v.w, h = v.h}, txt = txt}
   end
-  gui.add(2, buttons, {}, infoboxes)
+  scroll = {{x = option_pos.x+option_pos.w-12, y = option_pos.y+7, h = option_pos.h-14, grab_w = 6, value = {t = option_scroll, i = 1}, min = 0, max = math.max(1, math.ceil(#icons/7)*icon.h/(option_pos.h-18))-1, scale = -option_pos.h+18}}
+  gui.add(2, buttons, {}, infoboxes, scroll)
 end
 
 mapselect.update = function(dt)
@@ -57,7 +61,7 @@ mapselect.get_icon_pos = function()
   local y = 0
   local icons = {}
   for i, v in ipairs(maps) do
-    icons[i] = {x = option_pos.x+x*(icon.w+icon.border)+icon.border+4, y = option_pos.y+y*(icon.h+icon.border)+icon.border+5, w= icon.w, h = icon.h, num = i}
+    icons[i] = {x = option_pos.x+x*(icon.w+icon.border)+icon.border+6, y = option_pos.y+y*(icon.h+icon.border)+icon.border+5, w= icon.w, h = icon.h, num = i}
     x = x + 1
     if x > 2 then
       x = 0
