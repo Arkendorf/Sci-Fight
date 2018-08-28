@@ -8,9 +8,6 @@ gui.load = function()
 end
 
 gui.update = function(dt)
-  if gui.current_box then
-    gui.current_box.flash = gui.current_box.flash + dt
-  end
   local m_x, m_y = love.mouse.getPosition()
   for i, v in pairs(gui.menus) do
     for j, w in ipairs(v.infoboxes) do
@@ -33,6 +30,22 @@ gui.update = function(dt)
       end
     end
   end
+  if gui.current_item and gui.current_item.type == 1 then
+    gui.current_item.flash = gui.current_item.flash + dt
+  elseif gui.current_item and gui.current_item.type == 2 then
+    local scroll = gui.menus[gui.current_item[1]].scrolls[gui.current_item[2]]
+    local pos = (m_y/screen.scale-screen.x)-scroll.y-gui.current_item.offset
+    if pos < 0 then
+       pos = 0
+    end
+    if pos > scroll.h-scroll.grab.h then
+      pos = scroll.h-scroll.grab.h
+    end
+    if type(scroll.pos) == "number" then scroll.pos = pos else scroll.pos.t[scroll.pos.i] = pos end
+    if not love.mouse.isDown(1) then
+      gui.current_item  = nil
+    end
+  end
 end
 
 gui.draw = function()
@@ -43,9 +56,9 @@ gui.draw = function()
         love.graphics.draw(gui_imgs[6][tostring(w.w).."x"..tostring(w.h)], math.floor(x), math.floor(y))
 
         local string = ""
-        if gui.current_box and gui.current_box[1] == i and gui.current_box[2] == j then
+        if gui.current_item and gui.current_item.type == 1 and gui.current_item[1] == i and gui.current_item[2] == j then
           string = w.t[w.i]
-          if math.floor(math.sin(gui.current_box.flash*4)+0.5) == 0 then
+          if math.floor(math.sin(gui.current_item.flash*4)+0.5) == 0 then
             string = string.."_"
           end
         elseif string.len(w.t[w.i]) < 1 and w.sample then
@@ -78,10 +91,17 @@ gui.draw = function()
       love.graphics.draw(gui_imgs[6][tostring(w.w).."x"..tostring(w.h)], math.floor(x), math.floor(y))
       love.graphics.printf(w.txt, math.floor(x+5), math.floor(y+4), math.floor(w.w))
     end
+
+    for j, w in ipairs(v.scrolls) do
+      local pos = nil
+      if type(w.pos) == "number" then pos = w.pos else pos = w.pos.t[w.pos.i] end
+      love.graphics.setColor(1, 1, 1)
+      love.graphics.rectangle("fill", w.x, w.y+pos, w.grab.w, w.grab.h)
+    end
   end
 end
 
-gui.add = function(num, buttons, textboxes, infoboxes)
+gui.add = function(num, buttons, textboxes, infoboxes, scrolls)
   local b = {}
   if buttons then
     b = buttons
@@ -99,7 +119,11 @@ gui.add = function(num, buttons, textboxes, infoboxes)
     i = infoboxes
     gui.add_imgs(infoboxes, 6)
   end
-  gui.menus[num] = {buttons = b, textboxes = t, infoboxes = i}
+  local s = {}
+  if scrolls then
+    s = scrolls
+  end
+  gui.menus[num] = {buttons = b, textboxes = t, infoboxes = i, scrolls = s}
 end
 
 gui.remove = function(num)
@@ -116,51 +140,63 @@ end
 
 gui.clear = function()
   gui.menus = {}
-  gui.current_box = nil
+  gui.current_item = nil
 end
 
 gui.mousepressed = function(x, y, button)
-  local button_pressed = false
-  local box_clicked = false
-  for i, v in pairs(gui.menus) do
-    if not button_pressed then
-      for j, w in ipairs(v.buttons) do
+  if button == 1 then
+    local button_pressed = false
+    local box_clicked = false
+    for i, v in pairs(gui.menus) do
+      if not button_pressed then
+        for j, w in ipairs(v.buttons) do
+          local w_x, w_y = gui.get_pos(w)
+          if x >= screen.x+w_x*screen.scale and x <= screen.x+(w_x+w.w)*screen.scale and y >= screen.y+w_y*screen.scale and y <= screen.y+(w_y+w.h)*screen.scale then
+            if w.args then
+              w.func(unpack(w.args))
+            else
+              w.func()
+            end
+            button_pressed = true
+            break
+          end
+        end
+      end
+
+      for j, w in ipairs(v.textboxes) do
         local w_x, w_y = gui.get_pos(w)
         if x >= screen.x+w_x*screen.scale and x <= screen.x+(w_x+w.w)*screen.scale and y >= screen.y+w_y*screen.scale and y <= screen.y+(w_y+w.h)*screen.scale then
-          if w.args then
-            w.func(unpack(w.args))
-          else
-            w.func()
-          end
-          button_pressed = true
-          break
+          gui.current_item = {type = 1, i, j, flash = 0}
+          box_clicked = true
+        end
+      end
+
+      for j, w in ipairs(v.scrolls) do
+        local w_x, w_y = gui.get_pos(w)
+        local pos = nil
+        if type(w.pos) == "number" then pos = w.pos else pos = w.pos.t[w.pos.i] end
+        if x >= screen.x+w_x*screen.scale and x <= screen.x+(w_x+w.grab.w)*screen.scale and y >= screen.y+(w_y+pos)*screen.scale and y <= screen.y+(w_y+w.grab.h+pos)*screen.scale then
+          gui.current_item = {type = 2, i, j, offset = (y/screen.scale-screen.y)-w_y-pos}
+          box_clicked = true
         end
       end
     end
-
-    for j, w in ipairs(v.textboxes) do
-      local w_x, w_y = gui.get_pos(w)
-      if x >= screen.x+w_x*screen.scale and x <= screen.x+(w_x+w.w)*screen.scale and y >= screen.y+w_y*screen.scale and y <= screen.y+(w_y+w.h)*screen.scale then
-        gui.current_box = {i, j, flash = 0}
-        box_clicked = true
-      end
+    if not box_clicked then
+      gui.current_item = nil
     end
-  end
-  if not box_clicked then
-    gui.current_box = nil
   end
 end
 
 gui.keypressed = function(key)
-  if gui.current_box and key == "backspace" then
-    local box = gui.menus[gui.current_box[1]].textboxes[gui.current_box[2]]
+  if gui.current_item and key == "backspace" then
+    local box = gui.menus[gui.current_item[1]].textboxes[gui.current_item[2]]
     box.t[box.i] = string.sub(box.t[box.i], 1, -2)
   end
 end
 
 gui.textinput = function(text)
-  if gui.current_box then
-    local box = gui.menus[gui.current_box[1]].textboxes[gui.current_box[2]]
+  if gui.current_item then
+    local box = gui.menus[gui.current_item[1]].textboxes[gui.current_item[2]]
     if font:getWidth(box.t[box.i]..text) <= box.w-10 then
       box.t[box.i] = box.t[box.i]..text
     end
@@ -169,8 +205,22 @@ end
 
 gui.get_pos = function(w)
   local x, y = 0, 0
-  if type(w.x) == "number" then x = w.x else x = w.x.t[w.x.i] end
-  if type(w.y) == "number" then y = w.y else y = w.y.t[w.y.i] end
+  if type(w.x) == "number" then
+    x = w.x
+  else
+    x = w.x.t[w.x.i]
+    if w.x.o then
+      x = x + w.x.o
+    end
+  end
+  if type(w.y) == "number" then
+    y = w.y
+  else
+    y = w.y.t[w.y.i]
+    if w.y.o then
+      x = x + w.y.o
+    end
+  end
   return x, y
 end
 
