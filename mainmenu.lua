@@ -17,8 +17,8 @@ mainmenu.load = function()
   prompts[2].textboxes = {{x = {t = prompts[2], i = "x"}, y = prompts[2].y+textbox.border, w = prompts[2].w, h = textbox.h, t = prompts[2], i = "ip", sample = "I.P. Address"},
                           {x = {t = prompts[2], i = "x"}, y = prompts[2].y+textbox.border*2+textbox.h, w = prompts[2].w, h = textbox.h, t = prompts[2], i = "port", sample = "Port"}}
 
-  menu_color = {0.2, 0.4, 1}
-  text_color = {85/255, 81/255, 104/255}
+  menu_color = {0, 0, 0}
+  text_color = {86/255, 81/255, 116/255}
 end
 
 mainmenu.start = function()

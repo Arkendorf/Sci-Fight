@@ -11,11 +11,13 @@ mapselect = require "mapselect"
 abilities = require "abilities"
 weapons = require "weapons"
 endmenu = require "endmenu"
+background = require "background"
 
 love.load = function()
   math.randomseed(os.time())
   graphics.load()
   gui.load()
+  background.load()
 
   mapselect.load()
   mainmenu.load()
@@ -38,6 +40,7 @@ love.update = function(dt)
   if client then
     client:update()
   end
+  background.update(dt)
   if state == "mainmenu" then
     mainmenu.update(dt)
   elseif state == "clientmenu" then
@@ -60,6 +63,7 @@ end
 love.draw = function()
   love.graphics.setCanvas(screen.canvas)
   love.graphics.clear()
+  background.draw()
   if state == "mainmenu" then
     mainmenu.draw()
   elseif state == "clientmenu" then

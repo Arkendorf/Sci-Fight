@@ -48,6 +48,9 @@ graphics.load = function()
   weapon_img, weapon_quad, weapon_info = graphics.load_doublefolder("art/weaponimgs", 64, 64)
   char_img, char_quad, char_info = graphics.load_doublefolder("art/charimgs", 24, 48, graphics.load_face_quad)
 
+  star_img = love.graphics.newImage("art/gui/star.png")
+  star_quad = graphics.load_quad(star_img, 8, 8)
+
   shadow_color = {86/255, 81/255, 104/255}
 end
 

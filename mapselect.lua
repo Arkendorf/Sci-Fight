@@ -23,7 +23,7 @@ mapselect.load = function()
 
   option_pos = {x = (screen.w-256)/2, y = (screen.h-256)/2+66, w = 256, h = 192}
 
-  mapselect_imgs.header = gui.new_img(1, option_pos.w, 64)
+  mapselect_imgs.header = gui.new_img(4, option_pos.w, 64)
   mapselect_imgs.option = gui.new_img(5, option_pos.w, option_pos.h)
 end
 
@@ -49,7 +49,9 @@ end
 mapselect.draw = function(dt)
   love.graphics.draw(mapselect_imgs.header, option_pos.x, option_pos.y-66)
   love.graphics.draw(mapselect_imgs.option, option_pos.x, option_pos.y)
+  love.graphics.setColor(text_color)
   love.graphics.printf("Map Vote:\n"..map_name[current], option_pos.x, option_pos.y-42, option_pos.w, "center")
+  love.graphics.setColor(1, 1, 1)
   for i, v in ipairs(icons) do
     custom.icon_background(v.x, v.y, 4, current == i)
     love.graphics.draw(map_icon[current], v.x, v.y)
