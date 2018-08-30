@@ -12,6 +12,8 @@ particle.load = function()
   particle_info.flare = {t = 0.2, slow = 0, speed = 20, img = "flare", angle = true}
   particle_info.spark = {t = 0.2, slow = 1, speed = 20, img = "spark", angle = true}
   particle_info.explosion = {t = 0.5, slow = 0.9, speed = 14, img = "explosion"}
+  particle_info.blood = {t = 0.2, slow = 0.9, speed = 20, img = "blood"}
+
 end
 
 particle.update = function(dt)
