@@ -91,4 +91,14 @@ mainmenu.mat = function(num)
   end
 end
 
+mainmenu.get_connection_info = function()
+  return prompts[1].port, prompts[2].ip, prompts[2].port
+end
+
+mainmenu.set_connection_info = function(port1, ip, port2)
+  prompts[1].port = port1
+  prompts[2].ip = ip
+  prompts[2].port = port2
+end
+
 return mainmenu

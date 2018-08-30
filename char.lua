@@ -1,6 +1,6 @@
 local char = {}
 
-local target_range = 32
+local target_range = 24
 local target_speed = 32
 energy_max = 100
 local energy_increase = 0.1
@@ -62,9 +62,22 @@ char.input = function(dt)
   if current.k then
     local v = players[current.k]
     players[id].target.dX, target.dY, target.dZ = v.x+v.l/2, v.y+v.w/2, v.z+v.h/2
+    -- animate target
+    if players[id].target.frame < 4 then
+      players[id].target.frame = players[id].target.frame+dt*30
+      if players[id].target.frame > 4 then
+        players[id].target.frame = 4
+      end
+    end
   else
     local z = players[id].z+players[id].h/2
     target.dX, target.dY, target.dZ = m_x, m_y-z, z
+    if players[id].target.frame > 1 then
+      players[id].target.frame = players[id].target.frame-dt*30
+      if players[id].target.frame < 1 then
+        players[id].target.frame = 1
+      end
+    end
   end
   target.x = target.x + (target.dX-target.x) * dt * target_speed
   target.y = target.y + (target.dY-target.y) * dt * target_speed
@@ -236,7 +249,7 @@ end
 
 char.new = function(name, loadout, team)
   local item = {name = name, x = #grid[1][1]*tile_size*0.5, y = #grid[1]*tile_size*0.5, z = -24, l = 24, w = 24, h = 24, xV = 0, yV = 0, zV = 0,
-                speed = 1, hp = hp_max, energy = energy_max, score = 0, jump = false, inv = 0, team = team, killer = false, target = {x = 0, y = 0, z = 0},
+                speed = 1, hp = hp_max, energy = energy_max, score = 0, jump = false, inv = 0, team = team, killer = false, target = {x = 0, y = 0, z = 0, frame = 1},
                 anim = "run", frame = 1, skin = loadout.skin}
   item.weapon = {type = loadout.weapon, active = false, anim = "base", frame = 1, speed = 0}
   item.abilities = {}

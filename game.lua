@@ -60,7 +60,7 @@ game.draw = function()
   -- draw objects
   game.draw_queue()
   -- target
-  love.graphics.circle("line", players[id].target.x, players[id].target.y+players[id].target.z, 12, 24)
+  love.graphics.draw(target_img, target_quad[math.floor(players[id].target.frame)], players[id].target.x, players[id].target.y+players[id].target.z, 0, 1, 1, 16, 16)
 
   love.graphics.pop()
   -- draw hud

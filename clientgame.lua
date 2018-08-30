@@ -95,7 +95,7 @@ clientgame.update = function(dt)
   -- client pos
   char.input(dt)
   client:send("pos", {x = players[id].x, y = players[id].y, z = players[id].z, xV = players[id].xV, yV = players[id].yV, zV = players[id].zV})
-  client:send("target", players[id].target)
+  client:send("target", {x = players[id].target.x, y = players[id].target.y, z = players[id].target.z})
   -- game updating
   game.update(dt)
 end

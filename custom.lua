@@ -44,7 +44,6 @@ custom.load = function()
 end
 
 custom.update = function(dt)
-
 end
 
 custom.draw = function()
@@ -81,9 +80,9 @@ end
 
 custom.icon_background = function(x, y, type, bool)
   if bool then
-    love.graphics.draw(icon_img, icon_quad[type*2], x, y)
+    love.graphics.draw(icon_img, icon_quad[type*3-1], x, y)
   else
-    love.graphics.draw(icon_img, icon_quad[type*2-1], x, y)
+    love.graphics.draw(icon_img, icon_quad[type*3-2], x, y)
   end
 end
 

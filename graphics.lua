@@ -51,6 +51,9 @@ graphics.load = function()
   star_img = love.graphics.newImage("art/gui/star.png")
   star_quad = graphics.load_quad(star_img, 8, 8)
 
+  target_img = love.graphics.newImage("art/gui/target.png")
+  target_quad = graphics.load_quad(target_img, 32, 32)
+
   shadow_color = {86/255, 81/255, 104/255}
 end
 

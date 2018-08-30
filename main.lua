@@ -30,6 +30,9 @@ love.load = function()
   state = "mainmenu"
   mainmenu.start()
   global_dt = 0
+
+  -- load saved data
+  load()
 end
 
 love.update = function(dt)
@@ -134,5 +137,47 @@ love.quit = function()
     clientgame.quit()
   elseif state == "servergame" then
     servergame.quit()
+  end
+  save()
+end
+
+save = function()
+  local str = ""
+  -- abilities
+  for i, v in ipairs(loadouts) do
+    str = str..tostring(v.skin).."\r\n"
+    str = str..tostring(v.weapon).."\r\n"
+    for j, w in ipairs(v.abilities) do
+      str = str..tostring(w).."\r\n"
+    end
+  end
+  -- server / client connection info
+  local port1, ip, port2 = mainmenu.get_connection_info()
+  str = str..port1.."\r\n"..ip.."\r\n"..port2.."\r\n"
+  -- username
+  str = str..username[1]
+
+  love.filesystem.write("save.txt", str)
+end
+
+load = function()
+  if love.filesystem.getInfo("save.txt") then
+    local save_info = {}
+    for line in love.filesystem.lines("save.txt") do
+      save_info[#save_info+1] = line
+    end
+    -- load abilities
+    for i, v in ipairs(loadouts) do
+      v.skin = tonumber(save_info[(i-1)*7+1])
+      v.weapon = tonumber(save_info[(i-1)*7+2])
+      for j, w in ipairs(v.abilities) do
+        v.abilities[j] = tonumber(save_info[(i-1)*7+2+j])
+      end
+    end
+    -- server / client connection info
+    local port1, ip, port2 = mainmenu.get_connection_info()
+    mainmenu.set_connection_info(save_info[22], save_info[23], save_info[24])
+    -- username
+    username[1] = save_info[25]
   end
 end

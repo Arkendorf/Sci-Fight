@@ -17,31 +17,28 @@ hud.update = function(dt)
 end
 
 hud.draw = function()
+  -- hp and energy bars
   love.graphics.setColor(1, 0, 0)
   love.graphics.rectangle("fill", pos.x, pos.y, math.floor(hp/hp_max*bar.w), bar.h)
   love.graphics.setColor(0, 1, 1)
   love.graphics.rectangle("fill", pos.x, pos.y+bar.h+bar.border, math.floor(energy/energy_max*bar.w), bar.h)
   love.graphics.setColor(1, 1, 1)
+
+  -- ability icons
   for i, v in ipairs(players[id].abilities) do
     local x, y = icon.border+(i-1)*(icon.w+icon.border), screen.h-(icon.h+icon.border)
     if v.delay > 0 or abilities[v.type].energy > players[id].energy or (i < 3 and players[id].weapon.active) then
-      love.graphics.setShader(shader.greyscale)
+      love.graphics.draw(icon_img, icon_quad[9], x, y)
+    elseif v.active then
+      love.graphics.draw(icon_img, icon_quad[8], x, y)
+    else
+      love.graphics.draw(icon_img, icon_quad[7], x, y)
     end
-    if v.active then -- border if ability in use
-      love.graphics.setColor(0, 1, 1)
-      love.graphics.rectangle("fill", x-icon.border, y-icon.border, icon.w+icon.border*2, icon.h+icon.border*2)
-      love.graphics.setColor(1, 1, 1)
-    end
-    custom.icon_background(x, y, 3, false)
-    love.graphics.draw(ability_icon[v.type], x, y)
-    love.graphics.setShader()
     if v.delay > 0 then
-      love.graphics.setColor(0, 0, 0, 0.4)
-      love.graphics.circle("fill", x+16, y+16, 12)
-      love.graphics.setColor(1, 1, 1)
       love.graphics.printf(math.floor(v.delay*10)/10, x, y+12, icon.w, "center")
+    else
+      love.graphics.draw(ability_icon[v.type], x, y)
     end
-    love.graphics.setColor(1, 1, 1)
   end
 end
 

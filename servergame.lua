@@ -29,7 +29,7 @@ local server_hooks = {
   end,
 }
 
-local win_score = 1
+local win_score = 3
 
 servergame.start = function(port)
   -- initialize server hooks
@@ -44,7 +44,7 @@ servergame.update = function(dt)
   -- server pos
   char.input(dt)
   server:sendToAll("pos", {index = id, pos = {x = players[id].x, y = players[id].y, z = players[id].z, xV = players[id].xV, yV = players[id].yV, zV = players[id].zV}})
-  server:sendToAll("target", {index = id, target = players[id].target})
+  server:sendToAll("target", {index = id, target = {x = players[id].target.x, y = players[id].target.y, z = players[id].target.z}})
   -- server's abilities
   game.update_abilities(servergame.update_ability, id, dt)
   -- game updating
