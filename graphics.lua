@@ -3,7 +3,7 @@ local graphics = {}
 love.graphics.setDefaultFilter("nearest", "nearest")
 
 graphics.load = function()
-  love.window.setMode(1000, 600)
+  love.window.setMode(1300, 700)
   screen = {scale = 2, x = 0, y = 0}
   screen.w = love.graphics.getWidth() / screen.scale
   screen.h = love.graphics.getHeight() / screen.scale
@@ -53,6 +53,8 @@ graphics.load = function()
 
   target_img = love.graphics.newImage("art/gui/target.png")
   target_quad = graphics.load_quad(target_img, 32, 32)
+
+  logo_img = love.graphics.newImage("art/gui/logo.png")
 
   shadow_color = {86/255, 81/255, 104/255}
 end

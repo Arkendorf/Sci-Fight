@@ -48,11 +48,7 @@ mainmenu.update = function(dt)
 end
 
 mainmenu.draw = function()
---   for i, v in ipairs(prompts) do
---     if v.x > button.w+button.border-v.w then
---       love.graphics.rectangle("fill", v.x+2, v.y+2, v.w-4, button.h-4)
---     end
---   end
+  love.graphics.draw(logo_img, (screen.w-470)/2, 16)
 end
 
 mainmenu.prompt = function(num)

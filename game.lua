@@ -11,6 +11,8 @@ hud = require "hud"
 
 local game = {}
 
+game.screenshake = 0
+
 game.load = function()
   map.load()
   char.load()
@@ -45,10 +47,18 @@ game.update = function(dt)
   char.queue()
   bullet.queue()
   particle.queue()
+
+  if game.screenshake > 0 then
+    game.screenshake = game.screenshake - dt
+  end
 end
 
 game.draw = function()
   local offset = {math.ceil(screen.w/2-players[id].x-players[id].l/2), math.ceil(screen.h/2-players[id].y-players[id].z-players[id].w)}
+  if game.screenshake > 0 then
+    offset[1] = offset[1] + math.random(-2, 2)
+    offset[2] = offset[2] + math.random(-2, 2)
+  end
   shader.shadow:send("offset", offset)
   shader.layer:send("offset", offset)
   love.graphics.push()

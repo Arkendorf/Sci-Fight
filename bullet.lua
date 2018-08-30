@@ -158,6 +158,7 @@ bullet.explode_particle = function(v, r)
     local mag = r/12
     particle.new(v.x, v.y, v.z, dir.x/norm*mag, dir.y/norm*mag, dir.z/norm*mag, "explosion")
   end
+  game.screenshake = r/160
 end
 
 bullet.bound_collide = function(k, v)
