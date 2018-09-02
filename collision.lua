@@ -14,7 +14,7 @@ collision.grid = function(obj)
         local z = collision.coord_to_tile(obj.z, obj.h, i)
 
         local z_new = collision.coord_to_tile(obj.z+obj.zV*global_dt*60, obj.h, i)
-        if collision.in_bounds(x, y, z_new) and grid[z_new][y][x] > 0 and tiles[grid[z_new][y][x]] == 1 then
+        if collision.in_bounds(x, y, z_new) and grid[z_new][y][x] > 0 and tiles[grid[z_new][y][x]] > 0 then
           if obj.zV > 0 then
             obj.z = (z_new-1)*tile_size - obj.h
             obj.jump = false
@@ -22,30 +22,36 @@ collision.grid = function(obj)
             obj.z = z_new*tile_size
           end
           obj.zV = 0
+          -- save collision
+          obj.last_collide = grid[z_new][y][x]
           -- recalculate z
           z = collision.coord_to_tile(obj.z, obj.h, i)
         end
 
         local x_new = collision.coord_to_tile(obj.x+obj.xV*global_dt*60, obj.l, k)
-        if collision.in_bounds(x_new, y, z) and grid[z][y][x_new] > 0 and tiles[grid[z][y][x_new]] == 1 then
+        if collision.in_bounds(x_new, y, z) and grid[z][y][x_new] > 0 and tiles[grid[z][y][x_new]] > 0 then
           if obj.xV > 0 then
             obj.x = (x_new-1)*tile_size - obj.l
           elseif obj.xV < 0 then
             obj.x = x_new*tile_size
           end
           obj.xV = 0
+          -- save collision
+          obj.last_collide = grid[z][y][x_new]
           -- recalculate x
           x = collision.coord_to_tile(obj.x, obj.l, k)
         end
 
         local y_new = collision.coord_to_tile(obj.y+obj.yV*global_dt*60, obj.w, j)
-        if collision.in_bounds(x, y_new, z) and grid[z][y_new][x] > 0 and tiles[grid[z][y_new][x]] == 1 then
+        if collision.in_bounds(x, y_new, z) and grid[z][y_new][x] > 0 and tiles[grid[z][y_new][x]] > 0 then
           if obj.yV > 0 then
             obj.y = (y_new-1)*tile_size - obj.w
           elseif obj.yV < 0 then
             obj.y = y_new*tile_size
           end
           obj.yV = 0
+          -- save collision
+          obj.last_collide = grid[z][y_new][x]
         end
       end
     end
@@ -278,7 +284,7 @@ collision.line_and_grid = function(p1, p2)
   for z = z_min, z_max do
     for y = y_min, y_max do
       for x = x_min, x_max do
-        if collision.in_bounds(x, y, z) and tiles[grid[z][y][x]] == 1 then
+        if collision.in_bounds(x, y, z) and tiles[grid[z][y][x]] > 0 then
           local cube = {x = (x-1)*tile_size, y = (y-1)*tile_size, z = (z-1)*tile_size, l = tile_size, w = tile_size, h = tile_size}
           if collision.line_and_cube(p1, p2, cube) then
             local new_face, new_frac = collision.find_tile_face(p1, p2, cube)

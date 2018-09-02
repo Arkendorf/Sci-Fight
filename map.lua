@@ -4,7 +4,7 @@ tile_size = 32
 
 map.load = function()
   -- maps must be within 100x100x100 for layering and shadows to work properly
-  tiles = {[0] = 0, 1, 1, 1, 1, 1, 1}
+  tiles = {[0] = 0, 1, 1, 1, 1, 2, 1}
 
   prop_info = {}
   prop_info.console = {l = 4, w = 4, h = 1, img = "console", shadow = true}

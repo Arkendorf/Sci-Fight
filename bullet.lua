@@ -124,18 +124,20 @@ bullet.player_collide = function(k, v) -- only server should do this
 end
 
 bullet.damage = function(player, num, parent, dir, color)
-  bullet.spark(player, dir, color)
   player.hp = num
   player.inv = inv_time
-  player.killer = parent
-  if player.hp <= 0 then
-    char.death(player)
+  if parent then
+    player.killer = parent
+    bullet.spark(player, dir, color)
   end
   for i = 1, 3 do
     dir = {x = math.random()-.5, y = math.random()-.5}
     local norm = math.sqrt(dir.x*dir.x+dir.y*dir.y)
     local mag = 3
     particle.new(player.x+player.l/2, player.y+player.w/2, player.z+player.h/2, dir.x/norm*mag, dir.y/norm*mag, 0, "blood")
+  end
+  if player.hp <= 0 then
+    char.death(player)
   end
 end
 

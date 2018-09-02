@@ -166,6 +166,12 @@ end
 char.serverupdate = function(dt)
   for k, v in pairs(players) do
     server:sendToAll("pos", {index = k, pos = {x = v.x, y = v.y, z = v.z, xV = v.xV, yV = v.yV, zV = v.zV}})
+    if v.inv <= 0 and v.last_collide and tiles[v.last_collide] == 2 then -- damaging tiles
+      local num = v.hp - 25
+      bullet.damage(v, num)
+      server:sendToAll("hit", {index = k, num = num})
+      v.last_collide = 0
+    end
     if v.z > (#grid+tile_buffer)*tile_size then -- fall off reset
       v.hp = 0
       server:sendToAll("hp", {index = k, hp = 0})
