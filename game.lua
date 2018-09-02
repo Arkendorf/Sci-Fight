@@ -154,12 +154,12 @@ game.draw_tiles = function(x, y, z, tile)
 end
 
 game.draw_borders = function(x, y, z, tile)
-  shader.layer:send("coords", {x, y, z})
-  love.graphics.setShader(shader.layer)
   if tile > 0 and not map.floor_block(x, y, z) then
+    shader.shadow:send("z", z)
+    love.graphics.setShader(shader.shadow)
     graphics.draw_border(x, y, z, tile)
+    love.graphics.setShader()
   end
-  love.graphics.setShader()
 end
 
 game.draw_tile_shadows = function(x, y, z, tile)
@@ -246,11 +246,13 @@ end
 game.draw_prop_border = function(x, y)
   shader.prop_shadow:send("mask", layer_mask)
   shader.prop_shadow:send("mask_size", {x, y})
+  shader.prop_shadow:send("tile_size", tile_size)
   shader.prop_shadow:send("offset", {0, 0})
   for i, v in ipairs(props) do
     if prop_info[v.type].shadow then
+      shader.prop_shadow:send("w", prop_info[v.type].w)
       shader.prop_shadow:send("coords", {v.x, v.y, v.z})
-      -- love.graphics.setShader(shader.prop_shadow)
+      love.graphics.setShader(shader.prop_shadow)
       for i = -2, 2 do
         for j = math.abs(i)-2, -math.abs(i)+2 do
           love.graphics.draw(prop_img[prop_info[v.type].img], (v.x-1)*tile_size+j, (v.y+v.z-2)*tile_size+i)

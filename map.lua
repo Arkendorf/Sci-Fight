@@ -4,14 +4,18 @@ tile_size = 32
 
 map.load = function()
   -- maps must be within 100x100x100 for layering and shadows to work properly
-  tiles = {[0] = 0, 1, 1, 1, 1, 1, 1, 1}
+  tiles = {[0] = 0, 1, 1, 1, 1, 1, 1}
 
   prop_info = {}
   prop_info.console = {l = 4, w = 4, h = 1, img = "console", shadow = true}
   prop_info.runetop = {l = 4, w = 4, h = 1, img = "runetop", shadow = true}
   prop_info.timerods = {l = 2, w = 2, h = 3, img = "timerods", shadow = true}
+  prop_info.railing = {l = 1, w = 1, h = 1, img = "railing"}
   prop_info.railingright = {l = 1, w = 1, h = 1, img = "railingright"}
   prop_info.railingleft = {l = 1, w = 1, h = 1, img = "railingleft"}
+  prop_info.bridge = {l = 5, w = 1, h = 1, img = "bridge", shadow = true}
+  prop_info.cap = {l = 1, w = 3, h = 3, img = "cap", shadow = true}
+  prop_info.platform = {l = 2, w = 3, h = 1, img = "platform", shadow = true}
 
   map.set(1)
 end
@@ -125,8 +129,7 @@ map.set = function(num)
   love.graphics.setColor(0, 0, 0)
   game.draw_props("color") -- block out actual prop from borders
   love.graphics.setColor(1, 1, 1)
-  shader.layer:send("xray_color", {0, 0, 0, 0})
-  shader.layer:send("offset", {0, 0})
+  shader.shadow:send("offset", {0, 0})
   map.iterate(game.draw_borders) -- draw borders due to tiles
 
   map_canvas = love.graphics.newCanvas(x, y) -- create canvas you actually see

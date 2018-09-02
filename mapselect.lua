@@ -9,8 +9,7 @@ local mapselect_imgs = {}
 
 map_name = {
   "Time Machine Interior",
-  "Time Machine Interior",
-  "Time Machine Interior",
+  "Volcanic Shore",
 }
 
 mapselect.load = function()
@@ -54,7 +53,7 @@ mapselect.draw = function(dt)
   love.graphics.setColor(1, 1, 1)
   for i, v in ipairs(icons) do
     custom.icon_background(v.x, v.y, 4, current == i)
-    love.graphics.draw(map_icon[current], v.x, v.y)
+    love.graphics.draw(map_icon[i], v.x, v.y)
   end
 end
 
