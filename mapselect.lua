@@ -10,6 +10,7 @@ local mapselect_imgs = {}
 map_name = {
   "Time Machine Interior",
   "Volcanic Shore",
+  "Throne Room",
 }
 
 mapselect.load = function()

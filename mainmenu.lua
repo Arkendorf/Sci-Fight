@@ -48,7 +48,7 @@ mainmenu.update = function(dt)
 end
 
 mainmenu.draw = function()
-  love.graphics.draw(logo_img, (screen.w-470)/2, 16)
+  love.graphics.draw(logo_img, math.floor((screen.w-467)/2), 16)
 end
 
 mainmenu.prompt = function(num)

@@ -22,8 +22,10 @@ collision.grid = function(obj)
             obj.z = z_new*tile_size
           end
           obj.zV = 0
-          -- save collision
-          obj.last_collide = grid[z_new][y][x]
+          -- prepare for damage
+          if tiles[grid[z_new][y][x]] == 2 then
+            obj.tile_damage = true
+          end
           -- recalculate z
           z = collision.coord_to_tile(obj.z, obj.h, i)
         end
@@ -36,8 +38,10 @@ collision.grid = function(obj)
             obj.x = x_new*tile_size
           end
           obj.xV = 0
-          -- save collision
-          obj.last_collide = grid[z][y][x_new]
+          -- prepare for damage
+          if tiles[grid[z][y][x_new]] == 2 then
+            obj.tile_damage = true
+          end
           -- recalculate x
           x = collision.coord_to_tile(obj.x, obj.l, k)
         end
@@ -50,8 +54,10 @@ collision.grid = function(obj)
             obj.y = y_new*tile_size
           end
           obj.yV = 0
-          -- save collision
-          obj.last_collide = grid[z][y_new][x]
+          -- prepare for damage
+          if tiles[grid[z][y_new][x]] == 2 then
+            obj.tile_damage = true
+          end
         end
       end
     end
