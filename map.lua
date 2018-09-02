@@ -11,6 +11,7 @@ map.load = function()
   prop_info.runetop = {l = 4, w = 4, h = 1, img = "runetop", shadow = true}
   prop_info.timerods = {l = 2, w = 2, h = 3, img = "timerods", shadow = true}
   prop_info.railing = {l = 1, w = 1, h = 1, img = "railing"}
+  prop_info.railingup = {l = 1, w = 1, h = 1, img = "railingup"}
   prop_info.railingright = {l = 1, w = 1, h = 1, img = "railingright"}
   prop_info.railingleft = {l = 1, w = 1, h = 1, img = "railingleft"}
   prop_info.bridge = {l = 5, w = 1, h = 1, img = "bridge", shadow = true}
@@ -96,7 +97,7 @@ end
 map.set = function(num)
   grid = maps[num].grid
   props = maps[num].props
-  table.sort(props, function(a, b) return a.z > b.z end)
+  table.sort(props, function(a, b) return a.y+a.z < b.y+b.z end)
 
   -- shader stuff
   local x, y = #grid[1][1]*tile_size, (#grid+#grid[1])*tile_size

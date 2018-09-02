@@ -232,15 +232,16 @@ game.draw_props = function(shade, mask, shadow)
     shader[shade]:send("offset", {0, 0})
   end
   for i, v in ipairs(props) do
-    if not shadow or prop_info[v.type].shadow then
-      if mask then
-        shader[shade]:send("w", prop_info[v.type].w)
-        shader[shade]:send("coords", {v.x, v.y, v.z})
-      end
-      love.graphics.setShader(shader[shade])
-      love.graphics.draw(prop_img[prop_info[v.type].img], (v.x-1)*tile_size, (v.y+v.z-2)*tile_size)
-      love.graphics.setShader()
+    if mask then
+      shader[shade]:send("w", prop_info[v.type].w)
+      shader[shade]:send("coords", {v.x, v.y, v.z})
     end
+    if shadow then
+      shader[shade]:send("shadow", prop_info[v.type].shadow or false)
+    end
+    love.graphics.setShader(shader[shade])
+    love.graphics.draw(prop_img[prop_info[v.type].img], (v.x-1)*tile_size, (v.y+v.z-2)*tile_size)
+    love.graphics.setShader()
   end
 end
 
