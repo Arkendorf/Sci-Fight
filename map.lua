@@ -110,7 +110,7 @@ end
 map.set = function(num)
   grid = maps[num].grid
   props = maps[num].props
-  table.sort(props, function(a, b) return a.y+a.z < b.y+b.z end)
+  table.sort(props, function(a, b) return a.z-a.y > b.z-b.y end)
 
   -- shader stuff
   local x, y = #grid[1][1]*tile_size, (#grid+#grid[1])*tile_size
