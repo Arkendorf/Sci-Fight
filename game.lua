@@ -71,6 +71,7 @@ game.draw = function()
   game.draw_queue()
   -- target
   love.graphics.draw(target_img, target_quad[math.floor(players[id].target.frame)], players[id].target.x, players[id].target.y+players[id].target.z, 0, 1, 1, 16, 16)
+  -- love.graphics.draw(layer_mask)
 
   love.graphics.pop()
   -- draw hud
@@ -262,15 +263,13 @@ game.draw_props = function(shade, mask, shadow)
 end
 
 game.draw_prop_border = function(x, y)
-  shader.prop_shadow:send("mask", layer_mask)
-  shader.prop_shadow:send("mask_size", {x, y})
-  shader.prop_shadow:send("tile_size", tile_size)
-  shader.prop_shadow:send("offset", {0, 0})
+  shader.prop_border:send("mask", layer_mask)
+  shader.prop_border:send("mask_size", {x, y})
+  shader.prop_border:send("offset", {0, 0})
   for i, v in ipairs(props) do
     if prop_info[v.type].shadow then
-      shader.prop_shadow:send("w", prop_info[v.type].w)
-      shader.prop_shadow:send("coords", {v.x, v.y, v.z})
-      love.graphics.setShader(shader.prop_shadow)
+      shader.prop_border:send("coords", {v.x, v.y, v.z})
+      love.graphics.setShader(shader.prop_border)
       for i = -2, 2 do
         for j = math.abs(i)-2, -math.abs(i)+2 do
           love.graphics.draw(prop_img[prop_info[v.type].img], (v.x-1)*tile_size+j, (v.y+v.z-2)*tile_size+i)
