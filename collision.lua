@@ -14,48 +14,54 @@ collision.grid = function(obj)
         local z = collision.coord_to_tile(obj.z, obj.h, i)
 
         local z_new = collision.coord_to_tile(obj.z+obj.zV*global_dt*60, obj.h, i)
-        if collision.in_bounds(x, y, z_new) and grid[z_new][y][x] > 0 and tiles[grid[z_new][y][x]] > 0 then
-          if obj.zV > 0 then
-            obj.z = (z_new-1)*tile_size - obj.h
-            obj.jump = false
-          elseif obj.zV < 0 then
-            obj.z = z_new*tile_size
+        if collision.in_bounds(x, y, z_new) and grid[z_new][y][x] > 0 then
+          if tiles[grid[z_new][y][x]].solid then
+            if obj.zV > 0 then
+              obj.z = (z_new-1)*tile_size - obj.h
+              obj.jump = false
+            elseif obj.zV < 0 then
+              obj.z = z_new*tile_size
+            end
+            obj.zV = 0
+            -- recalculate z
+            z = collision.coord_to_tile(obj.z, obj.h, i)
           end
-          obj.zV = 0
           -- prepare for damage
-          if tiles[grid[z_new][y][x]] == 2 then
+          if tiles[grid[z_new][y][x]].damage then
             obj.tile_damage = true
           end
-          -- recalculate z
-          z = collision.coord_to_tile(obj.z, obj.h, i)
         end
 
         local x_new = collision.coord_to_tile(obj.x+obj.xV*global_dt*60, obj.l, k)
-        if collision.in_bounds(x_new, y, z) and grid[z][y][x_new] > 0 and tiles[grid[z][y][x_new]] > 0 then
-          if obj.xV > 0 then
-            obj.x = (x_new-1)*tile_size - obj.l
-          elseif obj.xV < 0 then
-            obj.x = x_new*tile_size
+        if collision.in_bounds(x_new, y, z) and grid[z][y][x_new] > 0 then
+          if tiles[grid[z][y][x_new]].solid then
+            if obj.xV > 0 then
+              obj.x = (x_new-1)*tile_size - obj.l
+            elseif obj.xV < 0 then
+              obj.x = x_new*tile_size
+            end
+            obj.xV = 0
+            -- recalculate x
+            x = collision.coord_to_tile(obj.x, obj.l, k)
           end
-          obj.xV = 0
           -- prepare for damage
-          if tiles[grid[z][y][x_new]] == 2 then
+          if tiles[grid[z][y][x_new]].damage then
             obj.tile_damage = true
           end
-          -- recalculate x
-          x = collision.coord_to_tile(obj.x, obj.l, k)
         end
 
         local y_new = collision.coord_to_tile(obj.y+obj.yV*global_dt*60, obj.w, j)
-        if collision.in_bounds(x, y_new, z) and grid[z][y_new][x] > 0 and tiles[grid[z][y_new][x]] > 0 then
-          if obj.yV > 0 then
-            obj.y = (y_new-1)*tile_size - obj.w
-          elseif obj.yV < 0 then
-            obj.y = y_new*tile_size
+        if collision.in_bounds(x, y_new, z) and grid[z][y_new][x] > 0 then
+          if tiles[grid[z][y_new][x]].solid then
+            if obj.yV > 0 then
+              obj.y = (y_new-1)*tile_size - obj.w
+            elseif obj.yV < 0 then
+              obj.y = y_new*tile_size
+            end
+            obj.yV = 0
           end
-          obj.yV = 0
           -- prepare for damage
-          if tiles[grid[z][y_new][x]] == 2 then
+          if tiles[grid[z][y_new][x]].damage then
             obj.tile_damage = true
           end
         end
@@ -290,7 +296,7 @@ collision.line_and_grid = function(p1, p2)
   for z = z_min, z_max do
     for y = y_min, y_max do
       for x = x_min, x_max do
-        if collision.in_bounds(x, y, z) and tiles[grid[z][y][x]] > 0 then
+        if collision.in_bounds(x, y, z) and tiles[grid[z][y][x]].solid then
           local cube = {x = (x-1)*tile_size, y = (y-1)*tile_size, z = (z-1)*tile_size, l = tile_size, w = tile_size, h = tile_size}
           if collision.line_and_cube(p1, p2, cube) then
             local new_face, new_frac = collision.find_tile_face(p1, p2, cube)
@@ -325,7 +331,7 @@ collision.find_tile_face = function(p1, p2, t)
       local y_offset = corner1.x-corner2.x
       if x_offset * (p2[v.x]-p1[v.x]) < 0 or y_offset * (p2[v.y]-p1[v.y]) < 0 then -- make sure edge is in LoS
         local tile = collision.get_tile({[v.x] = 1+math.floor(t[v.x]/tile_size)+x_offset, [v.y] = 1+math.floor(t[v.y]/tile_size)+y_offset, [v.z] = 1+math.floor(t[v.z]/tile_size)})
-        if tiles[tile] == 0 then --no adjacent tile to edge
+        if not tiles[tile].solid then --no adjacent tile to edge
           local collide, frac = collision.line_intersect({x = p1[v.x], y = p1[v.y]}, {x = p2[v.x], y = p2[v.y]}, {x = t[v.x]+tile_size*corner1.x, y = t[v.y]+tile_size*corner1.y}, {x = t[v.x]+tile_size*corner2.x, y = t[v.y]+tile_size*corner2.y})
           if collide then
             return {[v.x] = math.abs(x_offset), [v.y] = math.abs(y_offset), [v.z] = 0}, frac

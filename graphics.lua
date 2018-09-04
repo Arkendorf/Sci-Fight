@@ -238,8 +238,12 @@ graphics.draw = function(v, color)
   else
     love.graphics.draw(v.img, math.floor(v.x), math.floor(v.y+v.z), angle, sx, sy, ox, oy)
   end
-  love.graphics.setShader()
-  love.graphics.setColor(1, 1, 1)
+  if v.shader then
+    love.graphics.setShader()
+  end
+  if color or v.color then
+    love.graphics.setColor(1, 1, 1)
+  end
 end
 
 graphics.zoom = function(bool, num, min, max, scalar)

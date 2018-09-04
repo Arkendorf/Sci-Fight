@@ -71,6 +71,7 @@ game.draw = function()
   game.draw_queue()
   -- target
   love.graphics.draw(target_img, target_quad[math.floor(players[id].target.frame)], players[id].target.x, players[id].target.y+players[id].target.z, 0, 1, 1, 16, 16)
+  -- love.graphics.draw(shadow_mask)
 
   love.graphics.pop()
   -- draw hud
@@ -121,9 +122,25 @@ game.shadow = function(v)
     if v.r then
       r = v.r
     end
-    shader.shadow:send("z", z_offset+1)
     love.graphics.setColor(0.2, 0.2, 0.3, 0.5-diffuse/2)
-    love.graphics.circle("fill", math.floor(v.x+v.l/2), math.floor(v.y+v.w/2+z_offset*tile_size), r*(1+diffuse), 24)
+    shader.shadow:send("z", z_offset+1)
+    if v.shadow then
+      shader.shadow:send("reflect", false)
+      love.graphics.circle("fill", math.floor(v.x+v.l/2), math.floor(v.y+v.w/2+z_offset*tile_size), r*(1+diffuse), 24)
+    end
+    shader.shadow:send("reflect", true)
+    local reflect = {img = v.img, quad = v.quad, x = v.x, y = v.y, z= z_offset*tile_size, angle = v.angle, ox = v.ox, oy = v.oy, sx = v.sx, sy = v.sy}
+    if reflect.sy then
+      reflect.sy = reflect.sy*-1
+    else
+      reflect.sy = -1
+    end
+    if reflect.oy then
+      reflect.oy = v.img:getHeight()-reflect.oy+8
+    else
+      reflect.oy = v.img:getHeight()
+    end
+    graphics.draw(reflect)
   end
   love.graphics.setColor(1, 1, 1)
   love.graphics.setShader()
@@ -132,9 +149,7 @@ end
 game.draw_shadows = function()
   table.sort(queue, function(a, b) return a.z < b.z end)
   for i, v in ipairs(queue) do -- draw object shadows
-    if v.shadow then
-      game.shadow(v)
-    end
+    game.shadow(v)
   end
 end
 
@@ -194,11 +209,13 @@ game.draw_layer_mask = function(x, y, z, tile)
 end
 
 game.draw_shadow_mask = function(x, y, z, tile)
-  if tile > 0 then
-    love.graphics.setColor(1.01 - 0.01*z, 0, 0)
-    if not map.floor_block(x, y, z) then
-      love.graphics.rectangle("fill", (x-1)*tile_size, (y+z-2)*tile_size, tile_size, tile_size)
+  if tile > 0 and not map.floor_block(x, y, z) then
+    if tiles[tile].reflect then
+      love.graphics.setColor(1.01 - 0.01*z, 1, 0)
+    else
+      love.graphics.setColor(1.01 - 0.01*z, 0, 0)
     end
+    love.graphics.rectangle("fill", (x-1)*tile_size, (y+z-2)*tile_size, tile_size, tile_size)
   end
 end
 

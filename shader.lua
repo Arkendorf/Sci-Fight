@@ -5,13 +5,16 @@ shader.shadow = love.graphics.newShader[[
     extern vec2 mask_size;
     extern number z;
     extern vec2 offset;
+    extern bool reflect;
     vec4 effect( vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords ){
       vec2 adjusted_coords = vec2(screen_coords.x-offset.x, screen_coords.y-offset.y);
       if(adjusted_coords.x >= 0.0 && adjusted_coords.x <= mask_size.x && adjusted_coords.y >= 0.0 && adjusted_coords.y <= mask_size.y){
         vec4 pixel = Texel(texture, texture_coords);
         vec4 mask_pixel = Texel(mask, vec2(adjusted_coords.x/mask_size.x, adjusted_coords.y/mask_size.y));
         if((mask_pixel.r < 1.014 - 0.010*z) && (mask_pixel.r >= 1.005 - 0.010*z)){
-          return pixel*color;
+          if((reflect == false) || (mask_pixel.g == 1)){
+            return pixel*color;
+          }
         }
       }
       return vec4(0.0, 0.0, 0.0, 0.0);

@@ -96,7 +96,7 @@ char.update = function(dt)
     -- particles
     local speed = math.sqrt(v.xV*v.xV+v.yV*v.yV)
     local pos = {x = 1+math.floor((v.x+v.l/2)/tile_size), y = 1+math.floor((v.y+v.w/2)/tile_size), z = 1+math.floor((v.z+v.h+math.min(math.abs(v.zV), tile_size/2))/tile_size)}
-    if map.in_bounds(pos.x, pos.y, pos.z) and tiles[grid[pos.z][pos.y][pos.x]] > 0 then
+    if map.in_bounds(pos.x, pos.y, pos.z) and tiles[grid[pos.z][pos.y][pos.x]].solid then
       if math.random(1, 16) < speed then
         local vX, vY = math.random(-v.l/2, v.l/2), math.random(-v.w/2, v.w/2)
         particle.new(v.x+v.l/2+vX, v.y+v.w/2+vY, v.z+v.h, vX/40, vY/40, 0, "dust")
@@ -254,7 +254,7 @@ char.death = function(player)
 end
 
 char.new = function(name, loadout, team)
-  local item = {name = name, x = #grid[1][1]*tile_size*0.5, y = #grid[1]*tile_size*0.5, z = -24, l = 24, w = 24, h = 24, xV = 0, yV = 0, zV = 0,
+  local item = {name = name, x = #grid[1][1]*tile_size*0.5-12, y = #grid[1]*tile_size*0.5-12, z = -24, l = 24, w = 24, h = 24, xV = 0, yV = 0, zV = 0,
                 speed = 1, hp = hp_max, energy = energy_max, score = 0, jump = false, inv = 0, team = team, killer = false, target = {x = 0, y = 0, z = 0, frame = 1},
                 anim = "run", frame = 1, skin = loadout.skin}
   item.weapon = {type = loadout.weapon, active = false, anim = "base", frame = 1, speed = 0}
