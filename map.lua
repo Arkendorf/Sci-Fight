@@ -14,6 +14,8 @@ map.load = function()
     {solid = true},
     {solid = true, reflect = true},
     {solid = true},
+    {solid = true},
+    {solid = true},
   }
 
   prop_info = {}
@@ -30,6 +32,8 @@ map.load = function()
   prop_info.post = {l = 2, w = 2, h = 1, img = "post", shadow = true}
   prop_info.throne = {l = 1, w = 1, h = 1, img = "throne", shadow = true}
   prop_info.window = {l = 5, w = 1, h = 5, img = "window"}
+  prop_info.gate = {l = 5, w = 1, h = 5, img = "gate", shadow = true}
+  prop_info.pillar = {l = 2, w = 2, h = 5, img = "pillar", shadow = true}
 
   map.set(1)
 end
@@ -150,7 +154,7 @@ map.set = function(num)
   love.graphics.setCanvas(map_canvas)
   love.graphics.clear()
   map.iterate(game.draw_tiles) -- draw tiles
-  love.graphics.setColor(0.2, 0.2, 0.3, 0.5)
+  love.graphics.setColor(0.2, 0.2, 0.3, 0.3)
   map.iterate(game.draw_tile_shadows) -- draw tile shadows
   love.graphics.setColor(1, 1, 1)
   game.draw_props("prop_layer", layer_mask) -- draw props

@@ -11,6 +11,7 @@ map_name = {
   "Time Machine Interior",
   "Volcanic Shore",
   "Throne Room",
+  "Alien Arena",
 }
 
 mapselect.load = function()
