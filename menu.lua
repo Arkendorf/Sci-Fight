@@ -15,7 +15,6 @@ team_colors = {
 menu.mode = 1
 menu.buttons = {}
 menu.player_gui = {}
-menu.team_select = false
 
 local menu_imgs = {}
 
@@ -74,13 +73,11 @@ menu.draw_list = function()
   love.graphics.draw(menu_imgs.back, x, y)
   local i = 0
   for k, v in pairs(players) do
-    if menu.team_select ~= k then
-      if v.team > 0 then
-        love.graphics.setColor(team_colors[v.team])
-      end
-      love.graphics.print(v.name, v.x+5, y+v.y+5)
-      love.graphics.setColor(1, 1, 1)
+    if v.team > 0 then
+      love.graphics.setColor(team_colors[v.team])
     end
+    love.graphics.print(v.name, v.x+5, y+v.y+5)
+    love.graphics.setColor(1, 1, 1)
     if v.ready then
       love.graphics.print("Ready", x+251-font:getWidth("Ready"), y+i*16+5)
     end
@@ -116,6 +113,10 @@ end
 menu.mode_start[3] = function()
   menu.mode = 3
   mapselect.start(menu.buttons)
+end
+
+menu.mouse_pos = function()
+  return screen.x+love.mouse.getX()/screen.scale, screen.y+love.mouse.getY()/screen.scale
 end
 
 menu.mat = function(num)

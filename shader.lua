@@ -101,9 +101,12 @@ shader.prop_shadow_mask = love.graphics.newShader[[
                 return vec4(1.01-0.01*coords.z, 0, 0, 1);
               }
             }
+            else{
+            return vec4(0, 0, 0, 1);
+            }
           }
         }
-        return vec4(0, 0, 0, 1);
+        return vec4(0, 0, 0, 0);
       }
       else{
         if(pixel.a > 0){
