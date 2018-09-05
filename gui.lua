@@ -71,6 +71,10 @@ gui.draw = function()
         if w.a then
           love.graphics.setColor(1, 1, 1, w.a)
         end
+        if w.range then
+          shader.range:send("range", {w.range.x+5, w.range.y+5, w.range.w-10, w.range.h-10})
+          love.graphics.setShader(shader.range)
+        end
         love.graphics.draw(gui_imgs[6][tostring(w.w).."x"..tostring(w.h)], math.floor(x), math.floor(y))
 
         local string = ""
@@ -86,6 +90,7 @@ gui.draw = function()
         end
         love.graphics.print(string, math.floor(x+5), math.floor(y+(w.h-font:getHeight())/2)+1)
       end
+      love.graphics.setShader()
       love.graphics.setColor(1, 1, 1)
     end
 
@@ -198,7 +203,7 @@ gui.mousepressed = function(x, y, button)
       for j, w in ipairs(v.textboxes) do
         if not w.active or w.active.t[w.active.i] then
           local w_x, w_y = gui.get_pos(w)
-          if x >= screen.x+w_x*screen.scale and x <= screen.x+(w_x+w.w)*screen.scale and y >= screen.y+w_y*screen.scale and y <= screen.y+(w_y+w.h)*screen.scale then
+          if x >= screen.x+w_x*screen.scale and x <= screen.x+(w_x+w.w)*screen.scale and y >= screen.y+w_y*screen.scale and y <= screen.y+(w_y+w.h)*screen.scale and gui.in_range(x, y, w.range) then
             gui.current_item = {type = 1, i, j, flash = 0}
             box_clicked = true
           end

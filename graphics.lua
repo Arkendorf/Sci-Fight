@@ -9,8 +9,6 @@ graphics.load = function()
   screen.h = love.graphics.getHeight() / screen.scale
   screen.canvas = love.graphics.newCanvas(screen.w, screen.h)
 
-  -- love.graphics.setBackgroundColor(44/255,23/255, 99/255)
-
   font = love.graphics.newImageFont("font.png",
   " abcdefghijklmnopqrstuvwxyz" ..
   "ABCDEFGHIJKLMNOPQRSTUVWXYZ0" ..

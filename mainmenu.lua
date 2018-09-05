@@ -3,12 +3,9 @@ local mainmenu = {}
 local prompts = {{num = 1, active = false, x = 0, y = 0, w = 96, port = "25565", button_x = -128}, {num = 2, active = false, x = 0, y = 0, w = 96, port = "25565", ip = "localhost", button_x = -128}}
 local button = {w = 64, h = 48, border = 2}
 local textbox = {h = 16}
-local name_box = {w = 96, h = 16}
 local button_num = 4
 
 mainmenu.load = function()
-  username = {"Placeholder"}
-
   button.x, button.y = (screen.w-(button.w+button.border)*5)/2, (screen.h-button.h+32)/2
 
   textbox.border = (button.h-textbox.h*2)/3
@@ -34,7 +31,7 @@ mainmenu.start = function()
                    {txt ="Loadouts", x = button.x+(button.w+button.border)*2, y = button.y, w = button.w, h = button.h, func = wipe.start, args = {mainmenu.custom_start}},
                    {txt ="Settings", x = button.x+(button.w+button.border)*3, y = button.y, w = button.w, h = button.h, func = wipe.start, args = {mainmenu.settings_start}},
                    {txt ="Quit",     x = button.x+(button.w+button.border)*4, y = button.y, w = button.w, h = button.h, func = function() love.event.quit() end, args = {}}}
-  gui.add(3, buttons, {{x = (screen.w-name_box.w)/2, y = screen.h-name_box.h*2-button.border, w = name_box.w, h = name_box.h, t = username, i = 1, sample = "Username"}})
+  gui.add(3, buttons)
 
   for i, v in ipairs(prompts) do
     v.active = false

@@ -29,6 +29,10 @@ background.update = function(dt)
   for i, v in ipairs(stars) do
     v.a = 1+math.sin(t+v.a_offset)*.5
   end
+  local w, h = love.graphics.getDimensions()
+  if w ~= screen.w*screen.scale or h ~= screen.h*screen.scale then
+    background.res_change()
+  end
 end
 
 background.draw = function()
@@ -38,6 +42,15 @@ background.draw = function()
     love.graphics.draw(star_img, star_quad[v.type], v.x, v.y, 0, 1, 1, 4, 4)
     love.graphics.setColor(1, 1, 1)
   end
+end
+
+background.res_change = function()
+  screen.w = love.graphics.getWidth() / screen.scale
+  screen.h = love.graphics.getHeight() / screen.scale
+  screen.canvas = love.graphics.newCanvas(screen.w, screen.h)
+  background.load()
+  settings.load()
+  mainmenu.load()
 end
 
 return background
