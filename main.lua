@@ -91,7 +91,9 @@ love.draw = function()
 end
 
 love.mousepressed = function(x, y, button)
-  if state == "servergame" then
+  if state == "servermenu" then
+    servermenu.mousepressed(x, y, button)
+  elseif state == "servergame" then
     servergame.mousepressed(x, y, button)
   elseif state == "clientgame" then
     clientgame.mousepressed(x, y, button)
