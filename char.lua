@@ -14,6 +14,10 @@ skin_name = {
   "Shadow Trooper",
   "Bounty Hunter I",
   "Bounty Hunter II",
+  "Master",
+  "Dark Lord",
+  "Knight I",
+  "Knight II"
 }
 
 char.load = function()

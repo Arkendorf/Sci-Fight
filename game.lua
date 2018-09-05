@@ -136,9 +136,9 @@ game.shadow = function(v)
       reflect.sy = -1
     end
     if reflect.oy then
-      reflect.oy = v.img:getHeight()-reflect.oy+8
+      reflect.y = reflect.y + v.img:getHeight()-reflect.oy*2+8
     else
-      reflect.oy = v.img:getHeight()
+      reflect.y = reflect.y + v.img:getHeight()
     end
     graphics.draw(reflect)
   end
