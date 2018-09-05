@@ -72,7 +72,7 @@ shader.prop_layer_mask = love.graphics.newShader[[
           }
           else{
             if(mask_pixel.g >= 1.005-0.010*(coords.y) || (mask_pixel.g == 0.0)){
-              return vec4(0, 1.01 - 0.01*(coords.y+w-1), 1.01 - 0.01*(adjusted_coords.y/tile_size-coords.y-w), 1);
+              return vec4(0, 1.01 - 0.01*(coords.y+w-1), 1.01 - 0.01*(adjusted_coords.y/tile_size-coords.y-w+2), 1);
             }
           }
         }

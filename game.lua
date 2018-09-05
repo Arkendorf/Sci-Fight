@@ -24,7 +24,7 @@ game.load = function()
 
   queue = {}
 
-  ability_keys = {{"button", 1}, {"button", 2}, {"key", "lshift"}, {"key", "lctrl"}, {"key", "lalt"}}
+  ability_keys = {{"button", 1}, {"button", 2}, {"key", "capslock"}, {"key", "lshift"}, {"key", "lctrl"}}
 end
 
 game.start = function()
