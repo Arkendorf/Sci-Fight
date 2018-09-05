@@ -136,27 +136,27 @@ custom.set_current_slot = function(type)
   option_scroll[1] = 0
   if type == "skin" then
     for i, v in ipairs(icons) do
-      buttons[#buttons+1] = {x = v.x, y = {t = option_scroll, i = 1, o = v.y}, w = v.w, h = v.h, txt = tostring(v.num), func = custom.change_skin, args = {v.num}, hide = true}
+      buttons[#buttons+1] = {x = v.x, y = {t = option_scroll, i = 1, o = v.y}, w = v.w, h = v.h, txt = tostring(v.num), func = custom.change_skin, args = {v.num}, hide = true, range = option_pos}
       local txt = skin_name[v.num]
       local w, h = gui.text_size(txt, 128)
-      infoboxes[#infoboxes+1] = {x = v.x, y = {t = option_scroll, i = 1, o = v.y}, w = w, h = h, hit = {w = v.w, h = v.h}, txt = txt}
+      infoboxes[#infoboxes+1] = {x = v.x, y = {t = option_scroll, i = 1, o = v.y}, w = w, h = h, hit = {w = v.w, h = v.h}, txt = txt, range = option_pos}
     end
     local h = icon.h*2+icon.border
     scroll[1] = {x = option_pos.x+option_pos.w-12, y = option_pos.y+7, h = option_pos.h-14, grab_w = 6, value = {t = option_scroll, i = 1}, min = 0, max = math.max(1, math.ceil(#icons/7)*h/(option_pos.h-18))-1, scale = -option_pos.h+18}
   elseif type == "weapon" then
     for i, v in ipairs(icons) do
-        buttons[#buttons+1] = {x = v.x, y = {t = option_scroll, i = 1, o = v.y}, w = v.w, h = v.h, txt = tostring(v.num), func = custom.change_weapon, args = {v.num}, hide = true}
+        buttons[#buttons+1] = {x = v.x, y = {t = option_scroll, i = 1, o = v.y}, w = v.w, h = v.h, txt = tostring(v.num), func = custom.change_weapon, args = {v.num}, hide = true, range = option_pos}
         local txt = custom.weapon_info(v.num)
         local w, h = gui.text_size(txt, 128)
-        infoboxes[#infoboxes+1] = {x = v.x, y = {t = option_scroll, i = 1, o = v.y}, w = w, h = h, hit = {w = v.w, h = v.h}, txt = txt}
+        infoboxes[#infoboxes+1] = {x = v.x, y = {t = option_scroll, i = 1, o = v.y}, w = w, h = h, hit = {w = v.w, h = v.h}, txt = txt, range = option_pos}
       end
       scroll[1] = {x = option_pos.x+option_pos.w-12, y = option_pos.y+7, h = option_pos.h-14, grab_w = 6, value = {t = option_scroll, i = 1}, min = 0, max = math.max(1, math.ceil(#icons/3)*icon.h/(option_pos.h-18))-1, scale = -option_pos.h+18}
   else
     for i, v in ipairs(icons) do
-      buttons[#buttons+1] = {x = v.x, y = {t = option_scroll, i = 1, o = v.y}, w = v.w, h = v.h, txt = tostring(v.num), func = custom.change_ability, args = {v.num, type}, hide = true}
+      buttons[#buttons+1] = {x = v.x, y = {t = option_scroll, i = 1, o = v.y}, w = v.w, h = v.h, txt = tostring(v.num), func = custom.change_ability, args = {v.num, type}, hide = true, range = option_pos}
       local txt = custom.ability_info(v.num)
       local w, h = gui.text_size(txt, 128)
-      infoboxes[#infoboxes+1] = {x = v.x, y = {t = option_scroll, i = 1, o = v.y}, w = w, h = h, hit = {w = v.w, h = v.h}, txt = txt}
+      infoboxes[#infoboxes+1] = {x = v.x, y = {t = option_scroll, i = 1, o = v.y}, w = w, h = h, hit = {w = v.w, h = v.h}, txt = txt, range = option_pos}
     end
     scroll[1] = {x = option_pos.x+option_pos.w-12, y = option_pos.y+7, h = option_pos.h-14, grab_w = 6, value = {t = option_scroll, i = 1}, min = 0, max = math.max(1, math.ceil(#icons/7)*icon.h/(option_pos.h-18))-1, scale = -option_pos.h+18}
   end

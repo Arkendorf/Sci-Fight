@@ -12,6 +12,7 @@ abilities = require "abilities"
 weapons = require "weapons"
 endmenu = require "endmenu"
 background = require "background"
+settings = require "settings"
 
 love.load = function()
   math.randomseed(os.time())
@@ -25,6 +26,7 @@ love.load = function()
   game.load()
   custom.load()
   endmenu.load()
+  settings.load()
 
 
   state = "mainmenu"
@@ -58,6 +60,8 @@ love.update = function(dt)
     custom.update(dt)
   elseif state == "endmenu" then
     endmenu.update(dt)
+  elseif state == "settings" then
+    settings.update(dt)
   end
   gui.update(dt)
   wipe.update(dt)
@@ -81,6 +85,8 @@ love.draw = function()
     custom.draw()
   elseif state == "endmenu" then
     endmenu.draw()
+  elseif state == "settings" then
+    settings.draw()
   end
   gui.draw()
   wipe.draw()
@@ -97,6 +103,8 @@ love.mousepressed = function(x, y, button)
     servergame.mousepressed(x, y, button)
   elseif state == "clientgame" then
     clientgame.mousepressed(x, y, button)
+  elseif state == "settings" then
+    settings.mousepressed(x, y, button)
   end
   gui.mousepressed(x, y, button)
 end
@@ -114,6 +122,8 @@ love.keypressed = function(key)
     servergame.keypressed(key)
   elseif state == "clientgame" then
     clientgame.keypressed(key)
+  elseif state == "settings" then
+    settings.keypressed(key)
   end
   gui.keypressed(key)
 end

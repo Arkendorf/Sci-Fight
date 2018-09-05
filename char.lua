@@ -26,16 +26,16 @@ end
 char.input = function(dt)
   --input
   local add = {x = 0, y = 0}
-  if love.keyboard.isDown("w") then
+  if (movement_keys[1][1] == "key" and love.keyboard.isDown(movement_keys[1][2])) or (movement_keys[1][1] == "button" and love.mouse.isDown(movement_keys[1][2])) then
     add.y = add.y - 1
   end
-  if love.keyboard.isDown("s") then
+  if (movement_keys[3][1] == "key" and love.keyboard.isDown(movement_keys[3][2])) or (movement_keys[3][1] == "button" and love.mouse.isDown(movement_keys[3][2])) then
     add.y = add.y + 1
   end
-  if love.keyboard.isDown("a") then
+  if (movement_keys[2][1] == "key" and love.keyboard.isDown(movement_keys[2][2])) or (movement_keys[2][1] == "button" and love.mouse.isDown(movement_keys[2][2])) then
     add.x = add.x - 1
   end
-  if love.keyboard.isDown("d") then
+  if (movement_keys[4][1] == "key" and love.keyboard.isDown(movement_keys[4][2])) or (movement_keys[4][1] == "button" and love.mouse.isDown(movement_keys[4][2])) then
     add.x = add.x + 1
   end
   local norm = math.sqrt(add.x*add.x+add.y*add.y)
@@ -45,7 +45,7 @@ char.input = function(dt)
     players[id].yV = players[id].yV + add.y/norm*mag
   end
 
-  if love.keyboard.isDown("space") and not players[id].jump then
+  if ((movement_keys[5][1] == "key" and love.keyboard.isDown(movement_keys[5][2])) or (movement_keys[5][1] == "button" and love.mouse.isDown(movement_keys[5][2]))) and not players[id].jump then
     players[id].zV = players[id].zV - 4
     players[id].jump = true
   end

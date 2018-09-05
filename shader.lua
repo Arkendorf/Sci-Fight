@@ -207,15 +207,28 @@ shader.border = love.graphics.newShader[[
     }
   ]]
 
-  shader.background = love.graphics.newShader[[
-    extern vec4 color1;
-    extern vec4 color2;
-    number max = .5*.5+1;
-    vec4 effect( vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords ){
-      number dist = (.5-texture_coords.x)*(.5-texture_coords.x)+(1-texture_coords.y)*(1-texture_coords.y);
-      number frac = dist/max;
-      return color1*(1.0-frac)+color2*frac;
+shader.background = love.graphics.newShader[[
+  extern vec4 color1;
+  extern vec4 color2;
+  number max = .5*.5+1;
+  vec4 effect( vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords ){
+    number dist = (.5-texture_coords.x)*(.5-texture_coords.x)+(1-texture_coords.y)*(1-texture_coords.y);
+    number frac = dist/max;
+    return color1*(1.0-frac)+color2*frac;
+  }
+]]
+
+shader.range = love.graphics.newShader[[
+  extern vec4 range;
+  vec4 effect( vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords ){
+    vec4 pixel = Texel(texture, texture_coords);
+    if((screen_coords.x >= range.x) && (screen_coords.x <= range.x+range.z) && (screen_coords.y >= range.y) && (screen_coords.y <= range.y+range.w)){
+      return pixel*color;
     }
-  ]]
+    else {
+      return vec4(0, 0, 0, 0);
+    }
+  }
+]]
 
 return shader

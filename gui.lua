@@ -10,12 +10,18 @@ end
 gui.update = function(dt)
   local m_x, m_y = love.mouse.getPosition()
   for i, v in pairs(gui.menus) do
+    for j, w in ipairs(v.buttons) do
+      gui.active_update(w, dt)
+    end
+    for j, w in ipairs(v.textboxes) do
+      gui.active_update(w, dt)
+    end
     for j, w in ipairs(v.infoboxes) do
       if not w.a then
         w.a = 0
       end
       local w_x, w_y = gui.get_pos(w)
-      if m_x >= screen.x+w_x*screen.scale and m_x <= screen.x+(w_x+w.hit.w)*screen.scale and m_y >= screen.y+w_y*screen.scale and m_y <= screen.y+(w_y+w.hit.h)*screen.scale then
+      if m_x >= screen.x+w_x*screen.scale and m_x <= screen.x+(w_x+w.hit.w)*screen.scale and m_y >= screen.y+w_y*screen.scale and m_y <= screen.y+(w_y+w.hit.h)*screen.scale and gui.in_range(m_x, m_y, w.range) then
         if w.a < 1 then
           w.a = w.a + dt * 4
         else
@@ -62,6 +68,9 @@ gui.draw = function()
     for j, w in ipairs(v.textboxes) do
       if not w.hide then
         local x, y = gui.get_pos(w)
+        if w.a then
+          love.graphics.setColor(1, 1, 1, w.a)
+        end
         love.graphics.draw(gui_imgs[6][tostring(w.w).."x"..tostring(w.h)], math.floor(x), math.floor(y))
 
         local string = ""
@@ -77,6 +86,7 @@ gui.draw = function()
         end
         love.graphics.print(string, math.floor(x+5), math.floor(y+(w.h-font:getHeight())/2)+1)
       end
+      love.graphics.setColor(1, 1, 1)
     end
 
     for j, w in ipairs(v.buttons) do
@@ -86,10 +96,22 @@ gui.draw = function()
         if w.mat then
           mat = w.mat.func(unpack(w.mat.args))
         end
+        if w.a then
+          love.graphics.setColor(1, 1, 1, w.a)
+        end
+        if w.range then
+          shader.range:send("range", {w.range.x+5, w.range.y+5, w.range.w-10, w.range.h-10})
+          love.graphics.setShader(shader.range)
+        end
         love.graphics.draw(gui_imgs[mat][tostring(w.w).."x"..tostring(w.h)], math.floor(x), math.floor(y))
-
+        if type(w.txt) == "string" then
+          love.graphics.print(w.txt, math.floor(x+(w.w-font:getWidth(w.txt))/2), math.floor(y+(w.h-font:getHeight())/2))
+        else
+          local txt = w.txt.func(unpack(w.txt.args))
+          love.graphics.print(txt, math.floor(x+(w.w-font:getWidth(txt))/2), math.floor(y+(w.h-font:getHeight())/2))
+        end
+        love.graphics.setShader()
         love.graphics.setColor(1, 1, 1)
-        love.graphics.print(w.txt, math.floor(x+(w.w-font:getWidth(w.txt))/2), math.floor(y+(w.h-font:getHeight())/2))
       end
     end
 
@@ -158,24 +180,28 @@ gui.mousepressed = function(x, y, button)
     for i, v in pairs(gui.menus) do
       if not button_pressed then
         for j, w in ipairs(v.buttons) do
-          local w_x, w_y = gui.get_pos(w)
-          if x >= screen.x+w_x*screen.scale and x <= screen.x+(w_x+w.w)*screen.scale and y >= screen.y+w_y*screen.scale and y <= screen.y+(w_y+w.h)*screen.scale then
-            if w.args then
-              w.func(unpack(w.args))
-            else
-              w.func()
+          if not w.active or w.active.t[w.active.i] then
+            local w_x, w_y = gui.get_pos(w)
+            if x >= screen.x+w_x*screen.scale and x <= screen.x+(w_x+w.w)*screen.scale and y >= screen.y+w_y*screen.scale and y <= screen.y+(w_y+w.h)*screen.scale and gui.in_range(x, y, w.range) then
+              if w.args then
+                w.func(unpack(w.args))
+              else
+                w.func()
+              end
+              button_pressed = true
+              break
             end
-            button_pressed = true
-            break
           end
         end
       end
 
       for j, w in ipairs(v.textboxes) do
-        local w_x, w_y = gui.get_pos(w)
-        if x >= screen.x+w_x*screen.scale and x <= screen.x+(w_x+w.w)*screen.scale and y >= screen.y+w_y*screen.scale and y <= screen.y+(w_y+w.h)*screen.scale then
-          gui.current_item = {type = 1, i, j, flash = 0}
-          box_clicked = true
+        if not w.active or w.active.t[w.active.i] then
+          local w_x, w_y = gui.get_pos(w)
+          if x >= screen.x+w_x*screen.scale and x <= screen.x+(w_x+w.w)*screen.scale and y >= screen.y+w_y*screen.scale and y <= screen.y+(w_y+w.h)*screen.scale then
+            gui.current_item = {type = 1, i, j, flash = 0}
+            box_clicked = true
+          end
         end
       end
 
@@ -196,15 +222,19 @@ end
 gui.keypressed = function(key)
   if gui.current_item and key == "backspace" then
     local box = gui.menus[gui.current_item[1]].textboxes[gui.current_item[2]]
-    box.t[box.i] = string.sub(box.t[box.i], 1, -2)
+    if not box.active or box.active.t[box.active.i] then
+      box.t[box.i] = string.sub(box.t[box.i], 1, -2)
+    end
   end
 end
 
 gui.textinput = function(text)
   if gui.current_item then
     local box = gui.menus[gui.current_item[1]].textboxes[gui.current_item[2]]
-    if font:getWidth(box.t[box.i]..text) <= box.w-10 then
-      box.t[box.i] = box.t[box.i]..text
+    if not box.active or box.active.t[box.active.i] then
+      if font:getWidth(box.t[box.i]..text) <= box.w-10 then
+        box.t[box.i] = box.t[box.i]..text
+      end
     end
   end
 end
@@ -297,6 +327,34 @@ gui.scroll_setup = function(scrolls)
         v.pos = v.value/v.range*(v.h-v.grab_h)
       else
         v.pos = v.value.t[v.value.i]/v.range*(v.h-v.grab_h)
+      end
+    end
+  end
+end
+
+gui.in_range = function(mx, my, range)
+  if range then
+    return (mx/screen.scale-screen.x >= range.x and mx/screen.scale-screen.x <= range.x+range.w and my/screen.scale-screen.y >= range.y and my/screen.scale-screen.y <= range.y+range.h)
+  else
+    return true
+  end
+end
+
+gui.active_update = function(w, dt)
+  if w.active then
+    if not w.a then
+      w.a = 0
+    end
+    if w.active.t[w.active.i] and w.a < 1 then
+      w.a = w.a + dt * 4
+      if w.a > 1 then
+        w.a = 1
+      end
+    end
+    if not w.active.t[w.active.i] and w.a > 0 then
+      w.a = w.a - dt * 4
+      if w.a < 0 then
+        w.a = 0
       end
     end
   end
