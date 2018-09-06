@@ -35,7 +35,7 @@ custom.load = function()
   for i = 1, 3 do
     loadouts[i] = {skin = 1, weapon = 1, abilities = {7, 8, 13, 14, 15}}
   end
-  loadout_pos = {x = (screen.w-256)/2, y = (screen.h-256)/2+button2.h+button.border, w = 256, h = 80}
+  loadout_pos = {x = math.floor((screen.w-256)/2), y = math.floor((screen.h-256)/2)+button2.h+button.border, w = 256, h = 80}
   option_pos = {x = loadout_pos.x, y = loadout_pos.y+loadout_pos.h+button.border, w = loadout_pos.w, h = 144}
   option_canvas = love.graphics.newCanvas(option_pos.w, option_pos.h-14)
 
