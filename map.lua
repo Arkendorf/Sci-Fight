@@ -151,12 +151,11 @@ map.set = function(num)
   border_canvas = love.graphics.newCanvas(x, y) -- create canvas for borders (helps with perspective)
   love.graphics.setCanvas(border_canvas)
   love.graphics.clear()
+  map.iterate(game.draw_borders) -- draw borders due to tiles
   game.draw_prop_border(x, y) -- draw borders due to props
   love.graphics.setColor(0, 0, 0)
   game.draw_props("color") -- block out actual prop from borders
   love.graphics.setColor(1, 1, 1)
-  shader.shadow:send("offset", {0, 0})
-  map.iterate(game.draw_borders) -- draw borders due to tiles
 
   map_canvas = love.graphics.newCanvas(x, y) -- create canvas you actually see
   love.graphics.setCanvas(map_canvas)

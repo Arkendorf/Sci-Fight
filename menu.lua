@@ -12,9 +12,6 @@ team_colors = {
   {0, 1, 1},
 }
 
-players = {}
-id = 0
-
 menu.mode = 1
 menu.buttons = {}
 menu.player_gui = {}
@@ -29,6 +26,9 @@ menu.load = function()
 end
 
 menu.start = function()
+  players = {}
+  id = 0
+  
   menu.mode = 1
   menu.start_gui()
 end

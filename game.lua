@@ -168,10 +168,7 @@ end
 
 game.draw_borders = function(x, y, z, tile)
   if tile > 0 and not map.floor_block(x, y, z) then
-    shader.shadow:send("z", z)
-    love.graphics.setShader(shader.shadow)
     graphics.draw_border(x, y, z, tile)
-    love.graphics.setShader()
   end
 end
 
