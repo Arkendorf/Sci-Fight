@@ -214,7 +214,7 @@ load_data = function()
       v[2] = string.sub(info, 4, -1)
     end
     for i, v in ipairs(ability_keys) do
-      local info = save_info[29+i]
+      local info = save_info[34+i]
       if string.sub(info, 1, 3) == "but" then
         v[1] = "button"
       else

@@ -13,6 +13,8 @@ local button = {w = 64, h = 32, border = 2}
 local submenu_gui = {{}, {}}
 local submenu_h = {0, 0}
 
+local oldstate = "mainmenu"
+
 settings.load = function()
   username = {"Placeholder"}
 
@@ -42,7 +44,13 @@ settings.load = function()
   setting_canvas = love.graphics.newCanvas(pos.w-10, pos.h-10)
 end
 
-settings.start = function()
+settings.start = function(s)
+  state = "settings"
+  if s then
+    oldstate = s
+  else
+    oldstate = "mainmenu"
+  end
   gui.clear()
   local buttons = sidebar.new({{txt = "General", func = settings.change_submenu, args = {1}, mat = {func = settings.mat, args = {1}}},
                                {txt ="Controls", func = settings.change_submenu, args = {2}, mat = {func = settings.mat, args = {2}}},
@@ -174,8 +182,16 @@ settings.keypressed = function(key)
 end
 
 settings.leave = function()
-  state = "mainmenu"
-  mainmenu.start()
+  state = oldstate
+  gui.remove(1)
+  gui.remove(2)
+  if oldstate == "mainmenu" then
+    mainmenu.start()
+  elseif oldstate == "servergame" then
+    servergame.start_gui()
+  elseif oldstate == "clientgame" then
+    clientgame.start_gui()
+  end
 end
 
 return settings

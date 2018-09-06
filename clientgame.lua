@@ -82,6 +82,8 @@ local client_hooks = {
   end,
 }
 
+local menu_active = {false}
+
 clientgame.start = function(port)
   -- initialize client hooks
   for k,v in pairs(client_hooks) do
@@ -89,6 +91,17 @@ clientgame.start = function(port)
   end
 
   game.start()
+  clientgame.start_gui()
+  menu_active[1] = false
+end
+
+clientgame.start_gui = function()
+  local buttons = sidebar.new({{txt = "Settings", func = wipe.start, args = {settings.start, {state}}},
+                               {txt ="Leave", func = wipe.start, args = {clientmenu.leave}}})
+  for i, v in ipairs(buttons) do
+    v.active = {t = menu_active, i = 1}
+  end
+  gui.add(1, buttons)
 end
 
 clientgame.update = function(dt)
@@ -114,6 +127,10 @@ end
 
 clientgame.keypressed = function(key)
   game.abilities("key", key, clientgame.use_ability)
+
+  if key == "escape" then
+    menu_active[1] = not menu_active[1]
+  end
 end
 
 clientgame.keyreleased = function(key)

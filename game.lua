@@ -74,7 +74,6 @@ game.draw = function()
   love.graphics.pop()
   -- draw hud
   hud.draw()
-  love.graphics.print(tostring(players[0].last_collide), 20, 0)
 end
 
 game.mousepressed = function(x, y, button)

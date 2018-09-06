@@ -95,7 +95,7 @@ menu.draw = function()
 end
 
 menu.swap_mode = function(num)
-  if menu.mode ~= num and not players[id].ready then
+  if #players > 0 and menu.mode ~= num and not players[id].ready then
     wipe.start(menu.mode_start[num])
   end
 end
@@ -121,10 +121,10 @@ menu.mouse_pos = function()
 end
 
 menu.mat = function(num)
-  if num == menu.mode then
-    return 2
-  elseif players[id] and players[id].ready then
+  if #players < 1 or (players[id] and players[id].ready) then
     return 3
+  elseif num == menu.mode then
+    return 2
   else
     return 1
   end

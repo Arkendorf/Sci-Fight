@@ -31,13 +31,26 @@ local server_hooks = {
 
 local win_score = 3
 
+local menu_active = {false}
+
 servergame.start = function(port)
   -- initialize server hooks
-  for k,v in pairs(server_hooks) do
+  for k, v in pairs(server_hooks) do
     server:on(k, v)
   end
 
   game.start()
+  servergame.start_gui()
+  menu_active[1] = false
+end
+
+servergame.start_gui = function()
+  local buttons = sidebar.new({{txt = "Settings", func = wipe.start, args = {settings.start, {state}}},
+                               {txt ="Leave", func = wipe.start, args = {servermenu.leave}}})
+  for i, v in ipairs(buttons) do
+    v.active = {t = menu_active, i = 1}
+  end
+  gui.add(1, buttons)
 end
 
 servergame.update = function(dt)
@@ -79,6 +92,10 @@ end
 
 servergame.keypressed = function(key)
   game.abilities("key", key, servergame.use_ability)
+  
+  if key == "escape" then
+    menu_active[1] = not menu_active[1]
+  end
 end
 
 servergame.keyreleased = function(key)
