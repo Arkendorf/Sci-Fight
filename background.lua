@@ -35,7 +35,7 @@ background.update = function(dt)
     if state == "mainmenu" then
       mainmenu.start()
     elseif state == "settings" then
-      settings.start()
+      settings.start("reset")
     elseif state == "custom" then
       custom.start()
     elseif state == "servermenu" then

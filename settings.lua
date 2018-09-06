@@ -47,7 +47,9 @@ end
 settings.start = function(s)
   state = "settings"
   if s then
-    oldstate = s
+    if s ~= "reset" then
+      oldstate = s
+    end
   else
     oldstate = "mainmenu"
   end
@@ -130,7 +132,7 @@ end
 settings.screen_type = function()
   love.window.setFullscreen(not love.window.getFullscreen())
   background.res_change()
-  settings.start()
+  settings.start("reset")
 end
 
 settings.scale_string = function()
@@ -144,7 +146,7 @@ settings.scale = function()
     screen.scale = 1
   end
   background.res_change()
-  settings.start()
+  settings.start("reset")
 end
 
 settings.mat = function(num)

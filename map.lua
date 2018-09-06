@@ -111,10 +111,18 @@ map.in_bounds = function(x, y, z)
   return (x >= 1 and x <= #grid[1][1] and y >= 1 and y <= #grid[1] and z >= 1 and z <= #grid)
 end
 
+map.prop_sort = function(a, b)
+  if a.z ~= b.z then
+    return a.z > b.z
+  else
+    return a.y < b.y
+  end
+end
+
 map.set = function(num)
   grid = maps[num].grid
   props = maps[num].props
-  table.sort(props, function(a, b) return a.z-a.y > b.z-b.y end)
+  table.sort(props, map.prop_sort)
 
   -- shader stuff
   local x, y = #grid[1][1]*tile_size, (#grid+#grid[1])*tile_size
