@@ -20,6 +20,7 @@ mapselect.load = function()
   for i, v in ipairs(files) do
     local grid, props = love.filesystem.load("maps/"..v)()
     maps[i] = {grid = grid, props = props}
+    table.sort(maps[i].props, function(a, b) return a.z-a.y > b.z-b.y end)
   end
 
   option_pos = {x = (screen.w-256)/2, y = (screen.h-256)/2+66, w = 256, h = 192}

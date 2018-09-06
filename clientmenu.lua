@@ -57,6 +57,10 @@ clientmenu.start = function(ip, port)
     client:on(k, v)
   end
 
+  clientmenu.start_gui()
+end
+
+clientmenu.start_gui = function()
   menu.buttons = sidebar.new({{txt = "Players", func = menu.swap_mode, args = {1}, mat = {func = menu.mat, args = {1}}},
                                {txt ="Loadout", func = menu.swap_mode, args = {2}, mat = {func = menu.mat, args = {2}}},
                                {txt ="Map", func = menu.swap_mode, args = {3}, mat = {func = menu.mat, args = {3}}},

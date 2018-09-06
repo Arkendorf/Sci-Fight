@@ -52,13 +52,17 @@ servermenu.start = function(port)
     server:on(k, v)
   end
 
+  servermenu.start_gui()
+  menu.new_player(id, username[1])
+end
+
+servermenu.start_gui = function()
   menu.buttons = sidebar.new({{txt = "Players", func = menu.swap_mode, args = {1}, mat = {func = menu.mat, args = {1}}},
                                {txt ="Loadout", func = menu.swap_mode, args = {2}, mat = {func = menu.mat, args = {2}}},
                                {txt ="Map", func = menu.swap_mode, args = {3}, mat = {func = menu.mat, args = {3}}},
                                {txt ="Leave", func = wipe.start, args = {servermenu.leave}}})
   menu.player_gui = {{x = (screen.w-64)/2, y = (screen.h+256)/2-32, w = 64, h = 32, txt = "Ready", func = servermenu.ready, args = {id}, mat = {func = menu.readymat, args = {}}}}
   menu.start()
-  menu.new_player(id, username[1])
 end
 
 servermenu.update = function(dt)

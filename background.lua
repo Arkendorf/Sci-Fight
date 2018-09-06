@@ -32,6 +32,17 @@ background.update = function(dt)
   local w, h = love.graphics.getDimensions()
   if w ~= screen.w*screen.scale or h ~= screen.h*screen.scale then
     background.res_change()
+    if state == "mainmenu" then
+      mainmenu.start()
+    elseif state == "settings" then
+      settings.start()
+    elseif state == "custom" then
+      custom.start()
+    elseif state == "servermenu" then
+      servermenu.start_gui()
+    elseif state == "clientmenu" then
+      clientmenu.start_gui()
+    end
   end
 end
 
@@ -51,6 +62,9 @@ background.res_change = function()
   background.load()
   settings.load()
   mainmenu.load()
+  custom.load()
+  mapselect.load()
+  hud.load()
 end
 
 return background

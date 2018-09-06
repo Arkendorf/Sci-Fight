@@ -3,8 +3,12 @@ local graphics = {}
 love.graphics.setDefaultFilter("nearest", "nearest")
 
 graphics.load = function()
-  love.window.setMode(1300, 700)
-  screen = {scale = 2, x = 0, y = 0}
+  if love.filesystem.getInfo("save.txt") then
+    load_window()
+  else
+    love.window.setMode(1300, 700, {resizable = true})
+    screen = {scale = 2, x = 0, y = 0}
+  end
   screen.w = love.graphics.getWidth() / screen.scale
   screen.h = love.graphics.getHeight() / screen.scale
   screen.canvas = love.graphics.newCanvas(screen.w, screen.h)

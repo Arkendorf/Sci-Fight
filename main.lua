@@ -34,7 +34,7 @@ love.load = function()
   global_dt = 0
 
   -- load saved data
-  load()
+  load_data()
 end
 
 love.update = function(dt)
@@ -167,12 +167,24 @@ save = function()
   local port1, ip, port2 = mainmenu.get_connection_info()
   str = str..port1.."\r\n"..ip.."\r\n"..port2.."\r\n"
   -- username
-  str = str..username[1]
+  str = str..username[1].."\r\n"
+  -- window settings
+  str = str..tostring(love.window.getFullscreen()).."\r\n"
+  str = str..tostring(screen.scale).."\r\n"
+  str = str..tostring(love.graphics.getWidth()).."\r\n"
+  str = str..tostring(love.graphics.getHeight()).."\r\n"
+  -- controls
+  for i, v in ipairs(movement_keys) do
+    str = str..tostring(string.sub(v[1], 1, 3))..tostring(v[2]).."\r\n"
+  end
+  for i, v in ipairs(ability_keys) do
+    str = str..tostring(string.sub(v[1], 1, 3))..tostring(v[2]).."\r\n"
+  end
 
   love.filesystem.write("save.txt", str)
 end
 
-load = function()
+load_data = function()
   if love.filesystem.getInfo("save.txt") then
     local save_info = {}
     for line in love.filesystem.lines("save.txt") do
@@ -191,5 +203,40 @@ load = function()
     mainmenu.set_connection_info(save_info[22], save_info[23], save_info[24])
     -- username
     username[1] = save_info[25]
+    --controls
+    for i, v in ipairs(movement_keys) do
+      local info = save_info[29+i]
+      if string.sub(info, 1, 3) == "but" then
+        v[1] = "button"
+      else
+        v[1] = "key"
+      end
+      v[2] = string.sub(info, 4, -1)
+    end
+    for i, v in ipairs(ability_keys) do
+      local info = save_info[29+i]
+      if string.sub(info, 1, 3) == "but" then
+        v[1] = "button"
+      else
+        v[1] = "key"
+      end
+      v[2] = string.sub(info, 4, -1)
+    end
+  end
+end
+
+load_window = function()
+  if love.filesystem.getInfo("save.txt") then
+    local save_info = {}
+    for line in love.filesystem.lines("save.txt") do
+      save_info[#save_info+1] = line
+    end
+    love.window.setMode(save_info[28], save_info[29], {resizable = true})
+    if save_info[26] == "true" then
+      love.window.setFullscreen(true)
+    else
+      love.window.setFullscreen(false)
+    end
+    screen = {scale = tonumber(save_info[27]), x = 0, y = 0}
   end
 end
