@@ -174,7 +174,7 @@ save = function()
   str = str..tostring(love.graphics.getWidth()).."\r\n"
   str = str..tostring(love.graphics.getHeight()).."\r\n"
   -- controls
-  for i, v in ipairs(movement_keys) do
+  for i, v in ipairs(other_keys) do
     str = str..tostring(string.sub(v[1], 1, 3))..tostring(v[2]).."\r\n"
   end
   for i, v in ipairs(ability_keys) do
@@ -204,23 +204,25 @@ load_data = function()
     -- username
     username[1] = save_info[25]
     --controls
-    for i, v in ipairs(movement_keys) do
+    for i, v in ipairs(other_keys) do
       local info = save_info[29+i]
       if string.sub(info, 1, 3) == "but" then
         v[1] = "button"
+        v[2] = tonumber(string.sub(info, 4, -1))
       else
         v[1] = "key"
+        v[2] = string.sub(info, 4, -1)
       end
-      v[2] = string.sub(info, 4, -1)
     end
     for i, v in ipairs(ability_keys) do
-      local info = save_info[34+i]
+      local info = save_info[29+#other_keys+i]
       if string.sub(info, 1, 3) == "but" then
         v[1] = "button"
+        v[2] = tonumber(string.sub(info, 4, -1))
       else
         v[1] = "key"
+        v[2] = string.sub(info, 4, -1)
       end
-      v[2] = string.sub(info, 4, -1)
     end
   end
 end

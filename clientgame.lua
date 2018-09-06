@@ -119,6 +119,10 @@ end
 
 clientgame.mousepressed = function(x, y, button)
   game.abilities("button", button, clientgame.use_ability)
+
+  if other_keys[6][1] == "button" and button == other_keys[6][2] then
+    menu_active[1] = not menu_active[1]
+  end
 end
 
 clientgame.mousereleased = function(x, y, button)
@@ -128,7 +132,7 @@ end
 clientgame.keypressed = function(key)
   game.abilities("key", key, clientgame.use_ability)
 
-  if key == "escape" then
+  if other_keys[6][1] == "key" and key == other_keys[6][2] then
     menu_active[1] = not menu_active[1]
   end
 end

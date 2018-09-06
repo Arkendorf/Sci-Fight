@@ -19,7 +19,7 @@ settings.load = function()
   username = {"Placeholder"}
 
   ability_keys = {{"button", 1, "Weapon Ability 1"}, {"button", 2, "Weapon Ability 2"}, {"key", "capslock", "Ability 1"}, {"key", "lshift", "Ability 2"}, {"key", "lctrl", "Ability 3"}}
-  movement_keys = {{"key", "w", "Move Forward"}, {"key", "a", "Move Left"}, {"key", "s", "Move Backward"}, {"key", "d", "Move Right"}, {"key", "space", "Jump"}}
+  other_keys = {{"key", "w", "Move Forward"}, {"key", "a", "Move Left"}, {"key", "s", "Move Backward"}, {"key", "d", "Move Right"}, {"key", "space", "Jump"}, {"key", "escape", "Menu"}}
 
   pos.x, pos.y = (screen.w-256)/2, (screen.h-256)/2
 
@@ -32,13 +32,13 @@ settings.load = function()
 
   -- set up controls gui
   submenu_gui[2] = {{}, {}, {}}
-  for i, v in ipairs(movement_keys) do
+  for i, v in ipairs(other_keys) do
     submenu_gui[2][1][i] = {txt = {func = settings.control_string, args = {i}}, x = pos.x+pos.w-15-control_button.w, y = {t = scroll, i = 1, o = pos.y+(control_button.h+control_button.border)*(i-1)+6}, w = control_button.w, h = control_button.h, func = settings.change_control, args = {i}, range = pos}
   end
   for i, v in ipairs(ability_keys) do
-    submenu_gui[2][1][i+5] = {txt = {func = settings.control_string, args = {i+5}}, x = pos.x+pos.w-15-control_button.w, y = {t = scroll, i = 1, o = pos.y+(control_button.h+control_button.border)*(i+4)+6}, w = control_button.w, h = control_button.h, func = settings.change_control, args = {i+5}, range = pos}
+    submenu_gui[2][1][i+#other_keys] = {txt = {func = settings.control_string, args = {i+#other_keys}}, x = pos.x+pos.w-15-control_button.w, y = {t = scroll, i = 1, o = pos.y+(control_button.h+control_button.border)*(i+#other_keys-1)+6}, w = control_button.w, h = control_button.h, func = settings.change_control, args = {i+#other_keys}, range = pos}
   end
-  submenu_h[2] = 10*(control_button.h+control_button.border)
+  submenu_h[2] = (#other_keys+#ability_keys)*(control_button.h+control_button.border)
 
   setting_imgs.back = gui.new_img(5, pos.w, pos.h)
   setting_canvas = love.graphics.newCanvas(pos.w-10, pos.h-10)
@@ -70,11 +70,11 @@ settings.draw = function(dt)
     love.graphics.print("Screen Mode:", 2, 12+scroll[1]+name_box.h+name_box.border)
     love.graphics.print("Screen Scale:", 2, 12+scroll[1]+name_box.h+name_box.border+button.h+button.border)
   elseif submenu == 2 then
-    for i, v in ipairs(movement_keys) do
+    for i, v in ipairs(other_keys) do
       love.graphics.print(v[3]..":", 2, (control_button.h+control_button.border)*(i-1)+12+scroll[1])
     end
     for i, v in ipairs(ability_keys) do
-      love.graphics.print(v[3]..":", 2, (control_button.h+control_button.border)*(i+4)+12+scroll[1])
+      love.graphics.print(v[3]..":", 2, (control_button.h+control_button.border)*(i+#other_keys-1)+12+scroll[1])
     end
   end
   love.graphics.setCanvas(screen.canvas)
@@ -98,11 +98,11 @@ settings.set_submenu = function(num)
 end
 
 settings.control_string = function(num)
-  local table = movement_keys
+  local table = other_keys
   local num2 = num
-  if num > #movement_keys then
+  if num > #other_keys then
     table = ability_keys
-    num2 = num - #movement_keys
+    num2 = num - #other_keys
   end
   if current_control and current_control == num then
     return "[---]"
@@ -157,10 +157,10 @@ end
 
 settings.mousepressed = function(x, y, button)
   if current_control then
-    local table = movement_keys
-    if current_control > #movement_keys then
+    local table = other_keys
+    if current_control > #other_keys then
       table = ability_keys
-      current_control = current_control - #movement_keys
+      current_control = current_control - #other_keys
     end
     table[current_control][1] = "button"
     table[current_control][2] = button
@@ -170,10 +170,10 @@ end
 
 settings.keypressed = function(key)
   if current_control then
-    local table = movement_keys
-    if current_control > #movement_keys then
+    local table = other_keys
+    if current_control > #other_keys then
       table = ability_keys
-      current_control = current_control - #movement_keys
+      current_control = current_control - #other_keys
     end
     table[current_control][1] = "key"
     table[current_control][2] = key

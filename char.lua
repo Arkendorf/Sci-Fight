@@ -26,16 +26,16 @@ end
 char.input = function(dt)
   --input
   local add = {x = 0, y = 0}
-  if (movement_keys[1][1] == "key" and love.keyboard.isDown(movement_keys[1][2])) or (movement_keys[1][1] == "button" and love.mouse.isDown(movement_keys[1][2])) then
+  if (other_keys[1][1] == "key" and love.keyboard.isDown(other_keys[1][2])) or (other_keys[1][1] == "button" and love.mouse.isDown(other_keys[1][2])) then
     add.y = add.y - 1
   end
-  if (movement_keys[3][1] == "key" and love.keyboard.isDown(movement_keys[3][2])) or (movement_keys[3][1] == "button" and love.mouse.isDown(movement_keys[3][2])) then
+  if (other_keys[3][1] == "key" and love.keyboard.isDown(other_keys[3][2])) or (other_keys[3][1] == "button" and love.mouse.isDown(other_keys[3][2])) then
     add.y = add.y + 1
   end
-  if (movement_keys[2][1] == "key" and love.keyboard.isDown(movement_keys[2][2])) or (movement_keys[2][1] == "button" and love.mouse.isDown(movement_keys[2][2])) then
+  if (other_keys[2][1] == "key" and love.keyboard.isDown(other_keys[2][2])) or (other_keys[2][1] == "button" and love.mouse.isDown(other_keys[2][2])) then
     add.x = add.x - 1
   end
-  if (movement_keys[4][1] == "key" and love.keyboard.isDown(movement_keys[4][2])) or (movement_keys[4][1] == "button" and love.mouse.isDown(movement_keys[4][2])) then
+  if (other_keys[4][1] == "key" and love.keyboard.isDown(other_keys[4][2])) or (other_keys[4][1] == "button" and love.mouse.isDown(other_keys[4][2])) then
     add.x = add.x + 1
   end
   local norm = math.sqrt(add.x*add.x+add.y*add.y)
@@ -45,7 +45,7 @@ char.input = function(dt)
     players[id].yV = players[id].yV + add.y/norm*mag
   end
 
-  if ((movement_keys[5][1] == "key" and love.keyboard.isDown(movement_keys[5][2])) or (movement_keys[5][1] == "button" and love.mouse.isDown(movement_keys[5][2]))) and not players[id].jump then
+  if ((other_keys[5][1] == "key" and love.keyboard.isDown(other_keys[5][2])) or (other_keys[5][1] == "button" and love.mouse.isDown(other_keys[5][2]))) and not players[id].jump then
     players[id].zV = players[id].zV - 4
     players[id].jump = true
   end
