@@ -313,8 +313,8 @@ press_func = function(player, index, target)
   server:sendToAll("v", {index = index, zV = player.zV})
   return false
 end,
-delay = 6,
-energy = 15,
+delay = 2,
+energy = 20,
 name = "Leap",
 desc = "Burst of vertical momentum",
 }
@@ -454,7 +454,7 @@ particle_func = function(player, index, target)
   local dir = game.angle_norm({x = 0, y = 0, z = 1}, math.rad(math.random(-20, 20)))
   particle.new(player.x+player.l/2, player.y+player.w/2, player.z+player.h/2, dir.x, dir.y, dir.z, "jet", player)
 end,
-delay = 0.2,
+delay = 1,
 energy = 0.4,
 name = "Jetpack",
 desc = "Fly upwards",
