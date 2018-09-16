@@ -347,7 +347,7 @@ end
 
 char.draw_arm = function(p1, p2, skin, disp)
   love.graphics.setLineWidth(4)
-  love.graphics.setColor(0, 0, 0)
+  love.graphics.setColor(char_info[skin].base.bordercolor)
   love.graphics.line(p1.x, p1.y, p2.x, p2.y)
   love.graphics.setLineWidth(2)
   love.graphics.setColor(char_info[skin].base.armcolor)
