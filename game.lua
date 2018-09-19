@@ -8,6 +8,7 @@ servergame = require "servergame"
 bullet = require "bullet"
 particle = require "particle"
 hud = require "hud"
+pathfind = require "pathfind"
 
 local game = {}
 
@@ -26,6 +27,8 @@ game.load = function()
 end
 
 game.start = function()
+  pathfind.start()
+
   gui.clear()
   bullets = {}
   particles = {}
@@ -65,6 +68,8 @@ game.draw = function()
   map.draw()
   -- draw shadows
   game.draw_shadows()
+
+  pathfind.draw()
   -- draw objects
   game.draw_queue()
   -- target
