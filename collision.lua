@@ -133,7 +133,6 @@ collision.line_intersect = function(p1, p2, p3, p4)
     local t = ( s2.x * (p1.y - p3.y) - s2.y * (p1.x - p3.x)) / denom
 
     if s >= 0 and s <= 1 and t >= 0 and t <= 1 then
-      -- local i = {x = p1.x + (t * s1.x), y = p1.y+ (t * s1.y)}
       return true, t
     end
   end
