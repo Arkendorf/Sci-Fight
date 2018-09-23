@@ -159,8 +159,8 @@ pathfind.sign = function(num)
 end
 
 pathfind.astar = function(p1, p2)
-  local start_pos = nodes[137]
-  local goal_pos = nodes[49]
+  local start_pos = {x = p1.x/tile_size+1, y = p1.y/tile_size+1, z = p1.z/tile_size+1}
+  local goal_pos = {x = p2.x/tile_size+1, y = p2.y/tile_size+1, z = p2.z/tile_size+1}
 
 
   local frontier = {}
