@@ -20,10 +20,20 @@ pathfind.draw = function()
   local path = pathfind.astar(players[0], {x = 0, y = 9*32, z = 2*32})
   for i, v in ipairs(path) do
     love.graphics.setColor(1-(v.z-1)*.1, 1-(v.z-1)*.1, 0)
+    if v.action == "walk" then
+      love.graphics.setLineWidth(1)
+    elseif v.action == "jump" then
+      love.graphics.setLineWidth(5)
+    elseif v.action == "fall" then
+      love.graphics.setLineWidth(10)
+    else
+      love.graphics.setLineWidth(2)
+    end
     if i < #path then
       love.graphics.line((v.x-1)*tile_size+tile_size/2, (v.y+v.z-2)*tile_size+tile_size/2, (path[i+1].x-1)*tile_size+tile_size/2, (path[i+1].y+path[i+1].z-2)*tile_size+tile_size/2)
     end
   end
+  love.graphics.setLineWidth(2)
   love.graphics.setColor(1, 1, 1)
 end
 
@@ -93,9 +103,9 @@ pathfind.blocked = function(x, y, z)
 end
 
 pathfind.legal_edge = function(n1, n2)
-  local x_min, x_max = math.floor(math.min(n1.x, n2.x)), math.ceil(math.max(n1.x, n2.x))
-  local y_min, y_max = math.floor(math.min(n1.y, n2.y)), math.ceil(math.max(n1.y, n2.y))
-  local z_min, z_max = math.floor(math.min(n1.z, n2.z)), math.ceil(math.max(n1.z, n2.z))
+  local x_min, x_max = math.ceil(math.min(n1.x, n2.x)), math.ceil(math.max(n1.x, n2.x))
+  local y_min, y_max = math.ceil(math.min(n1.y, n2.y)), math.ceil(math.max(n1.y, n2.y))
+  local z_min, z_max = math.ceil(math.min(n1.z, n2.z)), math.ceil(math.max(n1.z, n2.z))
 
   for y = y_min, y_max do
     for x = x_min, x_max do
@@ -118,7 +128,7 @@ pathfind.legal_edge = function(n1, n2)
       return {dist = pathfind.dist(n1, n2), action = "walk"}
     end
   end
-  if math.floor(n1.z) - math.floor(n2.z) <= 1 then -- jump or fall
+  if math.ceil(n1.z) - math.ceil(n2.z) <= 1 then -- jump or fall
     local dist_sq = (n2.x-n1.x)*(n2.x-n1.x)+(n2.y-n1.y)*(n2.y-n1.y)
     local h_sq = (n2.z-n1.z)*math.abs(n2.z-n1.z)
     local action = ""
@@ -126,7 +136,7 @@ pathfind.legal_edge = function(n1, n2)
       action = "fall"
     elseif dist_sq <= 10+h_sq then -- if jump is necessary
       action = "jump"
-      if math.floor(n1.z) < math.floor(n2.z) then -- make sure airspace is checked if action is jumping fall
+      if math.ceil(n1.z) < math.ceil(n2.z) then -- make sure airspace is checked if action is jumping fall
         z_min = z_min - 1
       end
     else -- if not in range
@@ -135,7 +145,7 @@ pathfind.legal_edge = function(n1, n2)
     for z = z_min, z_max do
       for y = y_min, y_max do
         for x = x_min, x_max do
-          if z == z_min or (z <= math.floor(n1.z) and pathfind.check_tile(x, y, n2, n1)) or (z > math.floor(n1.z) and pathfind.check_tile(x, y, n1, n2)) then -- in bounds
+          if z == z_min or (z <= math.ceil(n1.z) and pathfind.check_tile(x, y, n2, n1)) or (z > math.ceil(n1.z) and pathfind.check_tile(x, y, n1, n2)) then -- in bounds
             if pathfind.blocked(x, y, z) then
               return false
             end
@@ -151,7 +161,7 @@ end
 pathfind.check_tile = function(x, y, n1, n2)
   local x_sign = pathfind.sign(n2.x-n1.x)
   local y_sign = pathfind.sign(n2.y-n1.y)
-  return ((x*x_sign > math.floor(n1.x)*x_sign or math.floor(n1.x) == math.floor(n2.x)) and (y*y_sign > math.floor(n1.y)*y_sign or math.floor(n1.y) == math.floor(n2.y)))
+  return ((x*x_sign > math.ceil(n1.x)*x_sign or math.ceil(n1.x) == math.ceil(n2.x)) and (y*y_sign > math.ceil(n1.y)*y_sign or math.ceil(n1.y) == math.ceil(n2.y)))
 end
 
 pathfind.sign = function(num)
@@ -187,22 +197,35 @@ end
 
 pathfind.check_end = function(current, goal_pos, start_pos, node_info)
   if current > 0 then
-    if pathfind.legal_edge(nodes[current], goal_pos) then
+    local edge = pathfind.legal_edge(nodes[current], goal_pos)
+    if edge then
       local path = {start_pos, goal_pos}
+      local action = edge.action
       while node_info.came_from[current] do
-        table.insert(path, 2, nodes[current])
-        current = node_info.came_from[current]
+        table.insert(path, 2, {x = nodes[current].x, y = nodes[current].y, z = nodes[current].z, action = action})
+        local next_num = node_info.came_from[current]
+        if next_num > 0 then
+          action = nodes[next_num].edges[current].action
+        else
+          path[1].action = pathfind.legal_edge(start_pos, nodes[current]).action
+        end
+        current = next_num
       end
       return path
     end
   elseif pathfind.legal_edge(start_pos, goal_pos) then
-    return {start_pos, goal_pos}
+    local path = {start_pos, goal_pos}
+    path[1].action = pathfind.legal_edge(start_pos, goal_pos).action
+    return path
   end
 end
 
 pathfind.score_node = function(next_num, edge, frontier, node_info, current, goal_pos)
   if edge and next_num ~= current then
     local new_cost = node_info.cost[current] + edge.dist
+    if edge.action == "jump" then -- jumps cost
+      new_cost = new_cost+1
+    end
     if not node_info.cost[next_num] or new_cost < node_info.cost[next_num] then
       node_info.cost[next_num] = new_cost
       node_info.scores[next_num] = new_cost + pathfind.heuristic(goal_pos, nodes[next_num])
