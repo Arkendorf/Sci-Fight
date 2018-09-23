@@ -25,7 +25,6 @@ pathfind.draw = function()
     end
   end
   love.graphics.setColor(1, 1, 1)
-  love.graphics.print(#path)
 end
 
 pathfind.make_nodes = function()
@@ -137,62 +136,66 @@ pathfind.sign = function(num)
 end
 
 pathfind.astar = function(p1, p2)
-  -- add start and end to node list
-  local astar_nodes = {unpack(nodes)}
-  local start_num = #astar_nodes + 1
-  local goal_num = #astar_nodes + 2
-  astar_nodes[start_num] = {x = math.floor(p1.x/tile_size+.5)+1, y = math.floor(p1.y/tile_size+.5)+1, z = math.ceil(p1.z/tile_size)+1}
-  pathfind.make_edges(astar_nodes[start_num], nodes)
-  astar_nodes[goal_num] = {x = math.floor(p2.x/tile_size+.5)+1, y = math.floor(p2.y/tile_size+.5)+1, z = math.ceil(p2.z/tile_size)+1}
-  for i = 1, #nodes do
-    astar_nodes[i].edges[start_num] = false
-    -- astar_nodes[i].edges[goal_num] = pathfind.legal_edge(astar_nodes[i], astar_nodes[goal_num])
+  local start_pos = nodes[137]
+  local goal_pos = nodes[49]
+
+
+  local frontier = {}
+  local node_info = {came_from = {[0] = false}, cost = {[0] = 0}, scores = {}}
+
+  -- find options from initial "node"
+  local path = pathfind.check_end(0, goal_pos, start_pos) -- if path can go from start to goal
+  if path then return path end
+  for next_num, node in ipairs(nodes) do
+    local dist = pathfind.legal_edge(start_pos, node)
+    pathfind.score_node(next_num, dist, frontier, node_info, 0, goal_pos)
   end
-
-  local frontier = {start_num}
-  local came_from = {}
-  local cost_so_far = {[start_num] = 0}
-  local scores = {[start_num] = 0}
-
   while #frontier > 0 do
     local current = frontier[1]
     table.remove(frontier, 1)
-    if current == goal_num then
-      break
-    end
-    for next_num, dist in ipairs(astar_nodes[current].edges) do
-      if dist then
-        local new_cost = cost_so_far[current] + dist
-        if not cost_so_far[next_num] or new_cost < cost_so_far[next_num] then
-          cost_so_far[next_num] = new_cost
-          scores[next_num] = new_cost + pathfind.heuristic(astar_nodes[goal_num], astar_nodes[next_num])
-          came_from[next_num] = current
-          local placed = false
-          for i, v in ipairs(frontier) do -- put item in proper place
-            if scores[v] > scores[next_num] then
-              table.insert(frontier, i, next_num)
-              placed = true
-              break
-            end
-          end
-          if not placed then -- if next has highest cost
-            table.insert(frontier, next_num)
-          end
-        end
-      end
+    local path = pathfind.check_end(current, goal_pos, start_pos, node_info)
+    if path then return path end
+    for next_num, dist in ipairs(nodes[current].edges) do
+      pathfind.score_node(next_num, dist, frontier, node_info, current, goal_pos)
     end
   end
-  if came_from[goal_num] then -- path is possible
-    local path = {}
-    local current = goal_num
-    while current ~= start_num do
-      table.insert(path, 1, astar_nodes[current])
-      current = came_from[current]
+  return {}
+end
+
+pathfind.check_end = function(current, goal_pos, start_pos, node_info)
+  if current > 0 then
+    if pathfind.legal_edge(nodes[current], goal_pos) then
+      local path = {start_pos, goal_pos}
+      while node_info.came_from[current] do
+        table.insert(path, 2, nodes[current])
+        current = node_info.came_from[current]
+      end
+      return path
     end
-    table.insert(path, 1, astar_nodes[start_num])
-    return path
-  else
-    return {}
+  elseif pathfind.legal_edge(start_pos, goal_pos) then
+    return {start_pos, goal_pos}
+  end
+end
+
+pathfind.score_node = function(next_num, dist, frontier, node_info, current, goal_pos)
+  if dist and next_num ~= current then
+    local new_cost = node_info.cost[current] + dist
+    if not node_info.cost[next_num] or new_cost < node_info.cost[next_num] then
+      node_info.cost[next_num] = new_cost
+      node_info.scores[next_num] = new_cost + pathfind.heuristic(goal_pos, nodes[next_num])
+      node_info.came_from[next_num] = current
+      local placed = false
+      for i, v in ipairs(frontier) do -- put item in proper place
+        if node_info.scores[v] > node_info.scores[next_num] then
+          table.insert(frontier, i, next_num)
+          placed = true
+          break
+        end
+      end
+      if not placed then -- if next has highest cost
+        table.insert(frontier, next_num)
+      end
+    end
   end
 end
 
