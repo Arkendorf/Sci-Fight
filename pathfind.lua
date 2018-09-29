@@ -107,15 +107,16 @@ pathfind.legal_edge = function(n1, n2)
   local y_min, y_max = math.ceil(math.min(n1.y, n2.y)), math.ceil(math.max(n1.y, n2.y))
   local z_min, z_max = math.ceil(math.min(n1.z, n2.z)), math.ceil(math.max(n1.z, n2.z))
 
-  for y = y_min, y_max do
-    for x = x_min, x_max do
-      if (y ~= n1.y or x ~= n1.x) and slope == (n2.y-y)/(n2.x-x) then -- check if nearer node with same slope exists (no overlap)
-        return false
+  if z_min == z_max then -- straight walk
+    local slope = (n2.y-n1.y)/(n2.x-n1.x) -- check if nearer node with same slope exists (no overlap)
+    for y = y_min, y_max do
+      for x = x_min, x_max do
+        if (y ~= n1.y or x ~= n1.x) and slope == (n2.y-y)/(n2.x-x) and pathfind.is_node(x, y, z_min) then
+          return false
+        end
       end
     end
-  end
 
-  if z_min == z_max then -- straight walk
     local walk = true
     for x= x_min, x_max do
       for y = y_min, y_max do
