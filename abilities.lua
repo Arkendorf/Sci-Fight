@@ -122,7 +122,7 @@ abilities[7] = {
 press_func = function(player, index, target)
   local dir = game.target_norm(player, target)
   local bubble = game.target_pos(player, dir, swing_range)
-  for k, v in pairs(players) do
+  for k, v in pairs(targets) do
     if k ~= index and char.damageable(k, index) and collision.sphere_and_cube(bubble, v, swing_radius) then
       local num = v.hp-weapons[player.weapon.type].mod*10
       bullet.damage(v, num, index, dir, weapons[player.weapon.type].color)
@@ -206,7 +206,7 @@ local spin_radius = 32
 abilities[10] = {
 press_func = function(player, index, target)
   local bubble = {x = player.x+player.l/2, y = player.y+player.w/2, z = player.z+player.h/2}
-  for k, v in pairs(players) do
+  for k, v in pairs(targets) do
     if k ~= index and char.damageable(k, index) and  collision.sphere_and_cube(bubble, v, spin_radius) then
       local num = v.hp-weapons[player.weapon.type].mod*10
       bullet.damage(v, num, index, dir, weapons[player.weapon.type].color)
@@ -245,7 +245,7 @@ press_func = function(player, index, target)
   server:sendToAll("v", {index = index, xV = player.xV, yV = player.yV})
 
   local bubble = game.target_pos(player, {x = x, y = y, z = 0}, lunge_range)
-  for k, v in pairs(players) do
+  for k, v in pairs(targets) do
     if k ~= index and char.damageable(k, index) and collision.sphere_and_cube(bubble, v, lunge_radius) then
       local num = v.hp-weapons[player.weapon.type].mod*15
       bullet.damage(v, num, index, dir, weapons[player.weapon.type].color)
@@ -286,7 +286,7 @@ press_func = function(player, index, target)
   local dir = game.target_norm(player, target)
   local bubble = game.target_pos(player, dir, push_range)
   local speed = 15
-  for k, v in pairs(players) do
+  for k, v in pairs(targets) do
     if k ~= index and collision.sphere_and_cube(bubble, v, push_radius) then
       local x1, y1, z1 = v.x+v.l/2, v.y+v.w/2, v.z+v.h/2
       local l_x, l_y, l_z = x1-bubble.x, y1-bubble.y, z1-bubble.z
@@ -321,12 +321,12 @@ desc = "Burst of vertical momentum",
 
 abilities[15] = {
 press_func = function(player, index, target)
-  player.speed = 2
+  player.speed = 1
   server:sendToAll("speed", {index = index, speed = player.speed})
   return true
 end,
 stop_func = function(player, index)
-  player.speed = 1
+  player.speed = .5
   server:sendToAll("speed", {index = index, speed = player.speed})
 end,
 delay = 2,
@@ -414,7 +414,7 @@ local flame_radius = 12
 local flame = function(player, index, target)
   local dir = game.target_norm(player, target)
   local bubble = game.target_pos(player, dir, flame_range)
-  for k, v in pairs(players) do
+  for k, v in pairs(targets) do
     if k ~= index and char.damageable(k, index) and collision.sphere_and_cube(bubble, v, flame_radius) then
       local num = v.hp - weapons[player.weapon.type].mod*0.2 -- bullet damage * weapon modifier
       v.killer = index

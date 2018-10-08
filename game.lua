@@ -9,14 +9,16 @@ bullet = require "bullet"
 particle = require "particle"
 hud = require "hud"
 pathfind = require "pathfind"
+enemy = require "enemy"
 
 local game = {}
+
+mode = "pve"
 
 game.screenshake = 0
 
 game.load = function()
   map.load()
-  char.load()
   bullet.load()
   particle.load()
   clientgame.load()
@@ -27,25 +29,31 @@ game.load = function()
 end
 
 game.start = function()
-  pathfind.start()
+  char.start()
+
+  targets = players
+  if mode == "pve" then
+    pathfind.start()
+    enemy.start()
+    targets = enemies
+  end
 
   gui.clear()
   bullets = {}
   particles = {}
-  for k, v in pairs(players) do
-    v.canvas = love.graphics.newCanvas(88, 88)
-  end
 end
 
 game.update = function(dt)
   -- normal updates
   char.update(dt)
+  enemy.update(dt)
   bullet.update(dt)
   particle.update(dt)
   hud.update(dt)
   -- create drawing queue
   queue = {}
   char.queue()
+  enemy.queue()
   bullet.queue()
   particle.queue()
 

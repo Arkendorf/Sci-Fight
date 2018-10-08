@@ -20,7 +20,10 @@ skin_name = {
   "Knight II"
 }
 
-char.load = function()
+char.start = function()
+  for k, v in pairs(players) do
+    v.canvas = love.graphics.newCanvas(88, 88)
+  end
 end
 
 char.input = function(dt)
@@ -40,7 +43,7 @@ char.input = function(dt)
   end
   local norm = math.sqrt(add.x*add.x+add.y*add.y)
   if norm > 0 then -- don't divide by zero!
-    local mag = .5 * players[id].speed
+    local mag = players[id].speed
     players[id].xV = players[id].xV + add.x/norm*mag
     players[id].yV = players[id].yV + add.y/norm*mag
   end
@@ -53,7 +56,7 @@ char.input = function(dt)
   -- target
   local m_x, m_y = game.mouse_pos()
   local current = {k = nil, dist = target_range}
-  for k, v in pairs(players) do
+  for k, v in pairs(targets) do
     if k ~= id and char.damageable(k, id) then
       local x = v.x+v.l/2
       local y = v.y+v.z+v.w
@@ -64,7 +67,7 @@ char.input = function(dt)
   end
   local target = players[id].target
   if current.k then
-    local v = players[current.k]
+    local v = targets[current.k]
     players[id].target.dX, target.dY, target.dZ = v.x+v.l/2, v.y+v.w/2, v.z+v.h/2
     -- animate target
     if players[id].target.frame < 4 then
@@ -90,80 +93,84 @@ end
 
 char.update = function(dt)
   for k, v in pairs(players) do
-    -- gravity
-    if v.zV < 10 then
-      v.zV = v.zV + 0.2
-    elseif v.zV > 10 then
-      v.zV = 10
+    char.update_char(k, v, dt)
+  end
+end
+
+char.update_char = function(k, v, dt)
+  -- gravity
+  if v.zV < 10 then
+    v.zV = v.zV + 0.2
+  elseif v.zV > 10 then
+    v.zV = 10
+  end
+
+  -- particles
+  local speed = math.sqrt(v.xV*v.xV+v.yV*v.yV)
+  local pos = {x = 1+math.floor((v.x+v.l/2)/tile_size), y = 1+math.floor((v.y+v.w/2)/tile_size), z = 1+math.floor((v.z+v.h+math.min(math.abs(v.zV), tile_size/2))/tile_size)}
+  if map.in_bounds(pos.x, pos.y, pos.z) and tiles[grid[pos.z][pos.y][pos.x]].solid then
+    if math.random(1, 16) < speed then
+      local vX, vY = math.random(-v.l/2, v.l/2), math.random(-v.w/2, v.w/2)
+      particle.new(v.x+v.l/2+vX, v.y+v.w/2+vY, v.z+v.h, vX/40, vY/40, 0, "dust")
     end
-
-    -- particles
-    local speed = math.sqrt(v.xV*v.xV+v.yV*v.yV)
-    local pos = {x = 1+math.floor((v.x+v.l/2)/tile_size), y = 1+math.floor((v.y+v.w/2)/tile_size), z = 1+math.floor((v.z+v.h+math.min(math.abs(v.zV), tile_size/2))/tile_size)}
-    if map.in_bounds(pos.x, pos.y, pos.z) and tiles[grid[pos.z][pos.y][pos.x]].solid then
-      if math.random(1, 16) < speed then
-        local vX, vY = math.random(-v.l/2, v.l/2), math.random(-v.w/2, v.w/2)
-        particle.new(v.x+v.l/2+vX, v.y+v.w/2+vY, v.z+v.h, vX/40, vY/40, 0, "dust")
-      end
-      if math.abs(v.zV) > 1 then
-        char.jump_particle(v)
-      end
+    if math.abs(v.zV) > 1 then
+      char.jump_particle(v)
     end
+  end
 
-    -- collision
-    collision.map(v)
+  -- collision
+  collision.map(v)
 
-    -- movement and friction
-    v.x = v.x + v.xV * dt * 60
-    v.xV = v.xV * 0.8
+  -- movement and friction
+  v.x = v.x + v.xV * dt * 60
+  v.xV = v.xV * 0.8
 
-    v.y = v.y + v.yV * dt * 60
-    v.yV = v.yV * 0.8
+  v.y = v.y + v.yV * dt * 60
+  v.yV = v.yV * 0.8
 
-    v.z = v.z + v.zV * dt * 60
+  v.z = v.z + v.zV * dt * 60
 
-    --invulnerability
-    if v.inv > 0 then
-      v.inv = v.inv - dt
+  --invulnerability
+  if v.inv > 0 then
+    v.inv = v.inv - dt
+  end
+
+  -- abilities
+  for i, w in ipairs(v.abilities) do
+    if w.delay > 0 then
+      w.delay = w.delay - dt
     end
+    if w.active and abilities[w.type].particle_func then
+      abilities[w.type].particle_func(v, k, v.target)
+    end
+  end
+  if v.energy < energy_max and not char.ability_check(v) then
+    v.energy = v.energy + energy_increase
+  elseif v.energy > energy_max then
+    v.energy = energy_max
+  end
 
-    -- abilities
-    for i, w in ipairs(v.abilities) do
-      if w.delay > 0 then
-        w.delay = w.delay - dt
-      end
-      if w.active and abilities[w.type].particle_func then
-        abilities[w.type].particle_func(v, k, v.target)
-      end
+  -- animation
+  v.weapon.frame = v.weapon.frame + v.weapon.speed*dt
+  if v.weapon.frame > #weapon_quad[v.weapon.type][v.weapon.anim]+1 then
+    if v.weapon.anim ~= "base" then
+      v.weapon.anim = "base"
     end
-    if v.energy < energy_max and not char.ability_check(v) then
-      v.energy = v.energy + energy_increase
-    elseif v.energy > energy_max then
-      v.energy = energy_max
-    end
+    v.weapon.frame = 1
+  end
 
-    -- animation
-    v.weapon.frame = v.weapon.frame + v.weapon.speed*dt
-    if v.weapon.frame > #weapon_quad[v.weapon.type][v.weapon.anim]+1 then
-      if v.weapon.anim ~= "base" then
-        v.weapon.anim = "base"
-      end
-      v.weapon.frame = 1
-    end
+  if math.abs(v.xV) > 0.1 or math.abs(v.yV) > 0.1 then
+    v.anim = "run"
+  else
+    v.anim = "base"
+  end
+  v.frame = v.frame + (math.abs(v.xV)+math.abs(v.yV))*6*dt
+  if v.frame > #char_quad[v.skin][v.anim][1]+1 then
+    v.frame = 1
+  end
 
-    if math.abs(v.xV) > 0.1 or math.abs(v.yV) > 0.1 then
-      v.anim = "run"
-    else
-      v.anim = "base"
-    end
-    v.frame = v.frame + (math.abs(v.xV)+math.abs(v.yV))*6*dt
-    if v.frame > #char_quad[v.skin][v.anim][1]+1 then
-      v.frame = 1
-    end
-
-    if v.hp <= 0 then -- death
-      char.death(v)
-    end
+  if v.hp <= 0 then -- death
+    char.death(v)
   end
 end
 
@@ -260,7 +267,7 @@ end
 
 char.new = function(name, loadout, team)
   local item = {name = name, x = #grid[1][1]*tile_size*0.5-12, y = #grid[1]*tile_size*0.5-12, z = -24, l = 24, w = 24, h = 24, xV = 0, yV = 0, zV = 0,
-                speed = 1, hp = hp_max, energy = energy_max, score = 0, jump = false, inv = 0, team = team, killer = false, target = {x = 0, y = 0, z = 0, frame = 1},
+                speed = .5, hp = hp_max, energy = energy_max, score = 0, jump = false, inv = 0, team = team, killer = false, target = {x = 0, y = 0, z = 0, frame = 1},
                 anim = "run", frame = 1, skin = loadout.skin}
   item.weapon = {type = loadout.weapon, active = false, anim = "base", frame = 1, speed = 0}
   item.abilities = {}
@@ -271,7 +278,7 @@ char.new = function(name, loadout, team)
 end
 
 char.damageable = function(k, l)
-  return (k ~= l and players[k].inv <= 0 and (players[k].team <= 0 or players[k].team ~= players[l].team))
+  return (k ~= l and targets[k].inv <= 0 and (targets[k].team <= 0 or targets[k].team ~= players[l].team))
 end
 
 char.queue = function()

@@ -7,34 +7,36 @@ pathfind.start = function()
 end
 
 pathfind.draw = function()
-  for i, v in ipairs(nodes) do
-    love.graphics.setColor(1-(v.z-1)*.1, 0, 0)
-    love.graphics.print(tostring(i), (v.x-1)*tile_size+tile_size/2-5, (v.y+v.z-2)*tile_size+tile_size/2-5)
-    for j, w in ipairs(v.edges) do
-      if w then
-        love.graphics.line((v.x-1)*tile_size+tile_size/2, (v.y+v.z-2)*tile_size+tile_size/2, (nodes[j].x-1)*tile_size+tile_size/2, (nodes[j].y+nodes[j].z-2)*tile_size+tile_size/2)
+  -- for i, v in ipairs(nodes) do
+  --   love.graphics.setColor(1-(v.z-1)*.1, 0, 0)
+  --   love.graphics.print(tostring(i), (v.x-1)*tile_size-5, (v.y+v.z-2)*tile_size-5)
+  --   for j, w in ipairs(v.edges) do
+  --     if w then
+  --       love.graphics.line((v.x-1)*tile_size, (v.y+v.z-2)*tile_size, (nodes[j].x-1)*tile_size, (nodes[j].y+nodes[j].z-2)*tile_size)
+  --     end
+  --   end
+  -- end
+
+  if enemies[1].path then
+    local path = enemies[1].path
+    for i, v in ipairs(path) do
+      if i < #path then
+        love.graphics.setColor(1-(v.z-1)*.1, 1-(v.z-1)*.1, 0)
+        if path[i+1].action == "walk" then
+          love.graphics.setLineWidth(1)
+        elseif path[i+1].action == "jump" then
+          love.graphics.setLineWidth(5)
+        elseif path[i+1].action == "fall" then
+          love.graphics.setLineWidth(10)
+        else
+          love.graphics.setLineWidth(2)
+        end
+        love.graphics.line((v.x-1)*tile_size, (v.y+v.z-2)*tile_size, (path[i+1].x-1)*tile_size, (path[i+1].y+path[i+1].z-2)*tile_size)
       end
     end
+    love.graphics.setLineWidth(2)
+    love.graphics.setColor(1, 1, 1)
   end
-
-  local path = pathfind.astar(players[0], {x = 0, y = 9*32, z = 2*32})
-  for i, v in ipairs(path) do
-    love.graphics.setColor(1-(v.z-1)*.1, 1-(v.z-1)*.1, 0)
-    if v.action == "walk" then
-      love.graphics.setLineWidth(1)
-    elseif v.action == "jump" then
-      love.graphics.setLineWidth(5)
-    elseif v.action == "fall" then
-      love.graphics.setLineWidth(10)
-    else
-      love.graphics.setLineWidth(2)
-    end
-    if i < #path then
-      love.graphics.line((v.x-1)*tile_size+tile_size/2, (v.y+v.z-2)*tile_size+tile_size/2, (path[i+1].x-1)*tile_size+tile_size/2, (path[i+1].y+path[i+1].z-2)*tile_size+tile_size/2)
-    end
-  end
-  love.graphics.setLineWidth(2)
-  love.graphics.setColor(1, 1, 1)
 end
 
 pathfind.make_nodes = function()
@@ -45,7 +47,7 @@ pathfind.make_nodes = function()
       for x, tile in ipairs(grid[z][y]) do
         if tiles[tile].solid and not tiles[grid[z][y][x]].damage and not pathfind.blocked(x, y, z) then -- make sure tile is solid and has space above
           if pathfind.is_node(x, y, z) then -- check if tile should be node
-            nodes[#nodes+1] = {x = x, y = y, z = z}
+            nodes[#nodes+1] = {x = x+.5, y = y+.5, z = z}
           end
         end
       end
@@ -103,9 +105,9 @@ pathfind.blocked = function(x, y, z)
 end
 
 pathfind.legal_edge = function(n1, n2)
-  local x_min, x_max = math.ceil(math.min(n1.x, n2.x)), math.ceil(math.max(n1.x, n2.x))
-  local y_min, y_max = math.ceil(math.min(n1.y, n2.y)), math.ceil(math.max(n1.y, n2.y))
-  local z_min, z_max = math.ceil(math.min(n1.z, n2.z)), math.ceil(math.max(n1.z, n2.z))
+  local x_min, x_max = math.floor(math.min(n1.x, n2.x)), math.floor(math.max(n1.x, n2.x))
+  local y_min, y_max = math.floor(math.min(n1.y, n2.y)), math.floor(math.max(n1.y, n2.y))
+  local z_min, z_max = math.floor(math.min(n1.z, n2.z)), math.floor(math.max(n1.z, n2.z))
 
   if z_min == z_max then -- straight walk
     local slope = (n2.y-n1.y)/(n2.x-n1.x) -- check if nearer node with same slope exists (no overlap)
@@ -170,8 +172,8 @@ pathfind.sign = function(num)
 end
 
 pathfind.astar = function(p1, p2)
-  local start_pos = {x = p1.x/tile_size+1, y = p1.y/tile_size+1, z = p1.z/tile_size+1}
-  local goal_pos = {x = p2.x/tile_size+1, y = p2.y/tile_size+1, z = p2.z/tile_size+1}
+  local start_pos = p1
+  local goal_pos = p2
 
 
   local frontier = {}
@@ -201,22 +203,22 @@ pathfind.check_end = function(current, goal_pos, start_pos, node_info)
     local edge = pathfind.legal_edge(nodes[current], goal_pos)
     if edge then
       local path = {start_pos, goal_pos}
-      local action = edge.action
-      while node_info.came_from[current] do
-        table.insert(path, 2, {x = nodes[current].x, y = nodes[current].y, z = nodes[current].z, action = action})
-        local next_num = node_info.came_from[current]
-        if next_num > 0 then
-          action = nodes[next_num].edges[current].action
+      path[2].action = edge.action
+      local next_num = node_info.came_from[current]
+      while next_num > 0 do
+        if node_info.came_from[current] == 0 then
+          table.insert(path, 2, {x = nodes[current].x, y = nodes[current].y, z = nodes[current].z, action = pathfind.legal_edge(start_pos, nodes[current]).action})
         else
-          path[1].action = pathfind.legal_edge(start_pos, nodes[current]).action
+          table.insert(path, 2, {x = nodes[current].x, y = nodes[current].y, z = nodes[current].z, action = nodes[next_num].edges[current].action})
         end
         current = next_num
+        next_num = node_info.came_from[current]
       end
       return path
     end
   elseif pathfind.legal_edge(start_pos, goal_pos) then
     local path = {start_pos, goal_pos}
-    path[1].action = pathfind.legal_edge(start_pos, goal_pos).action
+    path[2].action = pathfind.legal_edge(start_pos, goal_pos).action
     return path
   end
 end
@@ -253,5 +255,6 @@ end
 pathfind.heuristic = function(n1, n2)
   return pathfind.dist(n1, n2)
 end
+
 
 return pathfind
