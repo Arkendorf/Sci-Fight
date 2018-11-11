@@ -175,7 +175,6 @@ pathfind.astar = function(p1, p2)
   local start_pos = p1
   local goal_pos = p2
 
-
   local frontier = {}
   local node_info = {came_from = {[0] = false}, cost = {[0] = 0}, scores = {}}
 
@@ -205,8 +204,8 @@ pathfind.check_end = function(current, goal_pos, start_pos, node_info)
       local path = {start_pos, goal_pos}
       path[2].action = edge.action
       local next_num = node_info.came_from[current]
-      while next_num > 0 do
-        if node_info.came_from[current] == 0 then
+      while current > 0 do
+        if next_num == 0 then
           table.insert(path, 2, {x = nodes[current].x, y = nodes[current].y, z = nodes[current].z, action = pathfind.legal_edge(start_pos, nodes[current]).action})
         else
           table.insert(path, 2, {x = nodes[current].x, y = nodes[current].y, z = nodes[current].z, action = nodes[next_num].edges[current].action})

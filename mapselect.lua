@@ -12,6 +12,7 @@ map_name = {
   "Volcanic Shore",
   "Throne Room",
   "Alien Arena",
+  "Test",
 }
 
 mapselect.load = function()

@@ -87,6 +87,9 @@ game.draw = function()
   love.graphics.pop()
   -- draw hud
   hud.draw()
+  if enemies[1].path then
+    love.graphics.print(#enemies[1].path, 100, 0)
+  end
 end
 
 game.mousepressed = function(x, y, button)
