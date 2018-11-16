@@ -130,8 +130,16 @@ bullet.damage = function(player, num, parent, dir, color)
     player.killer = parent
     bullet.spark(player, dir, color)
   end
+  -- knock back player
+  if dir then
+    local norm = math.sqrt(dir.x*dir.x+dir.y*dir.y+dir.z*dir.z)
+    player.xV = player.xV + dir.x/norm
+    player.yV = player.yV + dir.y/norm
+    player.zV = player.zV + dir.z/norm
+  end
+  -- blood particle
   for i = 1, 3 do
-    dir = {x = math.random()-.5, y = math.random()-.5}
+    local dir = {x = math.random()-.5, y = math.random()-.5}
     local norm = math.sqrt(dir.x*dir.x+dir.y*dir.y)
     local mag = 3
     particle.new(player.x+player.l/2, player.y+player.w/2, player.z+player.h/2, dir.x/norm*mag, dir.y/norm*mag, 0, "blood")

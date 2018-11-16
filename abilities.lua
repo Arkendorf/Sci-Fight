@@ -288,8 +288,7 @@ press_func = function(player, index, target)
   local speed = 15
   for k, v in pairs(players) do
     if k ~= index and collision.sphere_and_cube(bubble, v, push_radius) then
-      local x1, y1, z1 = v.x+v.l/2, v.y+v.w/2, v.z+v.h/2
-      local l_x, l_y, l_z = x1-bubble.x, y1-bubble.y, z1-bubble.z
+      local l_x, l_y, l_z = v.x-player.x, v.y-player.y, v.z-player.z
       v.xV = v.xV*0.1 + math.cos(math.atan2(math.sqrt(l_y*l_y+l_z*l_z), l_x))*speed
       v.yV = v.yV*0.1 + math.cos(math.atan2(math.sqrt(l_z*l_z+l_x*l_x), l_y))*speed
       v.zV = v.zV*0.1 + math.cos(math.atan2(math.sqrt(l_x*l_x+l_y*l_y), l_z))*speed
@@ -301,7 +300,7 @@ particle_func = function(player, index, target)
   local dir = game.target_norm(player, target)
   particle.new(player.x+player.l/2, player.y+player.w/2, player.z+player.h/2, dir.x*7, dir.y*7, dir.z*7, "push", player)
 end,
-delay = 6,
+delay = 0,
 energy = 15,
 name = "Push",
 desc = "Shove other players backwards",
