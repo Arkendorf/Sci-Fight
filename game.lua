@@ -31,11 +31,9 @@ end
 game.start = function()
   char.start()
 
-  targets = players
   if mode == "pve" then
     pathfind.start()
     enemy.start()
-    targets = enemies
   end
 
   gui.clear()
@@ -46,14 +44,12 @@ end
 game.update = function(dt)
   -- normal updates
   char.update(dt)
-  enemy.update(dt)
   bullet.update(dt)
   particle.update(dt)
   hud.update(dt)
   -- create drawing queue
   queue = {}
   char.queue()
-  enemy.queue()
   bullet.queue()
   particle.queue()
 
@@ -87,9 +83,6 @@ game.draw = function()
   love.graphics.pop()
   -- draw hud
   hud.draw()
-  if enemies[1].path then
-    love.graphics.print(#enemies[1].path, 100, 0)
-  end
 end
 
 game.mousepressed = function(x, y, button)

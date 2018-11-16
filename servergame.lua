@@ -66,9 +66,6 @@ servergame.update = function(dt)
   -- server specific stuff
   -- update players
   char.serverupdate(dt)
-  if mode == "pve" then
-    enemy.serverupdate(dt)
-  end
   -- update bullets
   bullet.serverupdate(dt)
 

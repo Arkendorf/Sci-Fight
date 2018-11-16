@@ -56,7 +56,7 @@ char.input = function(dt)
   -- target
   local m_x, m_y = game.mouse_pos()
   local current = {k = nil, dist = target_range}
-  for k, v in pairs(targets) do
+  for k, v in pairs(players) do
     if k ~= id and char.damageable(k, id) then
       local x = v.x+v.l/2
       local y = v.y+v.z+v.w
@@ -67,7 +67,7 @@ char.input = function(dt)
   end
   local target = players[id].target
   if current.k then
-    local v = targets[current.k]
+    local v = players[current.k]
     players[id].target.dX, target.dY, target.dZ = v.x+v.l/2, v.y+v.w/2, v.z+v.h/2
     -- animate target
     if players[id].target.frame < 4 then
@@ -176,6 +176,9 @@ end
 
 char.serverupdate = function(dt)
   for k, v in pairs(players) do
+    if v.ai then
+      enemy.ai_melee(k, v, dt)
+    end
     server:sendToAll("pos", {index = k, pos = {x = v.x, y = v.y, z = v.z, xV = v.xV, yV = v.yV, zV = v.zV}})
     if v.inv <= 0 and v.tile_damage then -- damaging tiles
       local num = v.hp - 25
@@ -268,7 +271,7 @@ end
 char.new = function(name, loadout, team)
   local item = {name = name, x = #grid[1][1]*tile_size*0.5-12, y = #grid[1]*tile_size*0.5-12, z = -24, l = 24, w = 24, h = 24, xV = 0, yV = 0, zV = 0,
                 speed = .5, hp = hp_max, energy = energy_max, score = 0, jump = false, inv = 0, team = team, killer = false, target = {x = 0, y = 0, z = 0, frame = 1},
-                anim = "run", frame = 1, skin = loadout.skin}
+                anim = "run", frame = 1, skin = loadout.skin, ai = false}
   item.weapon = {type = loadout.weapon, active = false, anim = "base", frame = 1, speed = 0}
   item.abilities = {}
   for i, v in ipairs(loadout.abilities) do
@@ -278,7 +281,7 @@ char.new = function(name, loadout, team)
 end
 
 char.damageable = function(k, l)
-  return (k ~= l and targets[k].inv <= 0 and (targets[k].team <= 0 or targets[k].team ~= players[l].team))
+  return (k ~= l and players[k].inv <= 0 and (players[k].team <= 0 or players[k].team ~= players[l].team))
 end
 
 char.queue = function()

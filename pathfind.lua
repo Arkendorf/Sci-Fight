@@ -17,26 +17,26 @@ pathfind.draw = function()
   --   end
   -- end
 
-  if enemies[1].path then
-    local path = enemies[1].path
-    for i, v in ipairs(path) do
-      if i < #path then
-        love.graphics.setColor(1-(v.z-1)*.1, 1-(v.z-1)*.1, 0)
-        if path[i+1].action == "walk" then
-          love.graphics.setLineWidth(1)
-        elseif path[i+1].action == "jump" then
-          love.graphics.setLineWidth(5)
-        elseif path[i+1].action == "fall" then
-          love.graphics.setLineWidth(10)
-        else
-          love.graphics.setLineWidth(2)
-        end
-        love.graphics.line((v.x-1)*tile_size, (v.y+v.z-2)*tile_size, (path[i+1].x-1)*tile_size, (path[i+1].y+path[i+1].z-2)*tile_size)
-      end
-    end
-    love.graphics.setLineWidth(2)
-    love.graphics.setColor(1, 1, 1)
-  end
+  -- if enemies[1].path then
+  --   local path = enemies[1].path
+  --   for i, v in ipairs(path) do
+  --     if i < #path then
+  --       love.graphics.setColor(1-(v.z-1)*.1, 1-(v.z-1)*.1, 0)
+  --       if path[i+1].action == "walk" then
+  --         love.graphics.setLineWidth(1)
+  --       elseif path[i+1].action == "jump" then
+  --         love.graphics.setLineWidth(5)
+  --       elseif path[i+1].action == "fall" then
+  --         love.graphics.setLineWidth(10)
+  --       else
+  --         love.graphics.setLineWidth(2)
+  --       end
+  --       love.graphics.line((v.x-1)*tile_size, (v.y+v.z-2)*tile_size, (path[i+1].x-1)*tile_size, (path[i+1].y+path[i+1].z-2)*tile_size)
+  --     end
+  --   end
+  --   love.graphics.setLineWidth(2)
+  --   love.graphics.setColor(1, 1, 1)
+  -- end
 end
 
 pathfind.make_nodes = function()
