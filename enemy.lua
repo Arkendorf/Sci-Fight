@@ -14,7 +14,7 @@ end
 
 enemy.new = function(loadout)
   local item = {name = "enemy", x = #grid[1][1]*tile_size*0.5-12, y = #grid[1]*tile_size*0.5-12, z = -24, l = 24, w = 24, h = 24, xV = 0, yV = 0, zV = 0,
-                speed = .4, hp = 100, energy = 100, score = 0, jump = false, inv = 0, team = 0, killer = false, target = {x = 0, y = 0, z = 0, frame = 1},
+                speed = .4, hp = 100, energy = 100, score = 0, deaths = 0, jump = false, inv = 0, team = 0, killer = false, target = {x = 0, y = 0, z = 0, frame = 1},
                 anim = "run", frame = 1, skin = loadout.skin, ai = true, delay = 0}
   item.weapon = {type = loadout.weapon, active = false, anim = "base", frame = 1, speed = 0}
   item.abilities = {}

@@ -57,6 +57,8 @@ graphics.load = function()
   target_quad = graphics.load_quad(target_img, 32, 32)
 
   logo_img = love.graphics.newImage("art/gui/logo.png")
+  
+  charborder_img = love.graphics.newImage("art/gui/charborder.png")
 
   shadow_color = {86/255, 81/255, 104/255}
 end

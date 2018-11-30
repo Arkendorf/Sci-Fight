@@ -4,6 +4,7 @@ servermenu = require "servermenu"
 local menu = {}
 
 team_colors = {
+  [0] = {1, 1, 1},
   {1, 0, 0},
   {0, 0, 1},
   {0, 1, 0},
@@ -28,7 +29,7 @@ end
 menu.start = function()
   players = {}
   id = 0
-  
+
   menu.mode = 1
   menu.start_gui()
 end

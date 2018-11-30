@@ -34,6 +34,8 @@ game.start = function()
   if mode == "pve" then
     pathfind.start()
     enemy.start()
+    wave = 0
+    -- enemy.new_wave()
   end
 
   gui.clear()
@@ -77,8 +79,9 @@ game.draw = function()
   -- draw objects
   game.draw_queue()
   -- target
+  love.graphics.setColor(team_colors[players[id].team])
   love.graphics.draw(target_img, target_quad[math.floor(players[id].target.frame)], players[id].target.x, players[id].target.y+players[id].target.z, 0, 1, 1, 16, 16)
-  -- love.graphics.draw(layer_mask)
+  love.graphics.setColor(0, 0, 0)
 
   love.graphics.pop()
   -- draw hud
