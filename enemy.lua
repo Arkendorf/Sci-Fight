@@ -3,7 +3,7 @@ local enemy = {}
 local target_speed = 24
 
 enemy.start = function()
-  players[#players+1] = enemy.new({skin = 1, weapon = 1, abilities = {1}})
+  players[#players+1] = enemy.new({skin = 9, weapon = 1, abilities = {1}})
 
   for k, v in pairs(players) do
     if not v.canvas then
@@ -15,7 +15,7 @@ end
 enemy.new = function(loadout)
   local item = {name = "enemy", x = #grid[1][1]*tile_size*0.5-12, y = #grid[1]*tile_size*0.5-12, z = -24, l = 24, w = 24, h = 24, xV = 0, yV = 0, zV = 0,
                 speed = .4, hp = 100, energy = 100, score = 0, jump = false, inv = 0, team = 0, killer = false, target = {x = 0, y = 0, z = 0, frame = 1},
-                anim = "run", frame = 1, skin = loadout.skin, ai = true}
+                anim = "run", frame = 1, skin = loadout.skin, ai = true, delay = 0}
   item.weapon = {type = loadout.weapon, active = false, anim = "base", frame = 1, speed = 0}
   item.abilities = {}
   for i, v in ipairs(loadout.abilities) do
@@ -27,7 +27,7 @@ end
 enemy.ai_melee = function(k, v, dt)
   local current = {dist = math.huge, index = 0}
   for l, w in pairs(players) do
-    if not v.ai then
+    if not w.ai then
       local dist = pathfind.dist(v, w)
       if dist < current.dist then
         current.dist = dist
@@ -39,8 +39,16 @@ enemy.ai_melee = function(k, v, dt)
   enemy.target_player(k, v, player, dt)
 
   if current.dist < tile_size then -- attack
-  elseif enemy.new_path(v, player) then -- create new path
-    v.path = pathfind.astar(enemy.to_node(v), enemy.to_node(player))
+    -- servergame.use_ability(7, k)
+  elseif v.delay <= 0 then -- create new path
+    if enemy.new_path(v, player) then
+      v.path = pathfind.astar(enemy.to_node(v), enemy.to_node(player))
+      if #v.path < 0 then
+        v.delay = 1
+      end
+    end
+  elseif v.delay > 0 then
+    v.delay = v.delay - dt
   end
   enemy.follow_path(v)
 end

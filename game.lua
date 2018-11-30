@@ -88,10 +88,10 @@ end
 game.mousepressed = function(x, y, button)
 end
 
-game.abilities = function(mode, button, func)
+game.abilities = function(mode, button, func, k)
   for i, v in ipairs(ability_keys) do
     if v[1] == mode and button == v[2] then
-      func(i)
+      func(i, k)
     end
   end
 end

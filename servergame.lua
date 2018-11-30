@@ -83,7 +83,7 @@ servergame.draw = function()
 end
 
 servergame.mousepressed = function(x, y, button)
-  game.abilities("button", button, servergame.use_ability)
+  game.abilities("button", button, servergame.use_ability, id)
 
   if other_keys[6][1] == "button" and button == other_keys[6][2] then
     menu_active[1] = not menu_active[1]
@@ -95,7 +95,7 @@ servergame.mousereleased = function(x, y, button)
 end
 
 servergame.keypressed = function(key)
-  game.abilities("key", key, servergame.use_ability)
+  game.abilities("key", key, servergame.use_ability, id)
 
   if other_keys[6][1] == "key" and key == other_keys[6][2] then
     menu_active[1] = not menu_active[1]
@@ -106,10 +106,10 @@ servergame.keyreleased = function(key)
   game.abilities("key", key, servergame.stop_ability)
 end
 
-servergame.use_ability = function(num)
-  if char.use_ability(players[id], id, players[id].target, num) then
-    local ability = players[id].abilities[num]
-    server:sendToAll("ability_start", {index = id, num = num, delay = ability.delay, active = ability.active, energy = players[id].energy})
+servergame.use_ability = function(num, k)
+  if char.use_ability(players[k], k, players[k].target, num) then
+    local ability = players[k].abilities[num]
+    server:sendToAll("ability_start", {index = k, num = num, delay = ability.delay, active = ability.active, energy = players[k].energy})
   end
 end
 

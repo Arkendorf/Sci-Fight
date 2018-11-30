@@ -300,7 +300,7 @@ particle_func = function(player, index, target)
   local dir = game.target_norm(player, target)
   particle.new(player.x+player.l/2, player.y+player.w/2, player.z+player.h/2, dir.x*7, dir.y*7, dir.z*7, "push", player)
 end,
-delay = 0,
+delay = 6,
 energy = 15,
 name = "Push",
 desc = "Shove other players backwards",

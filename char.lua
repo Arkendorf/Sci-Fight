@@ -17,7 +17,8 @@ skin_name = {
   "Master",
   "Dark Lord",
   "Knight I",
-  "Knight II"
+  "Knight II",
+  "Cyborg",
 }
 
 char.start = function()
@@ -178,6 +179,7 @@ char.serverupdate = function(dt)
   for k, v in pairs(players) do
     if v.ai then
       enemy.ai_melee(k, v, dt)
+      server:sendToAll("target", {index = k, target = v.target})
     end
     server:sendToAll("pos", {index = k, pos = {x = v.x, y = v.y, z = v.z, xV = v.xV, yV = v.yV, zV = v.zV}})
     if v.inv <= 0 and v.tile_damage then -- damaging tiles
