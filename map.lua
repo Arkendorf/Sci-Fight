@@ -63,17 +63,6 @@ map.floor_block = function(x, y, z)
   return false
 end
 
-map.vert_block = function(x, y, z)
-  if z > 2 then
-    for i = z-2, 1, -1 do
-      if grid[i][y][x] > 0 then
-        return true, i
-      end
-    end
-  end
-  return false
-end
-
 map.iterate = function(func)
   for z, _ in ipairs(grid) do
     for y, _ in ipairs(grid[1]) do

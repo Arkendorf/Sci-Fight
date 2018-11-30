@@ -171,29 +171,40 @@ char.update_char = function(k, v, dt)
   end
 
   if v.hp <= 0 then -- death
-    char.death(v)
+    char.death(v, i)
   end
 end
 
 char.serverupdate = function(dt)
   for k, v in pairs(players) do
     if v.ai then
-      enemy.ai_melee(k, v, dt)
-      server:sendToAll("target", {index = k, target = v.target})
+      if v.deaths > 0 then
+        players[k] = nil
+        server:sendToAll("enemy", {index = k, info = nil})
+        enemy_count = enemy_count - 1
+        if enemy_count <= 0 then
+          enemy.new_wave()
+        end
+      else
+        enemy.ai_melee(k, v, dt)
+        server:sendToAll("target", {index = k, target = v.target})
+      end
     end
-    server:sendToAll("pos", {index = k, pos = {x = v.x, y = v.y, z = v.z, xV = v.xV, yV = v.yV, zV = v.zV}})
-    if v.inv <= 0 and v.tile_damage then -- damaging tiles
-      local num = v.hp - 25
-      bullet.damage(v, num)
-      server:sendToAll("hit", {index = k, num = num})
-      v.tile_damage = false
-    end
-    if v.z > (#grid+tile_buffer)*tile_size then -- fall off reset
-      v.hp = 0
-      server:sendToAll("hp", {index = k, hp = 0})
-    end
-    if k ~= id then
-      game.update_abilities(servergame.update_client_ability, k, dt)
+    if v then
+      server:sendToAll("pos", {index = k, pos = {x = v.x, y = v.y, z = v.z, xV = v.xV, yV = v.yV, zV = v.zV}})
+      if v.inv <= 0 and v.tile_damage then -- damaging tiles
+        local num = v.hp - 25
+        bullet.damage(v, num)
+        server:sendToAll("hit", {index = k, num = num})
+        v.tile_damage = false
+      end
+      if v.z > (#grid+tile_buffer)*tile_size then -- fall off reset
+        v.hp = 0
+        server:sendToAll("hp", {index = k, hp = 0})
+      end
+      if k ~= id then
+        game.update_abilities(servergame.update_client_ability, k, dt)
+      end
     end
   end
 end
@@ -260,14 +271,14 @@ end
 
 char.death = function(player)
   player.deaths = player.deaths + 1
+  if player.killer then
+    players[player.killer].score = players[player.killer].score + 1
+  end
   player.hp = hp_max
   player.energy = energy_max
   player.x = #grid[1][1]*tile_size*0.5-player.l/2
   player.y = #grid[1]*tile_size*0.5-player.w/2
   player.z = -player.h
-  if player.killer then
-    players[player.killer].score = players[player.killer].score + 1
-  end
   player.inv = death_inv
 end
 

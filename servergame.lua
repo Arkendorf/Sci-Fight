@@ -29,7 +29,7 @@ local server_hooks = {
   end,
 }
 
-local win_score = 3
+local win_score = 99
 
 local menu_active = {false}
 
@@ -42,6 +42,10 @@ servergame.start = function(port)
   game.start()
   servergame.start_gui()
   menu_active[1] = false
+
+  if mode == "pve" then
+    enemy.new_wave()
+  end
 end
 
 servergame.start_gui = function()
@@ -62,7 +66,6 @@ servergame.update = function(dt)
   game.update_abilities(servergame.update_ability, id, dt)
   -- game updating
   game.update(dt)
-
   -- server specific stuff
   -- update players
   char.serverupdate(dt)

@@ -35,7 +35,6 @@ game.start = function()
     pathfind.start()
     enemy.start()
     wave = 0
-    -- enemy.new_wave()
   end
 
   gui.clear()
@@ -100,9 +99,11 @@ game.abilities = function(mode, button, func, k)
 end
 
 game.update_abilities = function(func, k, dt)
-  for i, v in ipairs(players[k].abilities) do
-    if v.active then
-      func(i, k, dt)
+  if players[k] then
+    for i, v in ipairs(players[k].abilities) do
+      if v.active then
+        func(i, k, dt)
+      end
     end
   end
 end

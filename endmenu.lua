@@ -21,7 +21,9 @@ end
 endmenu.start = function()
   scores = {}
   for k, v in pairs(players) do
-    scores[#scores+1] = {k = k, score = v.score}
+    if not v.ai then
+      scores[#scores+1] = {k = k, score = v.score}
+    end
   end
   table.sort(scores, function(a, b) return a.score > b.score end)
   for i, v in ipairs(scores) do

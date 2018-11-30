@@ -5,9 +5,11 @@ end
 
 local client_hooks = {
   pos = function(data)
-    players[data.index].x, players[data.index].y, players[data.index].z = data.pos.x, data.pos.y, data.pos.z
-    if data.index ~= id then
-      players[data.index].xV, players[data.index].yV, players[data.index].zV = data.pos.xV, data.pos.yV, data.pos.zV
+    if players[data.index] then
+      players[data.index].x, players[data.index].y, players[data.index].z = data.pos.x, data.pos.y, data.pos.z
+      if data.index ~= id then
+        players[data.index].xV, players[data.index].yV, players[data.index].zV = data.pos.xV, data.pos.yV, data.pos.zV
+      end
     end
   end,
   v = function(data)
@@ -69,10 +71,14 @@ local client_hooks = {
     wipe.start(clientgame.start_end)
   end,
   hp = function(data)
-    players[data.index].hp = data.hp
+    if players[data.index] then
+      players[data.index].hp = data.hp
+    end
   end,
   target = function(data)
-    players[data.index].target = data.target
+    if players[data.index] then
+      players[data.index].target = data.target
+    end
   end,
   weaponanim = function(data)
     char.weapon_anim(data.index, data.anim, data.speed)
@@ -80,6 +86,14 @@ local client_hooks = {
       players[data.index].weapon.frame = data.frame
     end
   end,
+  enemy = function(data)
+    if not data.info then
+      players[data.index] = nil
+    else
+      players[data.index] = data.info
+      players[data.index].canvas = love.graphics.newCanvas(88, 88)
+    end
+  end
 }
 
 local menu_active = {false}
